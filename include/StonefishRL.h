@@ -45,6 +45,7 @@ public:
         std::vector<float> torque; 
 
         std::vector<float> gps; // Indices: [0] latitude, [1] longitude, [2] North, [3] East
+        std::vector<std::string> collisions; //includes names of objects colliding with this one
     };
 
     // Holds all objects in the scene
@@ -53,6 +54,16 @@ public:
         std::vector<InfoObject> observations;
     };
 
+    struct RobotInfo 
+    {
+    std::string name;
+    unsigned int id;
+    sf::Robot* pointer; // Optional: store pointer if you need direct access
+    };
+
+    
+
+
     // Constructor
     StonefishRL(const std::string& path, double frequency);
 
@@ -60,7 +71,12 @@ public:
     std::string RecieveInstructions(sf::SimulationApp& simApp);
     
     void SendObservations();
-    
+
+    // detect collisions in the simulation
+    std::vector<std::string> RobotCollisionDetector(std::string& collision_robot); // checks collisions with a specific robot and returns list of objects colliding with it. 
+
+    bool CheckNameForCollision(std::string name, std::string name2, std::string& collision_robot);
+
     void ApplyCommands(const std::string& str_cmds);
     
     StateScene GetStateScene();
@@ -80,6 +96,11 @@ public:
     void FillWithNanInfoObject(InfoObject& pose);
 
     void PrintAll();
+
+    // saving robot and other items names
+    const std::vector<std::string>& getRobotNames() const { return robotNames; }
+    const std::vector<std::string>& getSensorNames() const { return sensorNames; }
+    const std::vector<std::string>& getActuatorNames() const { return actuatorNames; }
 
     // Convert to JSON to send to Python
     std::string InfoObjectToJson(const InfoObject& pose); 
@@ -102,6 +123,11 @@ private:
     std::map<std::string, std::map<std::string, float>> commands_; // Values to apply to actuators
     StateScene current_state_; // Represents the latest observed state of the environment
     
+    //storage members
+    std::vector<std::string> robotNames;
+    std::vector<std::string> sensorNames;
+    std::vector<std::string> actuatorNames;
+
     zmq::context_t context; // ZeroMQ context
     zmq::socket_t socket;   // ZeroMQ socket
 };

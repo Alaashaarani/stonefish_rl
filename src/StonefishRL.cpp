@@ -28,6 +28,7 @@
 #include <Stonefish/actuators/Thruster.h>
 #include <Stonefish/actuators/LinkActuator.h>
 #include <Stonefish/actuators/JointActuator.h>
+#include <Stonefish/entities/FeatherstoneEntity.h>
 
 #include <Stonefish/core/Robot.h>
 
@@ -39,6 +40,8 @@
 #include <Stonefish/StonefishCommon.h>
 
 #include <SDL2/SDL.h>
+
+
 
 // Constructor of the StonefishRL class
 StonefishRL::StonefishRL(const std::string &path, double frequency)
@@ -99,6 +102,8 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp)
 void StonefishRL::SendObservations()
 {
     StateScene scalar_observations = GetStateScene();
+
+    std::cout << "collision from state scene " << scalar_observations.observations[0].collisions.size() << std::endl;
     //PrintAll();
     // Convert observations to string
     std::string obs_str_json = SerializeScene(scalar_observations.observations);
@@ -203,36 +208,95 @@ void StonefishRL::BuildScenario()
         return;
     }
 
+    // Clear previous data
+    robotNames.clear();
+    sensorNames.clear();
+    actuatorNames.clear();
+
+    // Store sensors
     sf::Sensor *sensor_ptr;
     unsigned int sensor_id = 0;
-    bool item_found = false;
-
     while ((sensor_ptr = getSensor(sensor_id++)) != nullptr)
     {
-      item_found = true;
+        sensorNames.push_back(sensor_ptr->getName());
     }
-    if (!item_found) std::cout << "[WARN] No sensors registered in this scenario!" << std::endl;
+    if (sensorNames.empty()) {
+        std::cout << "[WARN] No sensors registered in this scenario!" << std::endl;
+    }
 
+    // Store actuators
     sf::Actuator *actuator_ptr;
     unsigned int actuator_id = 0;
-    item_found = false;
     while ((actuator_ptr = getActuator(actuator_id++)) != nullptr)
     {
-        item_found = true;
+        actuatorNames.push_back(actuator_ptr->getName());
     }
-    if (!item_found) std::cout << "[WARN] No actuators registered in this scenario!" << std::endl;
+    if (actuatorNames.empty()) {
+        std::cout << "[WARN] No actuators registered in this scenario!" << std::endl;
+    }
 
+    // Store robots
     sf::Robot *robot_ptr;
     unsigned int robot_id = 0;
-    item_found = false;
     while ((robot_ptr = getRobot(robot_id++)) != nullptr)
     {
-        item_found = true;
+        robotNames.push_back(robot_ptr->getName());
     }
-    if (!item_found) std::cout << "[WARN] No robots registered in this scenario!" << std::endl;
+    if (robotNames.empty()) {
+        std::cout << "[WARN] No robots registered in this scenario!" << std::endl;
+    }
 
-    std::cout << "[INFO] Scenario loaded succesfully.\n";
+    std::cout << "[INFO] Scenario loaded successfully. Found: " 
+              << robotNames.size() << " robots, "
+              << sensorNames.size() << " sensors, "
+              << actuatorNames.size() << " actuators\n";
 }
+
+// void StonefishRL::BuildScenario()
+// {
+//     std::cout << "[INFO] Building scenario from: " << scenePath << std::endl;
+//     sf::ScenarioParser parser(this);
+
+//     if (!parser.Parse(scenePath))
+//     {
+//         std::cerr << "[ERROR] Error charging the scenario: " << scenePath << "\n";
+//         for (const auto &msg : parser.getLog())
+//         {
+//             std::cerr << "[ScenarioParser Log] " << msg.text << "\n";
+//         }
+//         return;
+//     }
+
+//     sf::Sensor *sensor_ptr;
+//     unsigned int sensor_id = 0;
+//     bool item_found = false;
+
+//     while ((sensor_ptr = getSensor(sensor_id++)) != nullptr)
+//     {
+//       item_found = true;
+//     }
+//     if (!item_found) std::cout << "[WARN] No sensors registered in this scenario!" << std::endl;
+
+//     sf::Actuator *actuator_ptr;
+//     unsigned int actuator_id = 0;
+//     item_found = false;
+//     while ((actuator_ptr = getActuator(actuator_id++)) != nullptr)
+//     {
+//         item_found = true;
+//     }
+//     if (!item_found) std::cout << "[WARN] No actuators registered in this scenario!" << std::endl;
+
+//     sf::Robot *robot_ptr;
+//     unsigned int robot_id = 0;
+//     item_found = false;
+//     while ((robot_ptr = getRobot(robot_id++)) != nullptr)
+//     {
+//         item_found = true;
+//     }
+//     if (!item_found) std::cout << "[WARN] No robots registered in this scenario!" << std::endl;
+
+//     std::cout << "[INFO] Scenario loaded succesfully.\n";
+// }
 
 
 StonefishRL::StateScene StonefishRL::GetStateScene()
@@ -262,7 +326,11 @@ StonefishRL::StateScene StonefishRL::GetStateScene()
             obs.rotation[0] = rollX;
             obs.rotation[1] = pitchY;
             obs.rotation[2] = yawZ;
-
+            
+            obs.collisions = RobotCollisionDetector(robot_name); 
+            // if( obs.collisions.size() > 0 ){
+            //     std::cout << "collisions" << obs.collisions[0] << std::endl;
+            // }
             state.observations.push_back(obs);
         } 
     }
@@ -406,6 +474,7 @@ StonefishRL::StateScene StonefishRL::GetStateScene()
             }
         }
     }
+    
     current_state_ = state;
     return state;
 }
@@ -494,10 +563,78 @@ std::vector<StonefishRL::InfoObject> StonefishRL::ParseResetCommand(const std::s
         result.push_back(obj);
         pos = end + 1;
     }
-
+    
     return result;
 }
 
+
+std::vector<std::string> StonefishRL::RobotCollisionDetector(std::string& collision_robot)
+{
+    sf::Entity* entA;
+    sf::Entity* entB; 
+    std::vector<std::string> collision_list;
+    int i=0;
+    if  (collision_robot.find("girona") == std::string::npos) {
+        return collision_list; // only check collisions for the girona robot
+    }
+    // std::cout << "Checking for collisions..." << std::endl;
+
+    btDispatcher* dispatcher = getDynamicsWorld()->getDispatcher();
+    int numManifolds = dispatcher->getNumManifolds();
+
+    for(int i=0; i<numManifolds; ++i)
+        {
+            btPersistentManifold* contactManifold = dispatcher->getManifoldByIndexInternal(i);
+            if(contactManifold->getNumContacts() == 0)
+                continue;
+
+            btCollisionObject* coA = (btCollisionObject*)contactManifold->getBody0();
+            btCollisionObject* coB = (btCollisionObject*)contactManifold->getBody1();
+            entA = (sf::Entity*)coA->getUserPointer();
+            entB = (sf::Entity*)coB->getUserPointer();
+        
+            if (CheckNameForCollision(entA->getName(), entB->getName(), collision_robot))
+            {   
+                std::string collision_info = entA->getName() +"AND"+ entB->getName();
+                collision_list.push_back(collision_info);
+            }
+        };
+
+        // std::cout << "Collisions detected with: ";
+        // for (const auto& name : collision_list)
+        // {
+        //     std::cout << name << " ";
+        // }
+        // std::cout << collision_list.size() << std::endl;
+
+    return collision_list;
+}
+
+
+bool StonefishRL::CheckNameForCollision(std::string name, std::string name2, std::string& collision_robot)
+{
+    std::string obj1, obj2;
+    std::vector<std::string> collision_target = {"Tank"}; // we will add the parts of the docking station later     
+    // Extract robot names from both input strings
+    
+    if (name.find(collision_robot) != std::string::npos) {
+        obj1 = name;
+        // std::cout << "Collision with target detected: " << name << std::endl;
+    }
+
+    for (const auto& part : collision_target)
+    {
+        
+        if (name2.find(part) != std::string::npos) {
+                obj2 = name2;
+                // std::cout << "Collision with target detected: " << name2 << std::endl;
+
+            }
+    }
+    // check if the robot is coliding with the tank
+    // Check if we found two DIFFERENT robots
+    return (!obj1.empty() && !obj2.empty() && obj1 != obj2);
+}
 
 void StonefishRL::ParseCommandsAndObservations(const std::string& str)
 {
@@ -659,6 +796,7 @@ std::string StonefishRL::InfoObjectToJson(const InfoObject& obj)
         << SafeFloat(obj.gps[1]) << ", "
         << SafeFloat(obj.gps[2]) << ", "
         << SafeFloat(obj.gps[3]) << "] "
+        
         << "}";
 
     return oss.str();
@@ -707,7 +845,8 @@ void StonefishRL::FillWithNanInfoObject(InfoObject& obj)
     obj.force.resize(3, NAN);
     obj.torque.resize(3, NAN);
 
-    obj.gps.resize(4, NAN); // Pos: [0] latitude, [1] longitude, [2] North, [3] East
+    obj.gps.resize(4, NAN);// Pos: [0] latitude, [1] longitude, [2] North, [3] East
+    obj.collisions.resize(5,""); // Just initialize with empty strings
 }
 
 

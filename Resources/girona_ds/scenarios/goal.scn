@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<scenario>
+<static name="goal" type="model">
+		<physical>
+			<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/Goal.obj" scale="1.0" convex="true"/>
+			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+		</physical>
+		<visual>
+			<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/Goal.obj" scale="1.0"/>
+			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+		</visual>
+		<material name="Aluminium"/>
+		<look name="black"/>
+		<world_transform rpy="0.0 0.0 ${-pi/2}" xyz="-5.5 0.0 5.2"/>
+	</static>
+
+</scenario>

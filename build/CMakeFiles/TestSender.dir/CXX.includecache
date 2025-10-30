@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/Sender.h
+zmq.hpp
+-
+string
+-
+vector
+-
+
+/home/cirs_alaa/repositories/stonefish_rl/src/Sender.cpp
+Sender.h
+/home/cirs_alaa/repositories/stonefish_rl/src/Sender.h
+iostream
+-
+sstream
+-
+windows.h
+-
+unistd.h
+-
+
+/home/cirs_alaa/repositories/stonefish_rl/src/test_sender.cpp
+Sender.h
+/home/cirs_alaa/repositories/stonefish_rl/src/Sender.h
+iostream
+-
+vector
+-
+windows.h
+-
+unistd.h
+-
+

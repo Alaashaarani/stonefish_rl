@@ -39,7 +39,6 @@ int learning(void* data) {
 
     // Start the simulation (includes building the scenario)
     simApp.StartSimulation();
-    int contador = 0;
     std::string nextStepSim;
 
     while(nextStepSim != "EXIT")
@@ -48,33 +47,23 @@ int learning(void* data) {
         
         float time0 = simManager->getSimulationTime();
 
+        // TODO: l'StepSimulation va a 1000 Hz mentre que els agents van a 5-20Hz
+        // si cada vegada que enviem un StepSimulation fem un SendObservations
+        // es mooolt lent!
         if(nextStepSim == "CMD")
         {
             simApp.StepSimulation();
-            if(nextStepSim == "CMD"){
-                myManager->SendObservations();
-                contador++;
-            }
+            myManager->SendObservations();
         }
         else if (nextStepSim == "RESET"){
             simApp.StepSimulation();
-            
-            contador = 0;
         }
        
-        //std::this_thread::sleep_for(std::chrono::milliseconds(115)); // Si el treiem (comentem aquesta linea) va tremendament ràpid.
-                                                                     // Si el posem a 1, va una mica ràpid, però acceptable.
-                                                                     // Si el deixem a 10, potser és un xic lent, però veus bé les trajectories que fa.
-        //float time1 = simManager->getSimulationTime();
-        
-        //float delta_time = time1 - time0;
-        //float steps_per_second = 1.0 / delta_time;
-        
-        //std::cout << "[INFO] Delta Time = " << delta_time << " segons" << std::endl;
-        //std::cout << "[INFO] Steps per second: " << steps_per_second << std::endl;
+        //std::this_thread::sleep_for(std::chrono::milliseconds(1));   // Si el treiem (comentem aquesta linea) va el màxim de ràpid.
+                                                                     // Si el posem a 1, va approx. a real-time                                                                     
     }
 
-    std::cout << "[INFO] Learning thread finished after " << contador << " steps." << std::endl;
+    std::cout << "[INFO] Learning thread finished." << std::endl;
     myManager->ExitRequest();
     return 0;
 }
@@ -96,12 +85,12 @@ int main(int argc, char **argv) {
     r.windowW = 1200;
     r.windowH = 900;
     
-    StonefishRL* simManager = new StonefishRL(scene_path, frequency);
+    StonefishRL* simManager = new StonefishRL(scene_path, frequency); // Create the StonefishRL simulation manager
 
     sf::GraphicalSimulationApp app("DEMO STONEFISH RL", scene_path, r, h, simManager);
     //sf::ConsoleSimulationApp app("DEMO STONEFISH RL", scene_path, simManager);
 
-    LearningThreadData data {app};
+    LearningThreadData data {app}; // is a struct that holds a reference to the sim app
     SDL_Thread* learningThread = SDL_CreateThread(learning, "learningThread", &data);
 
     app.Run(false, false, sf::Scalar(1/frequency));

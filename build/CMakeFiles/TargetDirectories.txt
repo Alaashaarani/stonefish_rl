@@ -1,0 +1,4 @@
+/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles/edit_cache.dir
+/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles/TestSender.dir
+/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles/rebuild_cache.dir
+/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles/StonefishRLTest.dir

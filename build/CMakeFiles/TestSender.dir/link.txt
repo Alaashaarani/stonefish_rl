@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/TestSender.dir/src/test_sender.cpp.o CMakeFiles/TestSender.dir/src/Sender.cpp.o  -o TestSender  -lzmq 

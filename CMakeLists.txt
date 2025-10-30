@@ -14,13 +14,15 @@ include_directories(
     ${ZMQ_INCLUDE_DIRS}
 )
 
-add_executable(StonefishRLTest 
-   src/main.cpp
-   src/StonefishRL.cpp
-)
+
+add_executable(StonefishRLTest src/main.cpp src/StonefishRL.cpp)
+add_executable(TestSender src/test_sender.cpp src/Sender.cpp)
 
 # Link with Stonefish library
 target_link_libraries(StonefishRLTest
     Stonefish::Stonefish
+    ${ZMQ_LIBRARIES}
+)
+target_link_libraries(TestSender
     ${ZMQ_LIBRARIES}
 )
