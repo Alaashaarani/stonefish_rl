@@ -17,6 +17,7 @@
 #include <Stonefish/sensors/Sensor.h> 
 
 #include <zmq.hpp> // Per la comunicació amb Python
+#include <Sender.h>
 
 class StonefishRL : public sf::SimulationManager {
 public:
@@ -123,6 +124,8 @@ private:
     std::map<std::string, std::map<std::string, float>> commands_; // Values to apply to actuators
     StateScene current_state_; // Represents the latest observed state of the environment
     
+    Sender sender;
+
     //storage members
     std::vector<std::string> robotNames;
     std::vector<std::string> sensorNames;

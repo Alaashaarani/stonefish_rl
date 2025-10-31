@@ -136,6 +136,60 @@ StonefishRLTest/fast:
 	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/build
 .PHONY : StonefishRLTest/fast
 
+executables/main.o: executables/main.cpp.o
+
+.PHONY : executables/main.o
+
+# target to build an object file
+executables/main.cpp.o:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/executables/main.cpp.o
+.PHONY : executables/main.cpp.o
+
+executables/main.i: executables/main.cpp.i
+
+.PHONY : executables/main.i
+
+# target to preprocess a source file
+executables/main.cpp.i:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/executables/main.cpp.i
+.PHONY : executables/main.cpp.i
+
+executables/main.s: executables/main.cpp.s
+
+.PHONY : executables/main.s
+
+# target to generate assembly for a file
+executables/main.cpp.s:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/executables/main.cpp.s
+.PHONY : executables/main.cpp.s
+
+executables/test_sender.o: executables/test_sender.cpp.o
+
+.PHONY : executables/test_sender.o
+
+# target to build an object file
+executables/test_sender.cpp.o:
+	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/executables/test_sender.cpp.o
+.PHONY : executables/test_sender.cpp.o
+
+executables/test_sender.i: executables/test_sender.cpp.i
+
+.PHONY : executables/test_sender.i
+
+# target to preprocess a source file
+executables/test_sender.cpp.i:
+	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/executables/test_sender.cpp.i
+.PHONY : executables/test_sender.cpp.i
+
+executables/test_sender.s: executables/test_sender.cpp.s
+
+.PHONY : executables/test_sender.s
+
+# target to generate assembly for a file
+executables/test_sender.cpp.s:
+	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/executables/test_sender.cpp.s
+.PHONY : executables/test_sender.cpp.s
+
 src/Sender.o: src/Sender.cpp.o
 
 .PHONY : src/Sender.o
@@ -143,6 +197,7 @@ src/Sender.o: src/Sender.cpp.o
 # target to build an object file
 src/Sender.cpp.o:
 	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/Sender.cpp.o
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.o
 .PHONY : src/Sender.cpp.o
 
 src/Sender.i: src/Sender.cpp.i
@@ -152,6 +207,7 @@ src/Sender.i: src/Sender.cpp.i
 # target to preprocess a source file
 src/Sender.cpp.i:
 	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/Sender.cpp.i
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.i
 .PHONY : src/Sender.cpp.i
 
 src/Sender.s: src/Sender.cpp.s
@@ -161,6 +217,7 @@ src/Sender.s: src/Sender.cpp.s
 # target to generate assembly for a file
 src/Sender.cpp.s:
 	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/Sender.cpp.s
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.s
 .PHONY : src/Sender.cpp.s
 
 src/StonefishRL.o: src/StonefishRL.cpp.o
@@ -169,6 +226,7 @@ src/StonefishRL.o: src/StonefishRL.cpp.o
 
 # target to build an object file
 src/StonefishRL.cpp.o:
+	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/StonefishRL.cpp.o
 	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.o
 .PHONY : src/StonefishRL.cpp.o
 
@@ -178,6 +236,7 @@ src/StonefishRL.i: src/StonefishRL.cpp.i
 
 # target to preprocess a source file
 src/StonefishRL.cpp.i:
+	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/StonefishRL.cpp.i
 	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.i
 .PHONY : src/StonefishRL.cpp.i
 
@@ -187,62 +246,9 @@ src/StonefishRL.s: src/StonefishRL.cpp.s
 
 # target to generate assembly for a file
 src/StonefishRL.cpp.s:
+	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/StonefishRL.cpp.s
 	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.s
 .PHONY : src/StonefishRL.cpp.s
-
-src/main.o: src/main.cpp.o
-
-.PHONY : src/main.o
-
-# target to build an object file
-src/main.cpp.o:
-	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
-
-src/main.i: src/main.cpp.i
-
-.PHONY : src/main.i
-
-# target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
-
-src/main.s: src/main.cpp.s
-
-.PHONY : src/main.s
-
-# target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
-
-src/test_sender.o: src/test_sender.cpp.o
-
-.PHONY : src/test_sender.o
-
-# target to build an object file
-src/test_sender.cpp.o:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/test_sender.cpp.o
-.PHONY : src/test_sender.cpp.o
-
-src/test_sender.i: src/test_sender.cpp.i
-
-.PHONY : src/test_sender.i
-
-# target to preprocess a source file
-src/test_sender.cpp.i:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/test_sender.cpp.i
-.PHONY : src/test_sender.cpp.i
-
-src/test_sender.s: src/test_sender.cpp.s
-
-.PHONY : src/test_sender.s
-
-# target to generate assembly for a file
-src/test_sender.cpp.s:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/test_sender.cpp.s
-.PHONY : src/test_sender.cpp.s
 
 # Help Target
 help:
@@ -254,18 +260,18 @@ help:
 	@echo "... TestSender"
 	@echo "... rebuild_cache"
 	@echo "... StonefishRLTest"
+	@echo "... executables/main.o"
+	@echo "... executables/main.i"
+	@echo "... executables/main.s"
+	@echo "... executables/test_sender.o"
+	@echo "... executables/test_sender.i"
+	@echo "... executables/test_sender.s"
 	@echo "... src/Sender.o"
 	@echo "... src/Sender.i"
 	@echo "... src/Sender.s"
 	@echo "... src/StonefishRL.o"
 	@echo "... src/StonefishRL.i"
 	@echo "... src/StonefishRL.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
-	@echo "... src/test_sender.o"
-	@echo "... src/test_sender.i"
-	@echo "... src/test_sender.s"
 .PHONY : help
 
 

@@ -38,6 +38,7 @@
 #include <Stonefish/core/SimulationApp.h>
 #include <Stonefish/core/ScenarioParser.h> // To load the XML file
 #include <Stonefish/StonefishCommon.h>
+#include <Sender.h>
 
 #include <SDL2/SDL.h>
 
@@ -50,8 +51,9 @@ StonefishRL::StonefishRL(const std::string &path, double frequency)
       context(1),                            // Initialize ZeroMQ context with 1 thread
       socket(context, zmq::socket_type::rep) // Create a REP socket
 {
-    InitializeZMQ();
-}
+    // InitializeZMQ();
+    Sender sender("tcp://*:5556");
+    }
 
 
 std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp)
@@ -107,7 +109,10 @@ void StonefishRL::SendObservations()
     //PrintAll();
     // Convert observations to string
     std::string obs_str_json = SerializeScene(scalar_observations.observations);
-    
+    std::string title= "observations";
+
+    // sender.send(title, obs_str_json, 1);
+
     this->socket.send(zmq::buffer(obs_str_json), zmq::send_flags::none);
 }
 

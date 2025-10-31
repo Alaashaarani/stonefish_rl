@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/StonefishRLTest.dir/executables/main.cpp.o"
+  "CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.o"
   "CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.o"
-  "CMakeFiles/StonefishRLTest.dir/src/main.cpp.o"
   "StonefishRLTest"
   "StonefishRLTest.pdb"
 )

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_FLAGS =   -std=gnu++17
 
-CXX_DEFINES = 
+CXX_DEFINES = -DBT_EULER_DEFAULT_ZYX -DBT_USE_DOUBLE_PRECISION -DSHADER_DIR_PATH=\"/usr/local/share/Stonefish/shaders/\"
 
-CXX_INCLUDES = -I/home/cirs_alaa/repositories/stonefish_rl/include -I/usr/include/pgm-5.2 
+CXX_INCLUDES = -I/home/cirs_alaa/repositories/stonefish_rl/include -I/home/cirs_alaa/repositories/stonefish_rl/src -I/usr/include/pgm-5.2 -isystem /usr/local/include/Stonefish 
 

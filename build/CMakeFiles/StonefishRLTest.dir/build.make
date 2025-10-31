@@ -57,22 +57,35 @@ include CMakeFiles/StonefishRLTest.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/StonefishRLTest.dir/flags.make
 
-CMakeFiles/StonefishRLTest.dir/src/main.cpp.o: CMakeFiles/StonefishRLTest.dir/flags.make
-CMakeFiles/StonefishRLTest.dir/src/main.cpp.o: ../src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/StonefishRLTest.dir/src/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/StonefishRLTest.dir/src/main.cpp.o -c /home/cirs_alaa/repositories/stonefish_rl/src/main.cpp
+CMakeFiles/StonefishRLTest.dir/executables/main.cpp.o: CMakeFiles/StonefishRLTest.dir/flags.make
+CMakeFiles/StonefishRLTest.dir/executables/main.cpp.o: ../executables/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/StonefishRLTest.dir/executables/main.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/StonefishRLTest.dir/executables/main.cpp.o -c /home/cirs_alaa/repositories/stonefish_rl/executables/main.cpp
 
-CMakeFiles/StonefishRLTest.dir/src/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/StonefishRLTest.dir/src/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/cirs_alaa/repositories/stonefish_rl/src/main.cpp > CMakeFiles/StonefishRLTest.dir/src/main.cpp.i
+CMakeFiles/StonefishRLTest.dir/executables/main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/StonefishRLTest.dir/executables/main.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/cirs_alaa/repositories/stonefish_rl/executables/main.cpp > CMakeFiles/StonefishRLTest.dir/executables/main.cpp.i
 
-CMakeFiles/StonefishRLTest.dir/src/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/StonefishRLTest.dir/src/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cirs_alaa/repositories/stonefish_rl/src/main.cpp -o CMakeFiles/StonefishRLTest.dir/src/main.cpp.s
+CMakeFiles/StonefishRLTest.dir/executables/main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/StonefishRLTest.dir/executables/main.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cirs_alaa/repositories/stonefish_rl/executables/main.cpp -o CMakeFiles/StonefishRLTest.dir/executables/main.cpp.s
+
+CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.o: CMakeFiles/StonefishRLTest.dir/flags.make
+CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.o: ../src/Sender.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.o -c /home/cirs_alaa/repositories/stonefish_rl/src/Sender.cpp
+
+CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/cirs_alaa/repositories/stonefish_rl/src/Sender.cpp > CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.i
+
+CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cirs_alaa/repositories/stonefish_rl/src/Sender.cpp -o CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.s
 
 CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.o: CMakeFiles/StonefishRLTest.dir/flags.make
 CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.o: ../src/StonefishRL.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.o -c /home/cirs_alaa/repositories/stonefish_rl/src/StonefishRL.cpp
 
 CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.i: cmake_force
@@ -85,13 +98,15 @@ CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.s: cmake_force
 
 # Object files for target StonefishRLTest
 StonefishRLTest_OBJECTS = \
-"CMakeFiles/StonefishRLTest.dir/src/main.cpp.o" \
+"CMakeFiles/StonefishRLTest.dir/executables/main.cpp.o" \
+"CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.o" \
 "CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.o"
 
 # External object files for target StonefishRLTest
 StonefishRLTest_EXTERNAL_OBJECTS =
 
-StonefishRLTest: CMakeFiles/StonefishRLTest.dir/src/main.cpp.o
+StonefishRLTest: CMakeFiles/StonefishRLTest.dir/executables/main.cpp.o
+StonefishRLTest: CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.o
 StonefishRLTest: CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.o
 StonefishRLTest: CMakeFiles/StonefishRLTest.dir/build.make
 StonefishRLTest: /usr/local/lib/libStonefish.so
@@ -102,7 +117,7 @@ StonefishRLTest: /usr/lib/x86_64-linux-gnu/libGLU.so
 StonefishRLTest: /usr/lib/gcc/x86_64-linux-gnu/9/libgomp.so
 StonefishRLTest: /usr/lib/x86_64-linux-gnu/libpthread.so
 StonefishRLTest: CMakeFiles/StonefishRLTest.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable StonefishRLTest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable StonefishRLTest"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/StonefishRLTest.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

@@ -2,7 +2,7 @@ import zmq
 import struct
 
 class Receiver:
-    def __init__(self, address="tcp://localhost:5555"):
+    def __init__(self, address="tcp://localhost:5556"):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.SUB)
         self.socket.connect(address)
