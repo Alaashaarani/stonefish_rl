@@ -9,18 +9,31 @@
 #endif
 
 Sender::Sender(const std::string& address) 
-    : context(1), socket(context, ZMQ_PUB) {
+    : context(1), socket(context, zmq::socket_type::rep) {
     
+    try{
     socket.bind(address);
-    std::cout << "Sender bound to: " << address << std::endl;
-    
+    std::cout << "[ZMQ Log] Sender bound to: " << address << std::endl;
+    }
+    catch(const zmq::error_t &e)
+    {
+        std::cerr << "[ZMQ ERROR] " << e.what() << "\n";
+    }
+
     #ifdef _WIN32
         Sleep(1000);
     #else
         sleep(1);
     #endif
     
-    std::cout << "Sender ready!" << std::endl;
+    std::cout << "[ZMQ Log] Sender ready!" << std::endl;
+}
+
+Sender::~Sender() {
+    socket.close();
+    context.close();
+
+    std::cout << "[ZMQ Log] Sender shutting down..." << std::endl;    
 }
 
 // Template implementation for simple types
@@ -131,6 +144,19 @@ void Sender::send(const std::string& title, const std::vector<std::string>& data
     std::cout << "Sent - ID: " << id << ", Title: " << title << ", vector<string> size: " << data.size() << std::endl;
 }
 
-Sender::~Sender() {
-    std::cout << "Sender shutting down..." << std::endl;
+zmq::message_t Sender::receive() {
+    zmq::message_t msg;
+    auto recv_result = socket.recv(msg);
+    std::cout << "[ZMQ Log] Received message of size: " << msg.size() << "and return" << " bytes." << std::endl;
+
+    return msg;
+}
+
+bool Sender::receive(zmq::message_t& msg, zmq::recv_flags flags) {
+    auto result = socket.recv(msg, flags);
+    return result.has_value();
+}
+
+void Sender::sendJson(const std::string& json_str) {
+    this->socket.send(zmq::buffer(json_str), zmq::send_flags::none);
 }

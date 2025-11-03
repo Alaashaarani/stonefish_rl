@@ -9,6 +9,7 @@
 #endif
 
 int main() {
+    std::cout << "Starting test_sender..." << std::endl;
     Sender sender("tcp://*:5555");
     
     int msg_id = 1;

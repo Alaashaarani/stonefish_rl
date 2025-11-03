@@ -124,13 +124,12 @@ private:
     std::map<std::string, std::map<std::string, float>> commands_; // Values to apply to actuators
     StateScene current_state_; // Represents the latest observed state of the environment
     
-    Sender sender;
-
+    Sender* sender;
     //storage members
     std::vector<std::string> robotNames;
     std::vector<std::string> sensorNames;
     std::vector<std::string> actuatorNames;
 
-    zmq::context_t context; // ZeroMQ context
-    zmq::socket_t socket;   // ZeroMQ socket
+    // zmq::context_t context; // ZeroMQ context
+    // zmq::socket_t socket;   // ZeroMQ socket
 };

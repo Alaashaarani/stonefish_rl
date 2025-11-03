@@ -1,6 +1,7 @@
 import zmq
 import json
 import gymnasium as gym
+from core.util.receiver import Receiver
 
 
 class EnvStonefishRL(gym.Env):
@@ -10,6 +11,8 @@ class EnvStonefishRL(gym.Env):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(ip)
+        self.receiver = Receiver()
+
 
         self.state = {} # Dictionary with all the info
 
@@ -39,14 +42,16 @@ class EnvStonefishRL(gym.Env):
         Recieves the observations (the simulator's JSON string), processes it,
         and updates the internal state to the latest observation.
         """
-        obs_dict = json.loads(msg)
+        try:
+            obs_dict = json.loads(msg)
+            # Convert 'None' to 'NaN'
+            obs_dict = self._replace_null_with_nan(obs_dict)
+            # Update state
+            self.state = obs_dict
+        except json.JSONDecodeError as e:
+            obs_dict = self.receiver.return_msg()
+            print("[WARN] Failed to decode JSON from simulator, using Receiver message instead.", obs_dict)
         
-        # Convert 'None' to 'NaN'
-        obs_dict = self._replace_null_with_nan(obs_dict)
-
-        # Update state
-        self.state = obs_dict
-
         return self.state
 
 
@@ -65,11 +70,12 @@ class EnvStonefishRL(gym.Env):
         """
         Send a command to the StonefishRL simulator and wait for a response.
         """
-        #print(f"[CONN] Enviant comanda: {message}")
+        print(f"[CONN] Enviant comanda: {message}")
         self.socket.send_string(message)
 
         # Wait to receive a response from the simulator
         response = self.socket.recv_string()
+
         #print(f"[CONN] Resposta rebuda de StonefishRL: {response}")
         return response
     
@@ -86,10 +92,20 @@ class EnvStonefishRL(gym.Env):
         Updates the state from the provided observation and calls Gym's reset.
         Note: This reset function expects that 'obs' is the simulator's JSON string.
         """
-        self._process_and_update_state(obs)
+        try:
+            obs_dict = json.loads(obs)
+            
+            self._process_and_update_state(obs_dict)
+            
+            super().reset(seed=seed)
+        except json.JSONDecodeError as e:
 
-        super().reset(seed=seed)
+            obs_dict = self.receiver.return_msg()
 
+            print("[WARN1] Failed to decode JSON from simulator during reset, using Receiver message instead.", obs_dict)
+
+
+        
         return self.state
     
 

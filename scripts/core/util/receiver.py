@@ -162,10 +162,10 @@ class Receiver:
         if self.print_msgs:
             print("Receiver stopped and cleaned up")
 
-if __name__ == "__main__":
-    receiver = Receiver()
-    receiver.enable_printing_msgs(False)
-    try:
-        receiver.start()
-    except KeyboardInterrupt:
-        receiver.stop()
+# if __name__ == "__main__":
+#     receiver = Receiver()
+#     receiver.enable_printing_msgs(False)
+#     try:
+#         receiver.start()
+#     except KeyboardInterrupt:
+#         receiver.stop()

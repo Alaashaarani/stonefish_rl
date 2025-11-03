@@ -174,7 +174,7 @@ class dsEnv(EnvStonefishRL):
         return obs, reward, terminated, truncated, info
 
 
-    def safe_vector(self, key, subkey, n=3):
+    def save_vector(self, key, subkey, n=3):
         """
         Return the first 'n' elements of the vector, otherwise return [nan] * n.
         """
@@ -212,24 +212,24 @@ class dsEnv(EnvStonefishRL):
         obs = []
         
         # ds position
-        obs += self.safe_vector("ds", "position", 3)
+        obs += self.save_vector("ds", "position", 3)
         obs += self.goal_pose.tolist()
         obs += self.check_colision()
 
-        # obs += self.safe_vector("goal", "position", 3)
+        # obs += self.save_vector("goal", "position", 3)
 
         # girona500 position and rotation
-        obs += self.safe_vector("girona500", "position", 3)
-        obs += self.safe_vector("girona500", "rotation", 3)
+        obs += self.save_vector("girona500", "position", 3)
+        obs += self.save_vector("girona500", "rotation", 3)
 
         # girona500 linear and angular velocity
-        obs += self.safe_vector("girona500/dynamics", "linear_velocity", 3)
-        obs += self.safe_vector("girona500/dynamics", "angular_velocity", 3)
+        obs += self.save_vector("girona500/dynamics", "linear_velocity", 3)
+        obs += self.save_vector("girona500/dynamics", "angular_velocity", 3)
         
-        # print("obs:", self.safe_vector("goal", "position", 3))
+        # print("obs:", self.save_vector("goal", "position", 3))
         # # girona500 gripper position and rotation
-        # obs += self.safe_vector("girona500/OdoGripper", "position", 3)
-        # obs += self.safe_vector("girona500/OdoGripper", "rotation", 3)
+        # obs += self.save_vector("girona500/OdoGripper", "position", 3)
+        # obs += self.save_vector("girona500/OdoGripper", "rotation", 3)
         
         # Arm joint angles
         for name, value in self.state.items():

@@ -48,20 +48,23 @@
 StonefishRL::StonefishRL(const std::string &path, double frequency)
     : sf::SimulationManager(frequency),
       scenePath(path),
-      context(1),                            // Initialize ZeroMQ context with 1 thread
-      socket(context, zmq::socket_type::rep) // Create a REP socket
+    //   context(1),                            // Initialize ZeroMQ context with 1 thread
+    //   socket(context, zmq::socket_type::rep), // Create a REP socket
+      sender(nullptr)
 {
     // InitializeZMQ();
-    Sender sender("tcp://*:5556");
+    sender = new Sender("tcp://*:5555"); 
     }
 
 
 std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp)
+
 {
     zmq::message_t request;
 
     // Wait to receive a message --> It will receive: "RESET:robot_name;"
-    auto result = socket.recv(request, zmq::recv_flags::none);
+    // auto result = socket.recv(request, zmq::recv_flags::none);
+    auto result = sender->receive(request, zmq::recv_flags::none); // ALAAEDDINE
 
     // Convert the message (buffer) to string and show it
     std::string cmd = request.to_string();
@@ -85,7 +88,8 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp)
     else if (prefix == "EXIT")
     {
        std::cout << "[ZMQ] Received EXIT\n";
-        socket.send(zmq::buffer("EXIT OK"), zmq::send_flags::none);
+        // socket.send(zmq::buffer("EXIT OK"), zmq::send_flags::none);
+        sender->sendJson("EXIT OK");
         return "EXIT";
     }
     else if (prefix == "CMD")
@@ -104,8 +108,7 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp)
 void StonefishRL::SendObservations()
 {
     StateScene scalar_observations = GetStateScene();
-
-    std::cout << "collision from state scene " << scalar_observations.observations[0].collisions.size() << std::endl;
+    // std::cout << "collision from state scene " << scalar_observations.observations[0].collisions.size() << std::endl;
     //PrintAll();
     // Convert observations to string
     std::string obs_str_json = SerializeScene(scalar_observations.observations);
@@ -113,7 +116,8 @@ void StonefishRL::SendObservations()
 
     // sender.send(title, obs_str_json, 1);
 
-    this->socket.send(zmq::buffer(obs_str_json), zmq::send_flags::none);
+    // this->socket.send(zmq::buffer(obs_str_json), zmq::send_flags::none);
+    sender->sendJson(obs_str_json);
 }
 
 
@@ -336,6 +340,9 @@ StonefishRL::StateScene StonefishRL::GetStateScene()
             // if( obs.collisions.size() > 0 ){
             //     std::cout << "collisions" << obs.collisions[0] << std::endl;
             // }
+            
+            // std::vector<std::string> messages = {"hello", "world", "from", "cpp"};
+            // this->sender->send( "ready",messages, 1); // Notify Python that we are ready to receive commands
             state.observations.push_back(obs);
         } 
     }
@@ -485,18 +492,18 @@ StonefishRL::StateScene StonefishRL::GetStateScene()
 }
 
 
-void StonefishRL::InitializeZMQ()
-{
-    try
-    {
-        socket.bind("tcp://*:5555"); // Listens on port 5555
-         std::cout << "[ZMQ] REP server active on port 5555\n";
-    }
-    catch (const zmq::error_t &e)
-    {
-        std::cerr << "[ZMQ ERROR] " << e.what() << "\n";
-    }
-}
+// void StonefishRL::InitializeZMQ()
+// {
+//     try
+//     {
+//         socket.bind("tcp://*:5555"); // Listens on port 5555
+//          std::cout << "[ZMQ] REP server active on port 5555\n";
+//     }
+//     catch (const zmq::error_t &e)
+//     {
+//         std::cerr << "[ZMQ ERROR] " << e.what() << "\n";
+//     }
+// }
 
 
 std::vector<StonefishRL::InfoObject> StonefishRL::ParseResetCommand(const std::string& str_command){
@@ -746,8 +753,9 @@ void StonefishRL::SetRobotPosition(const std::vector<InfoObject>& obj)
 
 
 void StonefishRL::ExitRequest() {
-    socket.close();
-    context.close();
+    // socket.close();
+    // context.close();
+    delete sender;
 
     std::cout << "[INFO] Simulation finished." << std::endl;
     std::exit(0);

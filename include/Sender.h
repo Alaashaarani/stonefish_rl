@@ -7,7 +7,7 @@
 
 class Sender {
 public:
-    Sender(const std::string& address = "tcp://*:5555");
+    Sender(const std::string& address);
     
     // For simple types (int, float, double, bool, etc.)
     template<typename T>
@@ -18,6 +18,13 @@ public:
     void send(const std::string& title, const std::vector<int>& data, int id);
     void send(const std::string& title, const std::vector<double>& data, int id);
     void send(const std::string& title, const std::vector<std::string>& data, int id);
+
+    // Send Json string
+    void sendJson(const std::string& json_str);
+
+     // Add receive capability
+    zmq::message_t receive();
+    bool receive(zmq::message_t& msg, zmq::recv_flags flags = zmq::recv_flags::none);
     
     ~Sender();
 

@@ -8,7 +8,6 @@ sys.path.append(parent_dir)
 from girona_ds.docking_env import dsEnv # Goal version
 from core.launch_stonefish import launch_stonefish_simulator
 
-
 launch_stonefish_simulator("Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn")
  
 
