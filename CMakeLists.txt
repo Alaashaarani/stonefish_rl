@@ -10,6 +10,7 @@ find_package(PkgConfig REQUIRED)
 file(GLOB_RECURSE SOURCE "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
 pkg_check_modules(ZMQ REQUIRED libzmq)
+pkg_check_modules(nlohmann_json REQUIRED)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
@@ -19,23 +20,24 @@ include_directories(
 
 
 add_executable(StonefishRLTest executables/main.cpp )
-add_executable(TestSender executables/test_sender.cpp )
+# add_executable(TestSender executables/test_sender.cpp )
 
 target_sources(StonefishRLTest PRIVATE
     ${SOURCE} 
 )
 
-target_sources(TestSender PRIVATE
-    ${SOURCE} 
-)
+# target_sources(TestSender PRIVATE
+#     ${SOURCE} 
+# )
 
 # Link with Stonefish library
 target_link_libraries(StonefishRLTest
     Stonefish::Stonefish
     ${ZMQ_LIBRARIES}
+    ${nlohmann_json_LIBRARIES}
 )
 
-target_link_libraries(TestSender
-    Stonefish::Stonefish
-    ${ZMQ_LIBRARIES}
-)
+# target_link_libraries(TestSender
+#     Stonefish::Stonefish
+#     ${ZMQ_LIBRARIES}
+# )

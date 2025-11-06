@@ -59,6 +59,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/TestSender.dir/DependInfo.cmake"
   "CMakeFiles/StonefishRLTest.dir/DependInfo.cmake"
   )

@@ -70,22 +70,48 @@ CMakeFiles/TestSender.dir/executables/test_sender.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TestSender.dir/executables/test_sender.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cirs_alaa/repositories/stonefish_rl/executables/test_sender.cpp -o CMakeFiles/TestSender.dir/executables/test_sender.cpp.s
 
-CMakeFiles/TestSender.dir/src/Sender.cpp.o: CMakeFiles/TestSender.dir/flags.make
-CMakeFiles/TestSender.dir/src/Sender.cpp.o: ../src/Sender.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/TestSender.dir/src/Sender.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TestSender.dir/src/Sender.cpp.o -c /home/cirs_alaa/repositories/stonefish_rl/src/Sender.cpp
+CMakeFiles/TestSender.dir/src/ActuatorController.cpp.o: CMakeFiles/TestSender.dir/flags.make
+CMakeFiles/TestSender.dir/src/ActuatorController.cpp.o: ../src/ActuatorController.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/TestSender.dir/src/ActuatorController.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TestSender.dir/src/ActuatorController.cpp.o -c /home/cirs_alaa/repositories/stonefish_rl/src/ActuatorController.cpp
 
-CMakeFiles/TestSender.dir/src/Sender.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/TestSender.dir/src/Sender.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/cirs_alaa/repositories/stonefish_rl/src/Sender.cpp > CMakeFiles/TestSender.dir/src/Sender.cpp.i
+CMakeFiles/TestSender.dir/src/ActuatorController.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/TestSender.dir/src/ActuatorController.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/cirs_alaa/repositories/stonefish_rl/src/ActuatorController.cpp > CMakeFiles/TestSender.dir/src/ActuatorController.cpp.i
 
-CMakeFiles/TestSender.dir/src/Sender.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TestSender.dir/src/Sender.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cirs_alaa/repositories/stonefish_rl/src/Sender.cpp -o CMakeFiles/TestSender.dir/src/Sender.cpp.s
+CMakeFiles/TestSender.dir/src/ActuatorController.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TestSender.dir/src/ActuatorController.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cirs_alaa/repositories/stonefish_rl/src/ActuatorController.cpp -o CMakeFiles/TestSender.dir/src/ActuatorController.cpp.s
+
+CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.o: CMakeFiles/TestSender.dir/flags.make
+CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.o: ../src/CommandProcessor.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.o -c /home/cirs_alaa/repositories/stonefish_rl/src/CommandProcessor.cpp
+
+CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/cirs_alaa/repositories/stonefish_rl/src/CommandProcessor.cpp > CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.i
+
+CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cirs_alaa/repositories/stonefish_rl/src/CommandProcessor.cpp -o CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.s
+
+CMakeFiles/TestSender.dir/src/StateManager.cpp.o: CMakeFiles/TestSender.dir/flags.make
+CMakeFiles/TestSender.dir/src/StateManager.cpp.o: ../src/StateManager.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/TestSender.dir/src/StateManager.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TestSender.dir/src/StateManager.cpp.o -c /home/cirs_alaa/repositories/stonefish_rl/src/StateManager.cpp
+
+CMakeFiles/TestSender.dir/src/StateManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/TestSender.dir/src/StateManager.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/cirs_alaa/repositories/stonefish_rl/src/StateManager.cpp > CMakeFiles/TestSender.dir/src/StateManager.cpp.i
+
+CMakeFiles/TestSender.dir/src/StateManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TestSender.dir/src/StateManager.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cirs_alaa/repositories/stonefish_rl/src/StateManager.cpp -o CMakeFiles/TestSender.dir/src/StateManager.cpp.s
 
 CMakeFiles/TestSender.dir/src/StonefishRL.cpp.o: CMakeFiles/TestSender.dir/flags.make
 CMakeFiles/TestSender.dir/src/StonefishRL.cpp.o: ../src/StonefishRL.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/TestSender.dir/src/StonefishRL.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/TestSender.dir/src/StonefishRL.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TestSender.dir/src/StonefishRL.cpp.o -c /home/cirs_alaa/repositories/stonefish_rl/src/StonefishRL.cpp
 
 CMakeFiles/TestSender.dir/src/StonefishRL.cpp.i: cmake_force
@@ -96,18 +122,37 @@ CMakeFiles/TestSender.dir/src/StonefishRL.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TestSender.dir/src/StonefishRL.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cirs_alaa/repositories/stonefish_rl/src/StonefishRL.cpp -o CMakeFiles/TestSender.dir/src/StonefishRL.cpp.s
 
+CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.o: CMakeFiles/TestSender.dir/flags.make
+CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.o: ../src/ZQMCommunicator.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.o -c /home/cirs_alaa/repositories/stonefish_rl/src/ZQMCommunicator.cpp
+
+CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/cirs_alaa/repositories/stonefish_rl/src/ZQMCommunicator.cpp > CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.i
+
+CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cirs_alaa/repositories/stonefish_rl/src/ZQMCommunicator.cpp -o CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.s
+
 # Object files for target TestSender
 TestSender_OBJECTS = \
 "CMakeFiles/TestSender.dir/executables/test_sender.cpp.o" \
-"CMakeFiles/TestSender.dir/src/Sender.cpp.o" \
-"CMakeFiles/TestSender.dir/src/StonefishRL.cpp.o"
+"CMakeFiles/TestSender.dir/src/ActuatorController.cpp.o" \
+"CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.o" \
+"CMakeFiles/TestSender.dir/src/StateManager.cpp.o" \
+"CMakeFiles/TestSender.dir/src/StonefishRL.cpp.o" \
+"CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.o"
 
 # External object files for target TestSender
 TestSender_EXTERNAL_OBJECTS =
 
 TestSender: CMakeFiles/TestSender.dir/executables/test_sender.cpp.o
-TestSender: CMakeFiles/TestSender.dir/src/Sender.cpp.o
+TestSender: CMakeFiles/TestSender.dir/src/ActuatorController.cpp.o
+TestSender: CMakeFiles/TestSender.dir/src/CommandProcessor.cpp.o
+TestSender: CMakeFiles/TestSender.dir/src/StateManager.cpp.o
 TestSender: CMakeFiles/TestSender.dir/src/StonefishRL.cpp.o
+TestSender: CMakeFiles/TestSender.dir/src/ZQMCommunicator.cpp.o
 TestSender: CMakeFiles/TestSender.dir/build.make
 TestSender: /usr/local/lib/libStonefish.so
 TestSender: /usr/lib/x86_64-linux-gnu/libfreetype.so
@@ -117,7 +162,7 @@ TestSender: /usr/lib/x86_64-linux-gnu/libGLU.so
 TestSender: /usr/lib/gcc/x86_64-linux-gnu/9/libgomp.so
 TestSender: /usr/lib/x86_64-linux-gnu/libpthread.so
 TestSender: CMakeFiles/TestSender.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable TestSender"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/cirs_alaa/repositories/stonefish_rl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable TestSender"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/TestSender.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

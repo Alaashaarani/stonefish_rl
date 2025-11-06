@@ -111,19 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named TestSender
-
-# Build rule for target.
-TestSender: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 TestSender
-.PHONY : TestSender
-
-# fast build rule for target.
-TestSender/fast:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/build
-.PHONY : TestSender/fast
-
-#=============================================================================
 # Target rules for targets named StonefishRLTest
 
 # Build rule for target.
@@ -163,62 +150,113 @@ executables/main.cpp.s:
 	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/executables/main.cpp.s
 .PHONY : executables/main.cpp.s
 
-executables/test_sender.o: executables/test_sender.cpp.o
+src/ActuatorController.o: src/ActuatorController.cpp.o
 
-.PHONY : executables/test_sender.o
-
-# target to build an object file
-executables/test_sender.cpp.o:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/executables/test_sender.cpp.o
-.PHONY : executables/test_sender.cpp.o
-
-executables/test_sender.i: executables/test_sender.cpp.i
-
-.PHONY : executables/test_sender.i
-
-# target to preprocess a source file
-executables/test_sender.cpp.i:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/executables/test_sender.cpp.i
-.PHONY : executables/test_sender.cpp.i
-
-executables/test_sender.s: executables/test_sender.cpp.s
-
-.PHONY : executables/test_sender.s
-
-# target to generate assembly for a file
-executables/test_sender.cpp.s:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/executables/test_sender.cpp.s
-.PHONY : executables/test_sender.cpp.s
-
-src/Sender.o: src/Sender.cpp.o
-
-.PHONY : src/Sender.o
+.PHONY : src/ActuatorController.o
 
 # target to build an object file
-src/Sender.cpp.o:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/Sender.cpp.o
-	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.o
-.PHONY : src/Sender.cpp.o
+src/ActuatorController.cpp.o:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/ActuatorController.cpp.o
+.PHONY : src/ActuatorController.cpp.o
 
-src/Sender.i: src/Sender.cpp.i
+src/ActuatorController.i: src/ActuatorController.cpp.i
 
-.PHONY : src/Sender.i
+.PHONY : src/ActuatorController.i
 
 # target to preprocess a source file
-src/Sender.cpp.i:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/Sender.cpp.i
-	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.i
-.PHONY : src/Sender.cpp.i
+src/ActuatorController.cpp.i:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/ActuatorController.cpp.i
+.PHONY : src/ActuatorController.cpp.i
 
-src/Sender.s: src/Sender.cpp.s
+src/ActuatorController.s: src/ActuatorController.cpp.s
 
-.PHONY : src/Sender.s
+.PHONY : src/ActuatorController.s
 
 # target to generate assembly for a file
-src/Sender.cpp.s:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/Sender.cpp.s
-	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/Sender.cpp.s
-.PHONY : src/Sender.cpp.s
+src/ActuatorController.cpp.s:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/ActuatorController.cpp.s
+.PHONY : src/ActuatorController.cpp.s
+
+src/CommandProcessor.o: src/CommandProcessor.cpp.o
+
+.PHONY : src/CommandProcessor.o
+
+# target to build an object file
+src/CommandProcessor.cpp.o:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/CommandProcessor.cpp.o
+.PHONY : src/CommandProcessor.cpp.o
+
+src/CommandProcessor.i: src/CommandProcessor.cpp.i
+
+.PHONY : src/CommandProcessor.i
+
+# target to preprocess a source file
+src/CommandProcessor.cpp.i:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/CommandProcessor.cpp.i
+.PHONY : src/CommandProcessor.cpp.i
+
+src/CommandProcessor.s: src/CommandProcessor.cpp.s
+
+.PHONY : src/CommandProcessor.s
+
+# target to generate assembly for a file
+src/CommandProcessor.cpp.s:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/CommandProcessor.cpp.s
+.PHONY : src/CommandProcessor.cpp.s
+
+src/ConfigLoader.o: src/ConfigLoader.cpp.o
+
+.PHONY : src/ConfigLoader.o
+
+# target to build an object file
+src/ConfigLoader.cpp.o:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/ConfigLoader.cpp.o
+.PHONY : src/ConfigLoader.cpp.o
+
+src/ConfigLoader.i: src/ConfigLoader.cpp.i
+
+.PHONY : src/ConfigLoader.i
+
+# target to preprocess a source file
+src/ConfigLoader.cpp.i:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/ConfigLoader.cpp.i
+.PHONY : src/ConfigLoader.cpp.i
+
+src/ConfigLoader.s: src/ConfigLoader.cpp.s
+
+.PHONY : src/ConfigLoader.s
+
+# target to generate assembly for a file
+src/ConfigLoader.cpp.s:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/ConfigLoader.cpp.s
+.PHONY : src/ConfigLoader.cpp.s
+
+src/StateManager.o: src/StateManager.cpp.o
+
+.PHONY : src/StateManager.o
+
+# target to build an object file
+src/StateManager.cpp.o:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/StateManager.cpp.o
+.PHONY : src/StateManager.cpp.o
+
+src/StateManager.i: src/StateManager.cpp.i
+
+.PHONY : src/StateManager.i
+
+# target to preprocess a source file
+src/StateManager.cpp.i:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/StateManager.cpp.i
+.PHONY : src/StateManager.cpp.i
+
+src/StateManager.s: src/StateManager.cpp.s
+
+.PHONY : src/StateManager.s
+
+# target to generate assembly for a file
+src/StateManager.cpp.s:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/StateManager.cpp.s
+.PHONY : src/StateManager.cpp.s
 
 src/StonefishRL.o: src/StonefishRL.cpp.o
 
@@ -226,7 +264,6 @@ src/StonefishRL.o: src/StonefishRL.cpp.o
 
 # target to build an object file
 src/StonefishRL.cpp.o:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/StonefishRL.cpp.o
 	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.o
 .PHONY : src/StonefishRL.cpp.o
 
@@ -236,7 +273,6 @@ src/StonefishRL.i: src/StonefishRL.cpp.i
 
 # target to preprocess a source file
 src/StonefishRL.cpp.i:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/StonefishRL.cpp.i
 	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.i
 .PHONY : src/StonefishRL.cpp.i
 
@@ -246,9 +282,35 @@ src/StonefishRL.s: src/StonefishRL.cpp.s
 
 # target to generate assembly for a file
 src/StonefishRL.cpp.s:
-	$(MAKE) -f CMakeFiles/TestSender.dir/build.make CMakeFiles/TestSender.dir/src/StonefishRL.cpp.s
 	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/StonefishRL.cpp.s
 .PHONY : src/StonefishRL.cpp.s
+
+src/ZQMCommunicator.o: src/ZQMCommunicator.cpp.o
+
+.PHONY : src/ZQMCommunicator.o
+
+# target to build an object file
+src/ZQMCommunicator.cpp.o:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/ZQMCommunicator.cpp.o
+.PHONY : src/ZQMCommunicator.cpp.o
+
+src/ZQMCommunicator.i: src/ZQMCommunicator.cpp.i
+
+.PHONY : src/ZQMCommunicator.i
+
+# target to preprocess a source file
+src/ZQMCommunicator.cpp.i:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/ZQMCommunicator.cpp.i
+.PHONY : src/ZQMCommunicator.cpp.i
+
+src/ZQMCommunicator.s: src/ZQMCommunicator.cpp.s
+
+.PHONY : src/ZQMCommunicator.s
+
+# target to generate assembly for a file
+src/ZQMCommunicator.cpp.s:
+	$(MAKE) -f CMakeFiles/StonefishRLTest.dir/build.make CMakeFiles/StonefishRLTest.dir/src/ZQMCommunicator.cpp.s
+.PHONY : src/ZQMCommunicator.cpp.s
 
 # Help Target
 help:
@@ -257,21 +319,29 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
-	@echo "... TestSender"
 	@echo "... rebuild_cache"
 	@echo "... StonefishRLTest"
 	@echo "... executables/main.o"
 	@echo "... executables/main.i"
 	@echo "... executables/main.s"
-	@echo "... executables/test_sender.o"
-	@echo "... executables/test_sender.i"
-	@echo "... executables/test_sender.s"
-	@echo "... src/Sender.o"
-	@echo "... src/Sender.i"
-	@echo "... src/Sender.s"
+	@echo "... src/ActuatorController.o"
+	@echo "... src/ActuatorController.i"
+	@echo "... src/ActuatorController.s"
+	@echo "... src/CommandProcessor.o"
+	@echo "... src/CommandProcessor.i"
+	@echo "... src/CommandProcessor.s"
+	@echo "... src/ConfigLoader.o"
+	@echo "... src/ConfigLoader.i"
+	@echo "... src/ConfigLoader.s"
+	@echo "... src/StateManager.o"
+	@echo "... src/StateManager.i"
+	@echo "... src/StateManager.s"
 	@echo "... src/StonefishRL.o"
 	@echo "... src/StonefishRL.i"
 	@echo "... src/StonefishRL.s"
+	@echo "... src/ZQMCommunicator.o"
+	@echo "... src/ZQMCommunicator.i"
+	@echo "... src/ZQMCommunicator.s"
 .PHONY : help
 
 
