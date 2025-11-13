@@ -18,8 +18,8 @@ std::vector<RobotResetInfo> CommandProcessor::parseResetCommand(const std::strin
         
         pos = end + 1;
     }
-    
-    std::cout << "[CommandProcessor] Parsed " << result.size() << " reset objects" << std::endl;
+    // debug output
+    // std::cout << "[CommandProcessor] Parsed " << result.size() << " reset objects" << std::endl;
     return result;
 }
 
@@ -49,9 +49,10 @@ void CommandProcessor::parseActionCommands(const std::string& command) {
     if (!obs_str.empty()) {
         parseObservationFilter(obs_str);
     }
-    
+    /* Debug output 
     std::cout << "[CommandProcessor] Parsed " << commands_.size() << " actuators, " 
-              << relevant_obs_names_.size() << " observation filters" << std::endl;
+    << relevant_obs_names_.size() << " observation filters" << std::endl;
+    */
 }
 
 RobotResetInfo CommandProcessor::parseObjectFromJson(const std::string& object_str) {
@@ -111,8 +112,9 @@ void CommandProcessor::parseCommandToken(const std::string& token) {
         try {
             float value = std::stof(action_value);
             commands_[actuator_name][action] = value;
-            std::cout << "[CommandProcessor] Command: " << actuator_name << ":" 
-                      << action << " = " << value << std::endl;
+            // debug print
+            // std::cout << "[CommandProcessor] Command: " << actuator_name << ":" 
+                    //   << action << " = " << value << std::endl;
         }
         catch (const std::exception& e) {
             std::cerr << "[CommandProcessor] Invalid value for " << actuator_name 

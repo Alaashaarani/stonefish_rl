@@ -3,7 +3,7 @@
 #include <sstream>
 
 // Constructor
-StonefishRL::StonefishRL(const std::string &path, double frequency)
+StonefishRL::StonefishRL(const std::string &path, const std::string &observation_conf_path,const std::string &action_conf_path, double frequency)
     : sf::SimulationManager(frequency),
       scenePath(path),
       communicator(nullptr)
@@ -13,7 +13,7 @@ StonefishRL::StonefishRL(const std::string &path, double frequency)
 
      // Load observation configuration
     ConfigLoader loader;
-    ObservationConfig config = loader.loadFromFile("observation_config.json");
+    ObservationConfig config = loader.loadFromFile(observation_conf_path);
     state_manager_.setObservationConfig(config);
     
     std::cout << "[StonefishRL] Initialized with scene: " << scenePath << std::endl;
@@ -25,7 +25,8 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
     auto result = communicator->receive(request, zmq::recv_flags::none);
 
     std::string cmd = request.to_string();
-    std::cout << "[StonefishRL] Received: (" << result << " bytes) in command: " << cmd << std::endl;
+    // debug output
+    // std::cout << "[StonefishRL] Received: (" << result << " bytes) in command: " << cmd << std::endl;
 
     int pos = cmd.find(":");
     std::string prefix = cmd.substr(0, pos);
@@ -38,6 +39,7 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
         
         // Send observations using new vector approach
         SendObservations();
+        // std::cout << "[StonefishRL] Received RESET command\n";
         return "RESET";
     }
     else if (prefix == "EXIT") {
@@ -70,13 +72,15 @@ void StonefishRL::SendObservations() {
     obs_json += "]";
     
     communicator->sendJson(obs_json);
-    std::cout << "[StonefishRL] Sent observation vector: " << observations.size() << " elements" << std::endl;
+    // Debug output
+    // std::cout << "[StonefishRL] Sent observation vector: " << observations.size() << " elements" << std::endl;
 }
 
 void StonefishRL::ApplyCommands(const std::string& str_cmds) {
     const auto& commands = command_processor_.getCommands();
     actuator_controller_.applyCommands(commands, this);
-    std::cout << "[StonefishRL] Applied commands to " << commands.size() << " actuators" << std::endl;
+    // debug output
+    // std::cout << "[StonefishRL] Applied commands to " << commands.size() << " actuators" << std::endl;
 }
 
 void StonefishRL::BuildScenario() {

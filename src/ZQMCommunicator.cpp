@@ -136,7 +136,8 @@ void ZMQCommunicator::sendJson(const std::string& json_str) {
     zmq::message_t msg(json_str.size());
     memcpy(msg.data(), json_str.c_str(), json_str.size());
     socket.send(msg, zmq::send_flags::none);
-    std::cout << "[ZMQ] Sent JSON: " << json_str.length() << " bytes" << std::endl;
+    // debug output
+    // std::cout << "[ZMQ] Sent JSON: " << json_str.length() << " bytes" << std::endl;
 }
 
 // Receive message
@@ -150,8 +151,8 @@ zmq::message_t ZMQCommunicator::receive() {
             std::cerr << "[ZMQ] Receive failed - no message received" << std::endl;
             return zmq::message_t(0);
         }
-        
-        std::cout << "[ZMQ] Received: " << msg.size() << " bytes" << std::endl;
+        // debug output
+        // std::cout << "[ZMQ] Received: " << msg.size() << " bytes" << std::endl;
         return msg;
         
     } catch (const zmq::error_t& e) {
@@ -166,7 +167,8 @@ bool ZMQCommunicator::receive(zmq::message_t& msg, zmq::recv_flags flags) {
         auto result = socket.recv(msg, flags);
         
         if (result) {
-            std::cout << "[ZMQ] Received: " << msg.size() << " bytes" << std::endl;
+            // debug output
+            // std::cout << "[ZMQ] Received: " << msg.size() << " bytes" << std::endl;
             return true;
         } else {
             // This is normal for non-blocking receives with no message

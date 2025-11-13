@@ -71,21 +71,23 @@ int learning(void* data) {
 
 int main(int argc, char **argv) {
 
-    double frequency = 1000.0;
+    double frequency = 200; // Simulation frequency in Hz
     
-    if (argc < 2) {
-        std::cerr << "[ERROR] You may need 1 argument at least." << std::endl;
+    if (argc < 4) {
+        std::cerr << "[ERROR] Arg input should be, SCENE_PATH, OBS_CONFIG_PATH, ACTION_CONFIG_PATH" << std::endl;
         return 1;
     }
 
     std::string scene_path = argv[1]; 
+    std::string obser_conf_path = argv[2]; 
+    std::string action_conf_path = argv[3]; 
 
     sf::HelperSettings h;
     sf::RenderSettings r;
-    r.windowW = 1200;
-    r.windowH = 900;
+    r.windowW = 900;
+    r.windowH = 600;
     
-    StonefishRL* simManager = new StonefishRL(scene_path, frequency); // Create the StonefishRL simulation manager
+    StonefishRL* simManager = new StonefishRL(scene_path, obser_conf_path, action_conf_path, frequency); // Create the StonefishRL simulation manager
 
     sf::GraphicalSimulationApp app("DEMO STONEFISH RL", scene_path, r, h, simManager);
     //sf::ConsoleSimulationApp app("DEMO STONEFISH RL", scene_path, simManager);

@@ -63,7 +63,8 @@ void ActuatorController::controlThruster(sf::Thruster* thruster, const std::unor
     for (const auto &[action, action_value] : actions) {
         if (action == "VELOCITY" || action == "TORQUE") {
             thruster->setSetpoint(action_value);
-            std::cout << "[ActuatorController] Set thruster setpoint: " << action_value << std::endl;
+            // debug print
+            // std::cout << "[ActuatorController] Set thruster setpoint: " << action_value << std::endl;
         }
         else {
             std::cout << "[ActuatorController] Unknown command '" << action << "' for thruster" << std::endl;

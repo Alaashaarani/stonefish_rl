@@ -1,0 +1,41 @@
+{
+  "action_config": {
+    "specs": [
+      {
+        "actuator_name": "girona500/ThrusterSurgePort",
+        "action_type": "TORQUE",
+        "output_name": "thruster_surge_port",
+        "min_value": -1.0,
+        "max_value": 1.0
+      },
+      {
+        "actuator_name": "girona500/ThrusterSurgeStarboard",
+        "action_type": "TORQUE", 
+        "output_name": "thruster_surge_starboard",
+        "min_value": -1.0,
+        "max_value": 1.0
+      },
+      {
+        "actuator_name": "girona500/ThrusterSway",
+        "action_type": "TORQUE",
+        "output_name": "thruster_sway",
+        "min_value": -1.0,
+        "max_value": 1.0
+      },
+      {
+        "actuator_name": "girona500/ThrusterHeaveBow", 
+        "action_type": "TORQUE",
+        "output_name": "thruster_heave_bow",
+        "min_value": -1.0,
+        "max_value": 1.0
+      },
+      {
+        "actuator_name": "girona500/ThrusterHeaveStern",
+        "action_type": "TORQUE",
+        "output_name": "thruster_heave_stern", 
+        "min_value": -1.0,
+        "max_value": 1.0
+      }
+    ]
+  }
+}

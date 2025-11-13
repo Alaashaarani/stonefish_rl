@@ -1,0 +1,54 @@
+{
+  "observation_config": {
+    "specs": [
+      {
+        "entity_name": "girona500",
+        "field_type": "position",
+        "component": "x",
+        "output_name": "robot_pose_x"
+      },
+      {
+        "entity_name": "girona500",
+        "field_type": "position", 
+        "component": "y",
+        "output_name": "robot_pose_y"
+      },
+      {
+        "entity_name": "girona500",
+        "field_type": "position",
+        "component": "z", 
+        "output_name": "robot_pose_z"
+      },
+      {
+        "entity_name": "girona500",
+        "field_type": "rotation",
+        "component": "yaw",
+        "output_name": "robot_pose_yaw"
+      },
+      {
+        "entity_name": "girona500",
+        "field_type": "collision",
+        "component": "binary",
+        "output_name": "collision_flag"
+      },
+      {
+        "entity_name": "girona500/imu_filter", 
+        "field_type": "imu.angular_velocity",
+        "component": "x",
+        "output_name": "imu_velocity_x"
+      },
+      {
+        "entity_name": "girona500/gps",
+        "field_type": "gps",
+        "component": "north",
+        "output_name": "gps_pose_north"
+      },
+      {
+        "entity_name": "girona500/pressure",
+        "field_type": "pressure",
+        "component": "value",
+        "output_name": "pressure_pose_depth"
+      }
+    ]
+  }
+}

@@ -16,24 +16,24 @@ def kill_existing_stonefish_processes():
     except subprocess.CalledProcessError:
         pass  # There are no prvious processes to kill
 
-def launch_stonefish_simulator(scene_relative_path):
+def global_path(relative_path):
+    """Get absolute path from project root"""
+    # Path to the project root directory
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+
+    return os.path.join(project_root, relative_path)
+
+def launch_stonefish_simulator(scene_relative_path, observation_config_path, action_config_path ):
     """
     Launch the Stonefish simulator with the specified scene.
     scene_relative_path: path relative to the project root.
     """
-
     # Make sure that there are no old Stonefish processes running
     kill_existing_stonefish_processes()
-
-    # Path to the project root directory
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-
+    
     # Path to the Stonefish executable
-    stonefish_exe = os.path.join(project_root, "build", "StonefishRLTest")
-
-    # Full path to the scene
-    scene_path = os.path.join(project_root, scene_relative_path)
-
+    stonefish_exe = os.path.join( global_path("build") , "StonefishRLTest")
+    
     # Run the scene
-    print(f"[INFO] Executing Stonefish with the scene: {scene_path}")
-    stonefish_proc = subprocess.Popen([stonefish_exe, scene_path])
+    print(f"[INFO] Executing Stonefish with the scene: {scene_relative_path}")
+    stonefish_proc = subprocess.Popen([stonefish_exe, scene_relative_path, observation_config_path,action_config_path])

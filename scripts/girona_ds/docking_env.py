@@ -5,18 +5,17 @@ import gymnasium as gym
 
 
 class dsEnv(EnvStonefishRL):
-    def __init__(self, ip="tcp://localhost:5555", search_time=60, 
-                 observation_config_path="observation_config.json", 
-                 action_config_path="action_config.json"):
+    def __init__(self, observation_config_path, action_config_path, search_time, ip="tcp://localhost:5555" ): 
+                 
         
         # Pass config paths to parent
-        super().__init__(ip, observation_config_path, action_config_path)
+        super().__init__( observation_config_path, action_config_path, ip )
 
         self.step_counter = 0
         self.target_threshold = 2
         self.search_time = search_time
         self.sim_stonefishRL = 0.001
-        self.dt = 0.2
+        self.dt = 0.02 # Simulation approximite Time per frame 
         self.goal_pose = np.array([-5.5, 0, 5.2])
         
         # Last action will be appended to observation
@@ -138,6 +137,7 @@ class dsEnv(EnvStonefishRL):
         """Get observation value by name pattern"""
         for i, name in enumerate(self.observation_names):
             if pattern in name and i < len(self.state):
+                print(f"[DEBUG] Found observation '{name}' matching pattern '{pattern}': {self.state[i]}")
                 return self.state[i]
         return default
 

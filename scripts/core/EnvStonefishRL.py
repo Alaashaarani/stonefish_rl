@@ -2,17 +2,15 @@ import zmq
 import json
 import gymnasium as gym
 import numpy as np
-from core.util.receiver import Receiver
 
 
 class EnvStonefishRL(gym.Env):
 
-    def __init__(self, ip="tcp://localhost:5555", observation_config_path="observation_config.json", action_config_path="action_config.json"):
+    def __init__(self, observation_config_path , action_config_path , ip="tcp://localhost:5555"):
         super().__init__()
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(ip)
-        self.receiver = Receiver()
 
         # Load configurations from JSON files
         self.observation_config = self._load_config(observation_config_path)
@@ -63,6 +61,7 @@ class EnvStonefishRL(gym.Env):
             specs = self.action_config.get("action_config", {}).get("specs", [])
             for spec in specs:
                 names.append(spec.get("output_name", "unknown_action"))
+            print(f"[DEBUG] Action names: {names}")
             return names
         except Exception as e:
             print(f"[ERROR] Failed to parse action names: {e}")

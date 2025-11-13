@@ -21,7 +21,7 @@
 
 class StonefishRL : public sf::SimulationManager {
 public:
-    StonefishRL(const std::string &path, double frequency);
+    StonefishRL(const std::string &path, const std::string &observation_conf_path, const std::string &action_conf_path, double frequency);
     
     std::string RecieveInstructions(sf::SimulationApp& simApp);
     void SendObservations();
