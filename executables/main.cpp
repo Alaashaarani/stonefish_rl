@@ -79,8 +79,9 @@ int main(int argc, char **argv) {
     }
 
     std::string scene_path = argv[1]; 
-    std::string obser_conf_path = argv[2]; 
-    std::string action_conf_path = argv[3]; 
+    std::string resources_path = argv[2]; 
+    std::string obser_conf_path = argv[3]; 
+    std::string action_conf_path = argv[4]; 
 
     sf::HelperSettings h;
     sf::RenderSettings r;
@@ -89,7 +90,7 @@ int main(int argc, char **argv) {
     
     StonefishRL* simManager = new StonefishRL(scene_path, obser_conf_path, action_conf_path, frequency); // Create the StonefishRL simulation manager
 
-    sf::GraphicalSimulationApp app("DEMO STONEFISH RL", scene_path, r, h, simManager);
+    sf::GraphicalSimulationApp app("DEMO STONEFISH RL", resources_path, r, h, simManager);
     //sf::ConsoleSimulationApp app("DEMO STONEFISH RL", scene_path, simManager);
 
     LearningThreadData data {app}; // is a struct that holds a reference to the sim app

@@ -8,11 +8,12 @@ sys.path.append(parent_dir)
 from girona_ds.docking_env import dsEnv # Goal version
 from core.launch_stonefish import launch_stonefish_simulator, global_path
 
-scene_path = global_path("Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn")
+scene_path = global_path("Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn") # concatinate the relative path with the global path of this repository
+resources_path = global_path ("./")
 observation_config_path = global_path("include/observations/ds_observation_config.json")
 action_config_path = global_path("include/observations/ds_action_config.json")
 
-launch_stonefish_simulator(scene_path, observation_config_path , action_config_path) 
+launch_stonefish_simulator(scene_path, resources_path, observation_config_path , action_config_path) 
 
 
 env = dsEnv(observation_config_path,

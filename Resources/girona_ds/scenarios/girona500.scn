@@ -4,12 +4,12 @@
 		<base_link name="Vehicle" type="compound" physics="submerged">
 			<external_part name="HullBottom" type="model" physics="submerged" buoyant="false">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/hull_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/hull_phy.obj" scale="1.0"/>
 					<thickness value="0.003"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/lower_hull.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/lower_hull.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Fiberglass"/>
@@ -19,12 +19,12 @@
 
 			<external_part name="HullPort" type="model" physics="submerged" buoyant="false">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/hull_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/hull_phy.obj" scale="1.0"/>
 					<thickness value="0.003"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/hull.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/hull.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Fiberglass"/>
@@ -34,12 +34,12 @@
 
 			<external_part name="HullStarboard" type="model" physics="submerged" buoyant="false">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/hull_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/hull_phy.obj" scale="1.0"/>
 					<thickness value="0.003"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/hull.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/hull.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Fiberglass"/>
@@ -49,12 +49,12 @@
 
 			<external_part name="TBarStern" type="model" physics="submerged" buoyant="false">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/tbar_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/tbar_phy.obj" scale="1.0"/>
 					<thickness value="0.003"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/tbar_back.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/tbar_back.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Aluminium"/>
@@ -64,12 +64,12 @@
 
 			<external_part name="TBarBow" type="model" physics="submerged" buoyant="false">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/tbar_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/tbar_phy.obj" scale="1.0"/>
 					<thickness value="0.003"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/tbar_front.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/tbar_front.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Aluminium"/>
@@ -79,11 +79,11 @@
 
 			<external_part name="DuctSway" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/duct_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/duct_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/duct.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/duct.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -93,11 +93,11 @@
 
 			<external_part name="DuctSurgePort" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/duct_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/duct_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/duct.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/duct.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -107,11 +107,11 @@
 
 			<external_part name="DuctSurgeStarboard" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/duct_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/duct_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/duct.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/duct.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -121,11 +121,11 @@
 
 			<external_part name="DuctHeaveStern" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/duct_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/duct_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/duct.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/duct.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -135,11 +135,11 @@
 
 			<external_part name="DuctHeaveBow" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/duct_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/duct_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/duct.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/duct.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -149,11 +149,11 @@
 
 			<external_part name="Antenna" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/antenna_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/antenna_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/antenna.obj" scale="1.0"/>
+					<mesh filename="Resources/g500/data/girona500/antenna.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Fiberglass"/>
@@ -164,11 +164,11 @@
 			<!-- extension arms to guide the robot in x direction of the docking station -->
 			<external_part name="back1" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p1_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p1_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p1_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p1_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -178,11 +178,11 @@
 
 			<external_part name="back2" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p2_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p2_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p2_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p2_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -192,11 +192,11 @@
 
 			<external_part name="back3" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p3_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p3_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p3_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p3_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -206,11 +206,11 @@
 
 			<external_part name="back4" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p4_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p4_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p4_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p4_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -220,11 +220,11 @@
 
 			<external_part name="back5" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p1_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p1_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p1_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p1_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -234,11 +234,11 @@
 
 			<external_part name="back6" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p2_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p2_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p2_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p2_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -249,11 +249,11 @@
 			<!-- front side - rotated from back ext by 180 -->
 			<external_part name="front1" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p1_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p1_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p1_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p1_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -263,11 +263,11 @@
 
 			<external_part name="front2" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p2_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p2_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p2_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p2_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -277,11 +277,11 @@
 
 			<external_part name="front3" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p3_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p3_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p3_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p3_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -291,11 +291,11 @@
 
 			<external_part name="front4" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p4_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p4_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p4_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p4_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -305,11 +305,11 @@
 
 			<external_part name="front5" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p1_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p1_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p1_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p1_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -319,11 +319,11 @@
 
 			<external_part name="front6" type="model" physics="submerged">
 				<physical>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p2_phy.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p2_phy.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</physical>
 				<visual>
-					<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/data/auv_ext_p2_vis.obj" scale="1.0"/>
+					<mesh filename="Resources/girona_ds/data/auv_ext_p2_vis.obj" scale="1.0"/>
 					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 				</visual>
 				<material name="Neutral"/>
@@ -364,14 +364,12 @@
 		<sensor name="dynamics" type="odometry" rate="30.0">
 			<link name="Vehicle"/>
 			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
-			<ros_publisher topic="/girona500/dynamics/odometry"/>
 		</sensor>
 
 		<sensor name="pressure" type="pressure" rate="5.0">
 			<link name="Vehicle"/>
 			<origin rpy="0.0 0.0 0.0" xyz="-0.48 0.35 -0.4"/>
 			<noise pressure="5.0"/>
-			<ros_publisher topic="/girona500/navigator/pressure"/>
 		</sensor>
 
 		<sensor name="dvl" type="dvl" rate="5.0">
@@ -380,21 +378,18 @@
 			<specs beam_angle="30.0"/>
 			<range velocity="9.0 9.0 9.0" altitude_min="0.5" altitude_max="81.0"/>
 			<noise velocity="0.0015" altitude="0.001"/>
-			<ros_publisher topic="/girona500/navigator/dvl_sim" altitude_topic="/girona500/navigator/altitude"/>
 		</sensor>
 
 		<sensor name="imu_filter" type="imu" rate="20.0">
 			<link name="Vehicle"/>
 			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 			<noise angle="0.000001745" angular_velocity="0.00001745"/>
-			<ros_publisher topic="/girona500/navigator/imu"/>
 		</sensor>
 
 		<sensor name="gps" type="gps" rate="1.0">
 			<link name="Vehicle"/>
 			<origin rpy="0.0 0.0 0.0" xyz="-0.54 -0.35 -0.74"/>
 			<noise ned_position="0.5"/>
-			<ros_publisher topic="/girona500/navigator/gps"/>
 		</sensor>
 
 		<!-- Camera Down Configuration -->
@@ -402,7 +397,6 @@
 			<link name="Vehicle"/>
 			<origin rpy="0.0 0.0 -1.571" xyz="0.535 0.0 0.45"/>
 			<specs resolution_x="${1936/2}" resolution_y="${1464/2}" horizontal_fov="55.0"/>
-			<ros_publisher topic="/girona500/camera_down"/>
 		</sensor>
 
 <!-- Thrusters -->
@@ -410,7 +404,7 @@
 			<link name="Vehicle"/>
 			<origin rpy="3.1416 0.0 0.0" xyz="-0.3297 -0.2587 -0.021"/>
 			<propeller diameter="0.18" right="true">
-				<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/propeller.obj"
+				<mesh filename="Resources/g500/data/girona500/propeller.obj"
 					scale="1.0" />
 				<material name="Neutral" />
 				<look name="propeller" />
@@ -433,7 +427,7 @@
 			<link name="Vehicle"/>
 			<origin rpy="0.0 0.0 0.0" xyz="-0.3297 0.2587 -0.021"/>
 			<propeller diameter="0.18" right="true">
-				<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/propeller.obj"
+				<mesh filename="Resources/g500/data/girona500/propeller.obj"
 					scale="1.0" />
 				<material name="Neutral" />
 				<look name="propeller" />
@@ -456,7 +450,7 @@
 			<link name="Vehicle"/>
 			<origin rpy="0.0 -1.571 -1.571" xyz="0.5347 0.0 -0.3137"/>
 			<propeller diameter="0.18" right="true">
-				<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/propeller.obj"
+				<mesh filename="Resources/g500/data/girona500/propeller.obj"
 					scale="1.0" />
 				<material name="Neutral" />
 				<look name="propeller" />
@@ -479,7 +473,7 @@
 			<link name="Vehicle"/>
 			<origin rpy="0.0 -1.571 1.571" xyz="-0.5827 0.0 -0.3137"/>
 			<propeller diameter="0.18" right="true">
-				<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/propeller.obj"
+				<mesh filename="Resources/g500/data/girona500/propeller.obj"
 					scale="1.0" />
 				<material name="Neutral" />
 				<look name="propeller" />
@@ -501,7 +495,7 @@
 			<link name="Vehicle"/>
 			<origin rpy="0.0 3.1416 1.571" xyz="-0.0627 0.0307 -0.021"/>
 			<propeller diameter="0.18" right="true">
-				<mesh filename="/home/cirs_alaa/repositories/stonefish_rl/Resources/g500/data/girona500/propeller.obj"
+				<mesh filename="Resources/g500/data/girona500/propeller.obj"
 					scale="1.0" />
 				<material name="Neutral" />
 				<look name="propeller" />
@@ -529,11 +523,8 @@
 			<resolution range="0.1" angle="0.1"/>
 			<origin xyz="0.15 0.0 0.6" rpy="3.14 0.0 0.0"/>
 			<link name="Vehicle"/>
-			<ros_publisher topic="/girona500/navigator/usblID2"/>
 		</comm>
 
 		<world_transform rpy="$(arg rpy_girona)" xyz="$(arg position)"/>
-		<ros_subscriber thrusters="/girona500/controller/thruster_setpoints_sim"/>
-		<ros_publisher thrusters="/girona500/controller/thruster_state"/>
 	</robot>
 </scenario>

@@ -23,7 +23,7 @@ def global_path(relative_path):
 
     return os.path.join(project_root, relative_path)
 
-def launch_stonefish_simulator(scene_relative_path, observation_config_path, action_config_path ):
+def launch_stonefish_simulator(scene_relative_path,resources_path, observation_config_path, action_config_path ):
     """
     Launch the Stonefish simulator with the specified scene.
     scene_relative_path: path relative to the project root.
@@ -36,4 +36,4 @@ def launch_stonefish_simulator(scene_relative_path, observation_config_path, act
     
     # Run the scene
     print(f"[INFO] Executing Stonefish with the scene: {scene_relative_path}")
-    stonefish_proc = subprocess.Popen([stonefish_exe, scene_relative_path, observation_config_path,action_config_path])
+    stonefish_proc = subprocess.Popen([stonefish_exe, scene_relative_path,resources_path, observation_config_path,action_config_path])
