@@ -78,6 +78,12 @@ private:
     */
     static float extractFromSensorType(sf::SimulationManager* sim, const std::string& name, 
                            sf::ScalarSensorType expected_type, int channel_index);
+    
+    // Return the quatornion values from the odomatry
+    static std::vector<float> extractRotationFromSensor(sf::SimulationManager* sim, 
+                                const std::string& name, sf::ScalarSensorType expected_type);
+
+    static double getYawFromQuaternion(std::vector<float> quat);
 
     
 };

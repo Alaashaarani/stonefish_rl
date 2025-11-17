@@ -27,7 +27,7 @@ class EnvStonefishRL(gym.Env):
         self.state = np.array([]) 
         self.observation_space = None
         self.action_space = None
-        
+        self.step_count = 0
         print(f"[ENV] Loaded: {self.observation_size} observations, {self.action_size} actions")
 
     def _load_config(self, config_path):
@@ -75,7 +75,7 @@ class EnvStonefishRL(gym.Env):
                 print(f"[WARNING] Observation size mismatch: expected {self.observation_size}, got {len(obs_vector)}")
             
             self.state = np.array(obs_vector, dtype=np.float32)
-            print(f"[DEBUG] Processed {len(self.state)} observations")
+            # print(f"[DEBUG] Processed {len(self.state)} observations")
             
         except json.JSONDecodeError as e:
             print(f"[ERROR] Failed to decode observation vector: {e}")
@@ -105,10 +105,13 @@ class EnvStonefishRL(gym.Env):
 
     def send_command(self, message):
         """Send command to StonefishRL simulator"""
-        print(f"[CONN] Sending command: {message}")
+        # print(f"[CONN] Sending command: {message}")
         self.socket.send_string(message)
+        # print(f"[PYTHON] Sending step action for step {self.step_count}")
+        self.step_count+=1        
         response = self.socket.recv_string()
-        print(f"[CONN] Response received: {len(response)} chars")
+        # print(f"[CONN] Response received: {len(response)} chars")
+        print("[EnvStonefishRL] Observation:", response)
         return response
 
     def close(self):
@@ -146,6 +149,7 @@ class EnvStonefishRL(gym.Env):
             
             super().reset(seed=seed)
             info = {}
+            self.step_count = 0
             return self.state, info
             
         except Exception as e:

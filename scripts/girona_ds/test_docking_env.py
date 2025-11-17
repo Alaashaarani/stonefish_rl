@@ -15,11 +15,10 @@ action_config_path = global_path("include/observations/ds_action_config.json")
 
 launch_stonefish_simulator(scene_path, resources_path, observation_config_path , action_config_path) 
 
-
+search_time =120
 env = dsEnv(observation_config_path,
             action_config_path,
-            ip="tcp://localhost:5555",
-            search_time=120 # sec
+            episode_duration= search_time, # sec
             )
 
 obs, info = env.reset()
@@ -34,17 +33,17 @@ while not (terminated or truncated):
     action = (cont_values).tolist() # go down
     obs, reward, terminated, truncated, info = env.step(action)   
     
-    print("\n Step: ", env.step_counter)
+    print("\n[Docking_env] Step: ", env.step_counter)
     # print("Observation:", obs)
-    print("Reward:", reward)
-    print("Terminated:", terminated, "| Truncated:", truncated)
+    print("[Docking_env] Reward:", reward)
+    print("[Docking_env] Terminated:", terminated, "| Truncated:", truncated)
 
     if terminated:
         print("GOAL ACHIEVED :) Resetting environment...\n")
         observation, info = env.reset()
         
     if truncated:
-        print("TRUNCATED: 30 seconds exceeded :(")
+        print(f" TRUNCATED: {search_time} seconds exceeded :(")
         observation, info = env.reset()
 
     terminated = False

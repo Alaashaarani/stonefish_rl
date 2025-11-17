@@ -16,7 +16,7 @@ void StateManager::setObservationConfig(const ObservationConfig& config) {
 
 void StateManager::initializeExtractors() {
     // Robot field extractors - explicitly cast double to float
-    
+    // use with external computation (example, ds position, object location .... )
     robot_extractors_ = {
         {"position.x", [](sf::SimulationManager* sim, const std::string& name) -> float {
             auto robot = sim->getRobot(name);
@@ -83,7 +83,7 @@ void StateManager::initializeExtractors() {
         {"encoder.angle", [](sf::SimulationManager* sim, const std::string& name) -> float {
             return extractFromSensorType(sim, name, sf::ScalarSensorType::ENCODER, 0);
         }},
-        {"encoder.angular_velocity", [](sf::SimulationManager* sim, const std::string& name) -> float {
+        {"encoder.angular.velocity", [](sf::SimulationManager* sim, const std::string& name) -> float {
             return extractFromSensorType(sim, name, sf::ScalarSensorType::ENCODER, 1);
         }},
 
@@ -97,31 +97,34 @@ void StateManager::initializeExtractors() {
         {"odom.position.z", [](sf::SimulationManager* sim, const std::string& name) -> float {
             return extractFromSensorType(sim, name, sf::ScalarSensorType::ODOM, 2);
         }},
-        {"odom.linear_velocity.x", [](sf::SimulationManager* sim, const std::string& name) -> float {
+        {"odom.linear.velocity.x", [](sf::SimulationManager* sim, const std::string& name) -> float {
             return extractFromSensorType(sim, name, sf::ScalarSensorType::ODOM, 3);
         }},
-        {"odom.linear_velocity.y", [](sf::SimulationManager* sim, const std::string& name) -> float {
+        {"odom.linear.velocity.y", [](sf::SimulationManager* sim, const std::string& name) -> float {
             return extractFromSensorType(sim, name, sf::ScalarSensorType::ODOM, 4);
         }},
-        {"odom.linear_velocity.z", [](sf::SimulationManager* sim, const std::string& name) -> float {
+        {"odom.linear.velocity.z", [](sf::SimulationManager* sim, const std::string& name) -> float {
             return extractFromSensorType(sim, name, sf::ScalarSensorType::ODOM, 5);
         }},
         {"odom.rotation.roll", [](sf::SimulationManager* sim, const std::string& name) -> float {
-            return extractFromSensorType(sim, name, sf::ScalarSensorType::ODOM, 6);
+            // (can be implemented if needed)
+            return NAN;
         }},
         {"odom.rotation.pitch", [](sf::SimulationManager* sim, const std::string& name) -> float {
-            return extractFromSensorType(sim, name, sf::ScalarSensorType::ODOM, 7);
+            // (can be implemented if needed)
+            return NAN;
         }},
         {"odom.rotation.yaw", [](sf::SimulationManager* sim, const std::string& name) -> float {
-            return extractFromSensorType(sim, name, sf::ScalarSensorType::ODOM, 8);
+            std::vector<float> vector  = extractRotationFromSensor(sim,name,sf::ScalarSensorType::ODOM);
+            return getYawFromQuaternion(vector);
         }},
-        {"odom.angular_velocity.x", [](sf::SimulationManager* sim, const std::string& name) -> float {
+        {"odom.angular.velocity.x", [](sf::SimulationManager* sim, const std::string& name) -> float {
             return extractFromSensorType(sim, name, sf::ScalarSensorType::ODOM, 10);
         }},
-        {"odom.angular_velocity.y", [](sf::SimulationManager* sim, const std::string& name) -> float {
+        {"odom.angular.velocity.y", [](sf::SimulationManager* sim, const std::string& name) -> float {
             return extractFromSensorType(sim, name, sf::ScalarSensorType::ODOM, 11);
         }},
-        {"odom.angular_velocity.z", [](sf::SimulationManager* sim, const std::string& name) -> float {
+        {"odom.angular.velocity.z", [](sf::SimulationManager* sim, const std::string& name) -> float {
             return extractFromSensorType(sim, name, sf::ScalarSensorType::ODOM, 12);
         }},
 
@@ -209,6 +212,18 @@ void StateManager::initializeExtractors() {
         {"dvl.altitude", [](sf::SimulationManager* sim, const std::string& name) -> float {
             return extractFromSensorType(sim, name, sf::ScalarSensorType::DVL, 3);
         }},
+        {"dvl.water.velocity.x", [](sf::SimulationManager* sim, const std::string& name) -> float {
+            // WARNING: IN DVL FRAME
+            return extractFromSensorType(sim, name, sf::ScalarSensorType::DVL, 4);
+        }},
+        {"dvl.water.velocity.y", [](sf::SimulationManager* sim, const std::string& name) -> float {
+            // WARNING: IN DVL FRAME
+            return extractFromSensorType(sim, name, sf::ScalarSensorType::DVL, 5); 
+        }},
+        {"dvl.water.velocity.z", [](sf::SimulationManager* sim, const std::string& name) -> float {
+            // WARNING: IN DVL FRAME
+            return extractFromSensorType(sim, name, sf::ScalarSensorType::DVL, 6);
+        }},
 
         // PROFILER SENSOR - if available
         {"profiler.range", [](sf::SimulationManager* sim, const std::string& name) -> float {
@@ -229,7 +244,7 @@ void StateManager::initializeExtractors() {
     };
 }
 
-// Helper function
+// Helper functions
 float StateManager::extractFromSensorType(sf::SimulationManager* sim, const std::string& name, 
                            sf::ScalarSensorType expected_type, int channel_index) {
     auto sensor_ptr = sim->getSensor(name);
@@ -240,6 +255,34 @@ float StateManager::extractFromSensorType(sf::SimulationManager* sim, const std:
         return NAN;
     return static_cast<float>(sensor->getLastSample().getValue(channel_index));
 }
+
+std::vector<float> StateManager::extractRotationFromSensor(sf::SimulationManager* sim, const std::string& name, 
+                           sf::ScalarSensorType expected_type) {
+    auto sensor_ptr = sim->getSensor(name);
+    std::vector<float> output(4,0);                        
+    sf::ScalarSensor* sensor = dynamic_cast<sf::ScalarSensor*>(sensor_ptr);
+    if (!sensor || sensor->getScalarSensorType() != expected_type){
+        std::cerr << "[State Manager] Cannot retrive Orientation" << std::endl;
+        return output;
+    } 
+    else{
+        sf::Sample values = sensor->getLastSample(); 
+        for (int i = 0; i < 4; i++)
+        output[i] = values.getValue(i+6); // orientation in quatornion is in 6,7,8,9
+    }
+
+    return output;
+}
+
+
+// Function to get only yaw from quaternion
+double StateManager::getYawFromQuaternion(std::vector<float> quat) {
+    // Yaw (z-axis rotation)
+    double siny_cosp = 2 * (quat[3] * quat[2] + quat[0] * quat[1]);
+    double cosy_cosp = 1 - 2 * (quat[1] * quat[1] + quat[2] * quat[2]);
+    return std::atan2(siny_cosp, cosy_cosp);
+}
+
 
 std::vector<float> StateManager::getObservationVector(sf::SimulationManager* sim) {
     std::vector<float> observations;
@@ -268,7 +311,10 @@ std::vector<float> StateManager::getObservationVector(sf::SimulationManager* sim
         
         observations.push_back(value);
     }
-    
+    // int id = 0;
+    // for(const float& spec_: observations){
+    //         std::cout << "[state_manager] Value stored "<< id++ <<" is: " << spec_ << std::endl; 
+    // }
     return observations;
 }
 
@@ -284,7 +330,7 @@ float StateManager::extractRobotField(sf::SimulationManager* sim, const Observat
                       << spec.entity_name << ": " << e.what() << std::endl;
         }
     } else {
-        std::cerr << "[StateManager] WARNING: No extractor for field: " << field_key << std::endl;
+        std::cerr << "[StateManager] WARNING: No robot extractor for field: " << field_key << std::endl;
     }
     
     return 0.0f;
@@ -301,9 +347,9 @@ float StateManager::extractSensorField(sf::SimulationManager* sim, const Observa
                       << spec.entity_name << ": " << e.what() << std::endl;
         }
     } else {
-        std::cerr << "[StateManager] WARNING: No extractor for field: " << field_key << std::endl;
+        std::cerr << "[StateManager] WARNING: No sensor extractor for field: " << field_key << std::endl;
     }
-    // // Implement sensor field extraction
+    // Implement sensor field extraction
     // std::cerr << "[StateManager] WARNING: Sensor extraction not yet implemented for " 
     //           << spec.entity_name << std::endl;
     return 0.0f;
@@ -321,6 +367,8 @@ sf::Robot* StateManager::findRobot(sf::SimulationManager* sim, const std::string
     unsigned int id = 0;
     sf::Robot* robot;
     while ((robot = sim->getRobot(id++)) != nullptr) {
+        // std::cout << "[StateManager] Checking robot: " << robot->getName() << " at value" << id << std::endl;
+
         if (robot->getName() == name) return robot;
     }
     return nullptr;

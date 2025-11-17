@@ -49,10 +49,10 @@ void CommandProcessor::parseActionCommands(const std::string& command) {
     if (!obs_str.empty()) {
         parseObservationFilter(obs_str);
     }
-    /* Debug output 
-    std::cout << "[CommandProcessor] Parsed " << commands_.size() << " actuators, " 
-    << relevant_obs_names_.size() << " observation filters" << std::endl;
-    */
+    //  Debug output 
+    // std::cout << "[CommandProcessor] Parsed " << commands_.size() << " actuators, " 
+    // << relevant_obs_names_.size() << " observation filters" << std::endl;
+    
 }
 
 RobotResetInfo CommandProcessor::parseObjectFromJson(const std::string& object_str) {
@@ -133,7 +133,7 @@ void CommandProcessor::parseObservationFilter(const std::string& obs_str) {
     while (std::getline(obsStream, obj_name, ';')) {
         if (!obj_name.empty()) {
             relevant_obs_names_.insert(obj_name);
-            std::cout << "[CommandProcessor] Observation filter: " << obj_name << std::endl;
+            // std::cout << "[CommandProcessor] Observation filter: " << obj_name << std::endl;
         }
     }
 }

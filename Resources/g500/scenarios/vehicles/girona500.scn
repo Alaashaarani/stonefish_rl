@@ -210,7 +210,7 @@
 			</internal_part>
 		</base_link>
 
-		<sensor name="dynamics" type="odometry" rate="30.0">
+		<sensor name="odometry" type="odometry" rate="30.0">
 			<link name="Vehicle"/>
 			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 		</sensor>

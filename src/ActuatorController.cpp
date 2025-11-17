@@ -61,7 +61,7 @@ void ActuatorController::controlServo(sf::Servo* servo, const std::unordered_map
 
 void ActuatorController::controlThruster(sf::Thruster* thruster, const std::unordered_map<std::string, float>& actions) {
     for (const auto &[action, action_value] : actions) {
-        if (action == "VELOCITY" || action == "TORQUE") {
+        if (action == "setPoint") {
             thruster->setSetpoint(action_value);
             // debug print
             // std::cout << "[ActuatorController] Set thruster setpoint: " << action_value << std::endl;

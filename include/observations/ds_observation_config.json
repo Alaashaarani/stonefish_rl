@@ -2,53 +2,81 @@
   "observation_config": {
     "specs": [
       {
-        "entity_name": "girona500",
+        "entity_name": "ds",
         "field_type": "position",
         "component": "x",
-        "output_name": "robot_pose_x"
+        "output_name": "ds_pose_x"
       },
       {
-        "entity_name": "girona500",
-        "field_type": "position", 
-        "component": "y",
-        "output_name": "robot_pose_y"
-      },
-      {
-        "entity_name": "girona500",
+        "entity_name": "ds",
         "field_type": "position",
-        "component": "z", 
-        "output_name": "robot_pose_z"
+        "component": "y",
+        "output_name": "ds_pose_y"
       },
       {
-        "entity_name": "girona500",
-        "field_type": "rotation",
+        "entity_name": "ds",
+        "field_type": "position",
+        "component": "z",
+        "output_name": "ds_pose_z"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.position",
+        "component": "x",
+        "output_name": "auv_pose_x"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.position", 
+        "component": "y",
+        "output_name": "auv_pose_y"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.position",
+        "component": "z", 
+        "output_name": "auv_pose_z"
+      },
+      
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.linear.velocity",
+        "component": "x",
+        "output_name": "auv_linear_velocity_x"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.linear.velocity", 
+        "component": "y",
+        "output_name": "auv_linear_velocity_y"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.linear.velocity",
+        "component": "z", 
+        "output_name": "auv_linear_velocity_z"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.rotation", 
         "component": "yaw",
-        "output_name": "robot_pose_yaw"
+        "output_name": "auv_pose_yaw"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.angular.velocity",
+        "component": "z", 
+        "output_name": "auv_angular_velocity_z"
       },
       {
         "entity_name": "girona500",
         "field_type": "collision",
         "component": "binary",
         "output_name": "collision_flag"
-      },
-      {
-        "entity_name": "girona500/imu_filter", 
-        "field_type": "imu.angular_velocity",
-        "component": "x",
-        "output_name": "imu_velocity_x"
-      },
-      {
-        "entity_name": "girona500/gps",
-        "field_type": "gps",
-        "component": "north",
-        "output_name": "gps_pose_north"
-      },
-      {
-        "entity_name": "girona500/pressure",
-        "field_type": "pressure",
-        "component": "value",
-        "output_name": "pressure_pose_depth"
       }
+    
+    
+      
     ]
   }
 }

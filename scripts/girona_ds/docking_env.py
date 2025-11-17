@@ -5,7 +5,11 @@ import gymnasium as gym
 
 
 class dsEnv(EnvStonefishRL):
-    def __init__(self, observation_config_path, action_config_path, search_time, ip="tcp://localhost:5555" ): 
+    def __init__(self, observation_config_path, action_config_path,
+                 episode_duration=120,  # seconds
+                 simulation_frequency=50,  # Hz, should be same value as in the main.cpp Frequency of stonefish 
+                 rl_frequency=10, # Hz, same value should be used in the main.cpp function  
+                 ip="tcp://localhost:5555" ): 
                  
         
         # Pass config paths to parent
@@ -13,9 +17,9 @@ class dsEnv(EnvStonefishRL):
 
         self.step_counter = 0
         self.target_threshold = 2
-        self.search_time = search_time
-        self.sim_stonefishRL = 0.001
-        self.dt = 0.02 # Simulation approximite Time per frame 
+        self.search_time = episode_duration
+        self.simulation_dt = 1.0 / simulation_frequency # shows the dt of each simulation step
+        self.rl_dt = 1.0 / rl_frequency # rl_dt steps time, used to step rl with a different rate of  
         self.goal_pose = np.array([-5.5, 0, 5.2])
         
         # Last action will be appended to observation
@@ -106,6 +110,8 @@ class dsEnv(EnvStonefishRL):
         info.update(self._get_additional_info())
         
         return obs, total_reward, terminated, truncated, info
+    
+    
 
     def calculate_additional_reward(self):
         """Application-specific reward calculation"""
@@ -135,9 +141,10 @@ class dsEnv(EnvStonefishRL):
 
     def _get_observation_by_pattern(self, pattern, default=0.0):
         """Get observation value by name pattern"""
+        # print("[DEBUG] self.observation_names", self.observation_names)
         for i, name in enumerate(self.observation_names):
             if pattern in name and i < len(self.state):
-                print(f"[DEBUG] Found observation '{name}' matching pattern '{pattern}': {self.state[i]}")
+                # print(f"[DEBUG] Found observation '{name}' matching pattern '{pattern}': {self.state[i]}")
                 return self.state[i]
         return default
 
@@ -168,7 +175,7 @@ class dsEnv(EnvStonefishRL):
     def _is_truncated(self):
         """Application-specific truncation conditions"""
         # Truncate if exceeded time limit
-        if self.step_counter * self.dt >= self.search_time:
+        if self.step_counter * self.rl_dt >= self.search_time:
             return True
         return False
 
