@@ -59,32 +59,34 @@
 	</static>
 
 	<!-- Robot -->
-	<include file="Resources/girona_ds/scenarios/girona500.scn">
+	<include file="Resources/girona_ds/scenarios/girona500_v2.scn">
 		<arg name="robot_name" value="girona500"/>
 		<arg name="position" value="0.0 0.0 0.0"/>
 		<arg name="rpy_girona" value="0.0 0.0 0.0"/>
 	</include>
 
-	<include file="Resources/girona_ds/scenarios/ds.scn">
+	<!-- <include file="Resources/girona_ds/scenarios/ds.scn">
 		<arg name="robot_name" value="ds"/>
 		<arg name="position" value="0.0 0.0 0.0"/>
 		<arg name="rpy_girona" value="0.0 0.0 0.0"/>
-	</include>
+	</include> -->
 
-	<include file="Resources/girona_ds/scenarios/goal.scn">
+	<!-- <include file="Resources/girona_ds/scenarios/goal.scn">
 		<arg name="robot_name" value="goal"/>
 		<arg name="position" value="0.0 0.0 0.0"/>
 		<arg name="rpy" value="0.0 0.0 0.0"/>
-	</include>
+	</include> -->
 
 	<!-- Girona Docking Station -->
-	<!-- <include file="$(find STONEFISH_RL)/scenarios/docking_station.scn">
-		<arg name="offset_x" value="$(param ds_north)" />
-		<arg name="offset_y" value="$(param ds_east)" />
-		<arg name="offset_z" value="$(param ds_down)" />
-		<arg name="offset_row" value="0.0" />
-		<arg name="offset_pitch" value="0.0" />
-		<arg name="offset_yaw" value="$(param ds_yaw)" />
-		<arg name="ds_name" value="$(param ds_name)" />
+	<!-- <include file="Resources/girona_ds/scenarios/ds.scn">
+		<arg name="ds_name" value="ds"/>
+		<arg name="position" value="0.0 0.0 0.0"/>
+		<arg name="rotation" value="0.0 0.0 0.0"/>
 	</include> -->
+
+	<include file="Resources/girona_ds/scenarios/ds_2.scn">
+		<arg name="ds_name" value="ds"/>
+		<arg name="position" value="0.0 0.0 5.5"/>
+		<arg name="rotation" value="0.0 0.0 0.0"/>
+	</include>
 </scenario>

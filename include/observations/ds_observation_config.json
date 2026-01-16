@@ -20,6 +20,12 @@
         "output_name": "ds_pose_z"
       },
       {
+        "entity_name": "ds",
+        "field_type": "rotation",
+        "component": "yaw",
+        "output_name": "ds_rotation_yaw"
+      },
+      {
         "entity_name": "girona500/odometry",
         "field_type": "odom.position",
         "component": "x",
@@ -37,7 +43,12 @@
         "component": "z", 
         "output_name": "auv_pose_z"
       },
-      
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.rotation", 
+        "component": "yaw",
+        "output_name": "auv_pose_yaw"
+      },
       {
         "entity_name": "girona500/odometry",
         "field_type": "odom.linear.velocity",
@@ -58,12 +69,6 @@
       },
       {
         "entity_name": "girona500/odometry",
-        "field_type": "odom.rotation", 
-        "component": "yaw",
-        "output_name": "auv_pose_yaw"
-      },
-      {
-        "entity_name": "girona500/odometry",
         "field_type": "odom.angular.velocity",
         "component": "z", 
         "output_name": "auv_angular_velocity_z"
@@ -74,9 +79,7 @@
         "component": "binary",
         "output_name": "collision_flag"
       }
-    
-    
-      
     ]
+    
   }
 }

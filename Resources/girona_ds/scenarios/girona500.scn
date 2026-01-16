@@ -393,11 +393,11 @@
 		</sensor>
 
 		<!-- Camera Down Configuration -->
-		<sensor name="camera_down" type="camera" rate="2.0">
+		<!-- <sensor name="camera_down" type="camera" rate="2.0">
 			<link name="Vehicle"/>
 			<origin rpy="0.0 0.0 -1.571" xyz="0.535 0.0 0.45"/>
 			<specs resolution_x="${1936/2}" resolution_y="${1464/2}" horizontal_fov="55.0"/>
-		</sensor>
+		</sensor> -->
 
 <!-- Thrusters -->
 		<actuator name="ThrusterSurgePort" type="thruster">
