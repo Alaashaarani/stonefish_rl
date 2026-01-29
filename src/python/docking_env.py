@@ -6,19 +6,16 @@ import time
 
 class dsEnv(EnvStonefishRLParallel):
     def __init__(self, observation_config_path, action_config_path,
+                 real_time = False,
                  resolution=300, 
                  env_id=0,
                  base_port=5555,
                  episode_duration=120,
-                 simulation_frequency=50,
-                 rl_frequency=10,
                  graphical=False,
                  **kwargs):
         
         # 1. Store timing parameters first
         self.search_time = episode_duration
-        self.simulation_dt = 1.0 / simulation_frequency
-        self.rl_dt = 1.0 / rl_frequency
         
         # 2. Extract paths from kwargs for the launcher
         scene_path = kwargs.get("scene_path")
@@ -27,23 +24,29 @@ class dsEnv(EnvStonefishRLParallel):
         # 3. Launch the simulator (Specific to this instance)
         if scene_path and resources_path:
             self.process = launch_stonefish_simulator(
-                scene_path, resources_path, 
-                observation_config_path, action_config_path, 
+                scene_path, 
+                resources_path, 
+                observation_config_path, 
+                action_config_path, 
+                real_time,
                 port=(base_port + env_id),
                 resolution=resolution,
                 graphical=graphical,
             )
             # Give the simulator a moment to bind the socket
-            time.sleep(2.0) 
+            time.sleep(1.0) 
         
         # 4. Initialize parent (ZMQ connection)
         super().__init__(observation_config_path, action_config_path, env_id, base_port)
 
         # 5. Application specific init
         self.step_counter = 0
+        self.goal_achieved = False
+        self.start_distance_factor = 0.0
         self.target_threshold = 2
         self.goal_pose = np.array([-5.5, 0, 5.2])
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
+        self.current_action = np.zeros(self.action_size, dtype=np.float32)
         
         
 
@@ -51,25 +54,32 @@ class dsEnv(EnvStonefishRLParallel):
         """Build RESET command - specific to this application"""
         # ds_pos = [-3, -1, 5.0]
         # ds_rot = [0.0, 0.0, 0.0]
-
+        # method one of randomization: start_distance_factor increases gradually
+        # if self.goal_achieved:
+        #     if self.start_distance_factor < 1.0:
+        #         self.start_distance_factor += 0.05
+        #     goal_achieved = False
+        # method two, random factor each time 
+        self.start_distance_factor = np.random.random()
+        # self.start_distance_factor = 0.1
         girona_pos = [
-            self.np_random.uniform(-6.0, 6.0),
-            self.np_random.uniform(-3.0, 3.0),
-            1.2
+            0.0+ self.start_distance_factor*self.np_random.uniform(-6.0, 6.0),
+            0.0+ self.start_distance_factor*self.np_random.uniform(-3.0, 3.0),
+            4.0- (self.start_distance_factor*2.8 )
         ]
-        girona_rot = [True,
-            self.np_random.uniform(-np.pi, np.pi),
+        girona_rot = [
+            0.0+ self.start_distance_factor*self.np_random.uniform(-np.pi, np.pi),
             0.0,
             0.0
         ]
 
         ds_pos = [
-            self.np_random.uniform(-1.0, 1.0),
-            self.np_random.uniform(-1.0, 1.0),
+            0.0+ self.start_distance_factor*self.np_random.uniform(-1.0, 1.0),
+            0.0+ self.start_distance_factor*self.np_random.uniform(-1.0, 1.0),
             5.5
         ]
         ds_rot = [
-            self.np_random.uniform(-np.pi, np.pi),
+            0.0+0.5*self.start_distance_factor*self.np_random.uniform(-np.pi, np.pi),
             0.0,
             0.0
         ]
@@ -115,14 +125,14 @@ class dsEnv(EnvStonefishRLParallel):
     def step(self, action):
         """Execute step with cleaned logic"""
         self.step_counter += 1
-        self.last_action_applied = np.array(action, dtype=np.float32).flatten()
+        self.current_action = np.array(action, dtype=np.float32).flatten()
         
         obs, reward, terminated, truncated, info = super().step(action)
-        
+
         # Application logic
         if not self._auv_observed_ds():
-            obs[0:4] = 0.0 # Efficiently zero out the slice
-            additional_reward = -10.0        
+            obs[0:3] += np.random.random(3) # mark as out of sight
+            additional_reward = -6.0 # Penalty for losing sight of the docking station
         else:
             additional_reward = self.calculate_additional_reward()
             
@@ -132,33 +142,45 @@ class dsEnv(EnvStonefishRLParallel):
             
         
         # Goal check
-        if additional_reward == 0:
+        if self.goal_achieved:
             print(f"[Port {self.port}] Goal achieved!")
             terminated = True
         
+        if truncated:
+            additional_reward -= 10.0  # Penalty for timeout
+            
         total_reward = reward + additional_reward
+        self.last_action_applied = self.current_action
         info.update(self._get_additional_info())
-        
-        return obs, total_reward, terminated, truncated, info
+        return np.round(obs,2), total_reward, terminated, truncated, info
     
 
     def calculate_additional_reward(self):
         """Application-specific reward calculation"""
         # Extract relevant observations using their names
         robot_pos = self._get_observation_by_pattern("auv_pose")
-        ball_pos = self._get_observation_by_pattern("ds_pose")
-        # collision_flag = self._get_observation_by_pattern("collision", default=0.0)
+        ds_pose = self._get_observation_by_pattern("ds_pose")
+        distance_x = robot_pos[0] - ds_pose[0]
+        distance_y = robot_pos[1] - ds_pose[1]
+        distance_z = robot_pos[2] - ds_pose[2]
+        Yaw_error = robot_pos[3] - ds_pose[3]
 
-        # print(f"[DEBUG] robot_pos: {robot_pos}, collision_flag: {collision_flag}")
-        # Calculate distances
-        dist_to_target = self._distance_to_target(robot_pos[:3])
+
+        reward_dist = -abs(distance_x)-abs(distance_y)-(abs(distance_z)-1.25)*0.5
+        reward_yaw = np.exp(-2*abs(Yaw_error))-1
+        smoothing_reward = - abs(self.current_action - self.last_action_applied).sum()/abs(2*np.ones(self.action_size)).sum()
+        # print(f"[Port {self.port}], reward_yaw {reward_yaw:.2f} Action smoothness penalty: {smoothing_reward:.4f}")        
+
         
-        reward = 0.0
         # print(f"[DEBUG] dist_to_target: {dist_to_target}, dist_to_goal: {dist_to_goal}, collision_flag: {collision_flag}")
-        if dist_to_target > 0.1: # this distance is the ellips summation of its radia 
-            reward = dist_to_target*-1 # this value makes the weight moving the ball equivalent to reaching the ball
+        reward = reward_dist  + reward_yaw + smoothing_reward# this value makes the weight moving the ball equivalent to reaching the ball
+
+        if abs(distance_z) > 1.27 or abs(distance_x) > 0.15 or abs(distance_y) > 0.15 : 
+            self.goal_achieved = False
         else:
-            return 0 # AUV Achieved the Goal
+            self.goal_achieved = True
+            reward += 500.0  # Large reward for reaching the goal
+        print(f"[Port {self.port}] Distance to target: {distance_x:.2f} {distance_y:.2f} {distance_z:.2f} m , reward: {reward:.2f}", end='\r')
 
         # print(f"[DEBUG] Calculated additional reward: {reward}")    
         return reward
@@ -182,6 +204,7 @@ class dsEnv(EnvStonefishRLParallel):
         return np.linalg.norm(robot_pos - target_pos)
 
 
+
     def _is_terminated(self):
         """Application-specific termination conditions"""
         robot_pos = self._get_observation_by_pattern("auv_pose")
@@ -193,16 +216,20 @@ class dsEnv(EnvStonefishRLParallel):
         return False
 
     def _is_truncated(self):
-        """Cleaned truncation logic"""
-        return self.step_counter * self.rl_dt >= self.search_time
+        """Cleaned truncation logic""" 
+        return self.step_counter >= self.search_time
     
     def _auv_observed_ds(self):
         """Check if AUV has observed the docking station"""
-        ds_pos = self._get_observation_by_pattern("ds_pose")[:2]
-        auv_pos = self._get_observation_by_pattern("auv_pose")[:2]
-        distance = np.linalg.norm(ds_pos - auv_pos)
-        # Consider observed if within 10 meters
-        return distance < 2.0
+        ds_pos = self._get_observation_by_pattern("ds_pose")[:3]
+        auv_pos = self._get_observation_by_pattern("auv_pose")[:3]
+        
+        # check if AUV lies in DS cone field of view
+        k = 0.64 # considering the cone size of (2,2,4.4) 
+        xy_plane_distance = np.linalg.norm(ds_pos[:2]-auv_pos[:2])
+        z_distance = k*abs(ds_pos[2]-auv_pos[2])
+        return xy_plane_distance <= z_distance 
+
 
     def _get_additional_info(self):
         """Additional info for this application"""

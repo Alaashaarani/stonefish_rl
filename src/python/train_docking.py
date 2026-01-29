@@ -1,12 +1,14 @@
 import os
 import subprocess
 import sys
-from stable_baselines3 import SAC
+from stable_baselines3 import SAC,PPO
 from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
-
+import time
 from EnvStonefishRL import global_path
 from docking_env import dsEnv
+import wandb
+from wandb.integration.sb3 import WandbCallback
 
 def make_env(rank, 
              graphical=True,
@@ -28,6 +30,7 @@ def make_env(rank,
             observation_config_path=obs_path,
             action_config_path=act_path,
             resolution=reso,
+            episode_duration=100,
             env_id=rank,               # Unique ID: 0, 1, etc.
             base_port=5555,            # Port will be 5555 + rank
             scene_path=scene_path,
@@ -77,7 +80,8 @@ if __name__ == "__main__":
             
             windows_resolution = int(sys.argv[3])
     else:
-
+        enable_graphical = False
+        windows_resolution = 400
         num_envs = 2  # Set to 2 for two instances
 
 
@@ -85,9 +89,15 @@ if __name__ == "__main__":
     # 1. Configuration
     
     log_dir = "./logs/"
-    best_model_path ="SAC_girona_docking_final.zip"
+    best_model_path ="SAC_run2.zip"
     os.makedirs(log_dir, exist_ok=True)
 
+    run = wandb.init(
+    project="stonefish_docking",
+    sync_tensorboard=True,  # This automatically uploads your SB3 logs
+    monitor_gym=True,       # This upload videos of the robot
+    save_code=True, )
+    
     # 2. Create Parallel Environments
     # VecMonitor logs episode rewards/lengths for tensorboard
     train_env = SubprocVecEnv([make_env(i,graphical=enable_graphical,reso=windows_resolution) for i in range(num_envs)])
@@ -95,7 +105,8 @@ if __name__ == "__main__":
 
     # 3. Create Evaluation Environment (Separate instance for testing)
     # This ensures the best model is saved based on clean performance
-    eval_env = SubprocVecEnv([make_env(num_envs,reso=600)]) # Use the next available ID
+    time.sleep(2)  # Ensure different ports
+    eval_env = SubprocVecEnv([make_env(num_envs+2,reso=windows_resolution)]) # Use the next available ID
     eval_env = VecMonitor(eval_env, log_dir)
 
     # 4. Callback to evaluate and save the best model
@@ -103,39 +114,61 @@ if __name__ == "__main__":
         eval_env,
         best_model_save_path=log_dir,
         log_path=log_dir,
-        eval_freq=2500, # Adjust frequency for parallel steps
+        eval_freq=500, # Adjust frequency for parallel steps
         deterministic=True,
         render=False
     )
 
     # 5. Initialize SAC
     # MlpPolicy is standard for vector/sensor observations
-    # model = SAC(
+    model = SAC(
+        "MlpPolicy", 
+        train_env, 
+        train_freq=(1, "step"), # Collect steps from each env before updating
+        gradient_steps=1,       # Do  gradient updates 
+        verbose=1, 
+        # tensorboard_log=log_dir,
+        tensorboard_log=f"runs/{run.id}",
+        buffer_size=100000, 
+        learning_starts=3000
+    )
+
+    # model = PPO(
     #     "MlpPolicy", 
     #     train_env, 
-    #     train_freq=(1, "step"), # Collect steps from each env before updating
-    #     gradient_steps=1,       # Do  gradient updates 
-    #     verbose=1, 
-    #     tensorboard_log=log_dir,
-    #     buffer_size=100000, 
-    #     learning_starts=3000
+    #     verbose=1,
+    #     tensorboard_log=f"runs/{run.id}"
     # )
 
     # Optional: Load previous model
-    model = SAC.load(best_model_path, env=train_env)
+    # model = SAC.load(best_model_path, env=train_env,tenserboard_log=f"runs/{run.id}")
+    # model = SAC.load("sac_warm_started", env=train_env, tensorboard_log=f"runs/{run.id}")
+    # model = SAC.load("../logs/sac_run4", env=train_env, tensorboard_log=f"runs/{run.id}")
 
+    starting_time = time.time()
     # 6. Train the model
     print(f"Starting training with {num_envs} instances...")
     try:
         model.learn(
-            total_timesteps=2500_000, 
-            callback=eval_callback,
-            reset_num_timesteps=False
-        )
+            total_timesteps=1500000,
+            reset_num_timesteps=False, 
+            callback=[eval_callback, WandbCallback(
+        gradient_save_freq=100,
+        model_save_path=f"models/{run.id}",
+        verbose=2,
+        
+        )] )
+   
     except KeyboardInterrupt:
         print("Training interrupted by user.")
     finally:
         # 7. Final Save and Cleanup
-        model.save("SAC_girona_docking_final")
+        model.save("SAC_run3")
         train_env.close()
         eval_env.close()
+
+    end_time = time.time()
+    elapsed_time = end_time - starting_time
+    print(f"Training completed in {elapsed_time / 60:.2f} minutes.")
+
+    

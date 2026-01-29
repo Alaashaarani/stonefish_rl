@@ -13,6 +13,7 @@ if __name__ == "__main__":
     res_path = global_path("./")
     
     # Path to your best model
+    # model_path = "/home/cirs_alaa/repositories/stonefish_rl/src/python/SAC_girona_docking_final.zip"
     model_path = "/home/cirs_alaa/repositories/stonefish_rl/src/python/logs/best_model.zip"
 
     # 2. Initialize the Single Environment
@@ -32,11 +33,12 @@ if __name__ == "__main__":
 
     # 3. Load the Model
     # We pass the env to the load function to ensure the action/obs spaces match
-    model = SAC.load(model_path, env=env)
+    # model = SAC.load(model_path, env=env)
+    model = SAC.load("sac_warm_started.zip", env=env)  # IGNORE
     print(f"Model loaded from: {model_path}")
 
     # 4. Evaluation Loop
-    num_episodes = 5
+    num_episodes = 30
     for ep in range(num_episodes):
         obs, _ = env.reset()
         done = False
@@ -49,8 +51,11 @@ if __name__ == "__main__":
         while not (done or truncated):
             # deterministic=True is crucial for evaluation!
             action, _ = model.predict(obs, deterministic=True)
-            
-            obs, reward, done, truncated, info = env.step(action*100)
+
+            # downward actions 
+            # action = np.array([0.0, 0.0, 0.0,-1.0,-1.0])
+
+            obs, reward, done, truncated, info = env.step(action)
             
             total_reward += reward
             step_counter += 1

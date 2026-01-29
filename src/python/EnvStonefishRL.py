@@ -250,6 +250,7 @@ def launch_stonefish_simulator(scene_relative_path,
                                resources_path, 
                                observation_config_path, 
                                action_config_path, 
+                               real_time = False,
                                port=5555,
                                resolution=300,
                                graphical=False):
@@ -264,18 +265,22 @@ def launch_stonefish_simulator(scene_relative_path,
     print(f"[INFO] Executing Stonefish on Port {port} with the scene: {scene_relative_path}")
     
     # We use a process group (start_new_session) so we can kill this specific tree later
-    stonefish_proc = subprocess.Popen(
-        [stonefish_exe, 
-         scene_relative_path, 
-         resources_path, 
-         observation_config_path, 
-         action_config_path, 
-         str(port),
-         str(resolution),
-         str(graphical)
-         ],
-        start_new_session=True 
-    )
+    vector = [stonefish_exe, 
+        scene_relative_path, 
+        resources_path, 
+        observation_config_path, 
+        action_config_path, 
+        str(port),
+        str(resolution),
+        str(graphical)
+        ]
+    
+    if real_time: 
+        vector.append(str(0.0)) # flag for real time,
+    
+        
+    stonefish_proc = subprocess.Popen(vector,
+        start_new_session=True )
     
     return stonefish_proc
 

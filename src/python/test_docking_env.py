@@ -3,7 +3,7 @@ import numpy as np
 import time
 from docking_env import dsEnv
 from EnvStonefishRL import global_path
-
+from controller import LogitechController
 from stable_baselines3.common.vec_env import SubprocVecEnv
 
 def make_env(rank, 
@@ -26,8 +26,10 @@ def make_env(rank,
             observation_config_path=obs_path,
             action_config_path=act_path,
             resolution=reso,
+            real_time= True,
+            episode_duration=2000, # sec
             env_id=rank,               # Unique ID: 0, 1, etc.
-            base_port=5555,            # Port will be 5555 + rank
+            base_port=5595,            # Port will be 5555 + rank
             scene_path=scene_path,
             resources_path=res_path,
             graphical=graphical # if true, make sure to have low number of instances 
@@ -68,8 +70,9 @@ if __name__ == "__main__":
             
             windows_resolution = int(sys.argv[3])
     else:
-
-        num_instances = 2  # Set to 2 for two instances
+        enable_graphical = True
+        windows_resolution = 800
+        num_instances = 1  # Set to 2 for two instances
     
     # Create the vectorized environment
     # This spawns 'num_instances' separate python processes, each launching Stonefish
@@ -79,17 +82,33 @@ if __name__ == "__main__":
     
     # Reset all environments
     obs = envs.reset()
+    controller = LogitechController(deadzone=0.1)
 
     for step in range(10000):
         # Generate random actions for all environments
-        # action shape will be (num_instances, action_size)
-        actions = [envs.action_space.sample() for _ in range(num_instances)]
+        # action shape will be (num_instances, action_size) randomly sampled
+        # controller
+        actions = [controller.get_thruster_values() for _ in range(num_instances)]
         
+        #  random actions
+        # actions = [envs.action_space.sample() for _ in range(num_instances)]
+
+        # downward action (hard coded)
+        # actions = [[0.0, 0.0, 0.0,-1.0,-1.0] for _ in range(num_instances)]
+        
+        # Circular motion
+        # actions = [[0.7,0.1,0.0,-0.0,-0.0]for _ in range(num_instances)]
+        
+        # stable 
+        # actions = [[0.0,0.0,0.0,-0.0,-0.0]for _ in range(num_instances)]
+
         # Step all environments simultaneously
         obs, rewards, dones, infos = envs.step(actions)
-        
-        if step % 10 == 0:
-            print(f"Step {step} | Rewards: {rewards}")
+        if abs(rewards) > 100:
+            print(f"\nStep {step} | Rewards: {rewards} | observations[0]: {obs[0]}")
+            
+        if step % 100 == 0:
+            print(f"Step {step} | Rewards: {rewards} | observations[0]: {obs[0]}")
 
     print("Testing finished. Closing environments...")
     envs.close()

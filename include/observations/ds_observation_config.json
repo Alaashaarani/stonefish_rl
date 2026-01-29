@@ -23,7 +23,7 @@
         "entity_name": "ds",
         "field_type": "rotation",
         "component": "yaw",
-        "output_name": "ds_rotation_yaw"
+        "output_name": "ds_pose_yaw"
       },
       {
         "entity_name": "girona500/odometry",
