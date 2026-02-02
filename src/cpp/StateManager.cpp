@@ -394,13 +394,13 @@ sf::Actuator* StateManager::findActuator(sf::SimulationManager* sim, const std::
     return nullptr;
 }
 
-void StateManager::updateRobotPosition(const std::vector<RobotResetInfo>& robot_info, sf::SimulationManager* sim) {
+void StateManager::updateRobotPosition(const std::vector<ResetInfo>& robot_info, sf::SimulationManager* sim) {
     for (const auto& info : robot_info) {
         positionSingleRobot(info, sim);
     }
 }
 
-void StateManager::positionSingleRobot(const RobotResetInfo& info, sf::SimulationManager* sim) {
+void StateManager::positionSingleRobot(const ResetInfo& info, sf::SimulationManager* sim) {
     sf::Robot* robot = findRobot(sim, info.name);
     if (!robot) {
         std::cerr << "[StateManager] ERROR: Robot not found for reset: " << info.name << std::endl;
@@ -456,3 +456,4 @@ void StateManager::printObservationSpecs() const {
                   << "." << spec.field_type << "." << spec.component << std::endl;
     }
 }
+

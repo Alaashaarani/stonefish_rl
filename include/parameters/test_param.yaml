@@ -1,0 +1,18 @@
+# Environment Settings
+env:
+  observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_observation_config.json"
+  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
+  instances: 1
+  base_port: 5595
+  search_time: 30
+  rl_observation_freq: 5
+
+
+sim:
+  scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn"
+  resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
+  graphical_interface: True
+  resolution: 600
+  realtime: False
+
+

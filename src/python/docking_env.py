@@ -5,39 +5,25 @@ import gymnasium as gym
 import time
 
 class dsEnv(EnvStonefishRLParallel):
-    def __init__(self, observation_config_path, action_config_path,
-                 real_time = False,
-                 resolution=300, 
-                 env_id=0,
-                 base_port=5555,
-                 episode_duration=120,
-                 graphical=False,
-                 **kwargs):
+    def __init__(self, rank, config,**kwargs):
+        
+        
+        obs_path = config["env"]["observation_config"]
+        act_path = config["env"]["action_config"]
+
         
         # 1. Store timing parameters first
-        self.search_time = episode_duration
+        self.search_time = config["env"]["search_time"]  # seconds
+        self.rl_observation_freq = config["env"]["rl_observation_freq"]  # Hz
         
-        # 2. Extract paths from kwargs for the launcher
-        scene_path = kwargs.get("scene_path")
-        resources_path = kwargs.get("resources_path")
         
         # 3. Launch the simulator (Specific to this instance)
-        if scene_path and resources_path:
-            self.process = launch_stonefish_simulator(
-                scene_path, 
-                resources_path, 
-                observation_config_path, 
-                action_config_path, 
-                real_time,
-                port=(base_port + env_id),
-                resolution=resolution,
-                graphical=graphical,
-            )
-            # Give the simulator a moment to bind the socket
-            time.sleep(1.0) 
+        self.process = launch_stonefish_simulator(rank, config)            
+        # Give the simulator a moment to bind the socket
+        time.sleep(1.0) 
         
         # 4. Initialize parent (ZMQ connection)
-        super().__init__(observation_config_path, action_config_path, env_id, base_port)
+        super().__init__(obs_path, act_path, rank, config["env"]["base_port"])
 
         # 5. Application specific init
         self.step_counter = 0
@@ -58,7 +44,7 @@ class dsEnv(EnvStonefishRLParallel):
         # if self.goal_achieved:
         #     if self.start_distance_factor < 1.0:
         #         self.start_distance_factor += 0.05
-        #     goal_achieved = False
+
         # method two, random factor each time 
         self.start_distance_factor = np.random.random()
         # self.start_distance_factor = 0.1
@@ -84,9 +70,11 @@ class dsEnv(EnvStonefishRLParallel):
             0.0
         ]
 
+        current_vec = [self.np_random.uniform(-.1, 0.1),self.np_random.uniform(-0.1, 0.1), 0.0]
+
         return [
-            {"name": "girona500", "position": girona_pos, "rotation": girona_rot},
-            {"name": "ds", "position": ds_pos, "rotation": ds_rot}
+            {"name": "girona500", "position": girona_pos, "rotation": girona_rot, "current":current_vec},
+            {"name": "ds", "position": ds_pos, "rotation": ds_rot},
         ]
 
     def reset(self, seed=None, options=None):
@@ -100,7 +88,7 @@ class dsEnv(EnvStonefishRLParallel):
         
         self.step_counter = 0
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
-        
+        self.goal_achieved = False
         obs = self.get_observation()
         info = {}
         
@@ -119,7 +107,7 @@ class dsEnv(EnvStonefishRLParallel):
         
         # Add last action
         # obs.extend(self.last_action_applied.tolist())
-        
+
         return np.array(obs, dtype=np.float32)
 
     def step(self, action):
@@ -194,7 +182,6 @@ class dsEnv(EnvStonefishRLParallel):
             if pattern in name and i < len(self.state):
                 # print("Matched")
                 value.append(self.state[i])
-        
         return np.array(value) if len(value)>0 else default
 
     def _distance_to_target(self, robot_pos):
@@ -217,7 +204,7 @@ class dsEnv(EnvStonefishRLParallel):
 
     def _is_truncated(self):
         """Cleaned truncation logic""" 
-        return self.step_counter >= self.search_time
+        return self.step_counter/self.rl_observation_freq >= self.search_time
     
     def _auv_observed_ds(self):
         """Check if AUV has observed the docking station"""

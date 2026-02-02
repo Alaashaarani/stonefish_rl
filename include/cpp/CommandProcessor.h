@@ -15,7 +15,7 @@ public:
     CommandProcessor() = default;
     
     // Parse reset command and return robot reset information
-    std::vector<RobotResetInfo> parseResetCommand(const std::string& command);
+    std::vector<ResetInfo> parseResetCommand(const std::string& command);
 
     
     // Parse action commands and observation filters
@@ -45,7 +45,7 @@ private:
     std::unordered_set<std::string> relevant_obs_names_;
     
     // Helper methods
-    RobotResetInfo parseObjectFromJson(const std::string& object_str);
+    ResetInfo parseObjectFromJson(const std::string& object_str);
     void parseCommandToken(const std::string& token);
     void parseObservationFilter(const std::string& obs_str);
 };

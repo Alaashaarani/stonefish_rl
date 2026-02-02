@@ -15,6 +15,7 @@ StonefishRL::StonefishRL(const std::string &path,
       actuator_controller_()   // Default init (stateless)
 {
     // 1. Initialize ZMQ communicator
+    std::cout << "[StonefishRL,cpp] Initializing ZMQ communicator..." << port << std::endl;
     communicator = new ZMQCommunicator(port);  
     std::cout << "[StonefishRL] Initialized on port " << port << std::endl;
 
@@ -47,10 +48,19 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
     cmd = cmd.substr(pos + 1);
 
     if (prefix == "RESET") {
-        // Updated: Use RobotResetInfo instead of InfoObject
-        std::vector<RobotResetInfo> command_data = command_processor_.parseResetCommand(cmd);
+        // Updated: Use ResetInfo instead of InfoObject
+        std::vector<ResetInfo> command_data = command_processor_.parseResetCommand(cmd);
         state_manager_.updateRobotPosition(command_data, this);
         
+        sf::Vector3 currentVec(
+            command_data[0].current[0], 
+            command_data[0].current[1], 
+            command_data[0].current[2]
+        );
+        // std::cout << "[StonefishRL] Setting ocean current to: (" 
+        //           << currentVec[0] << ", " << currentVec[1] << ", " << currentVec[2] << ")\n";
+        getOcean()->AddVelocityField(new sf::Uniform(currentVec));    
+
         // Send observations using new vector approach
         SendObservations();
         // std::cout << "[StonefishRL] Received RESET command\n";
@@ -84,10 +94,7 @@ void StonefishRL::SendObservations() {
         if (i < observations.size() - 1) obs_json += ",";
     }
     obs_json += "]";
-    
     communicator->sendJson(obs_json);
-    // Debug output
-    // std::cout << "[StonefishRL] Sent observation vector: " << observations.size() << " elements" << std::endl;
 }
 
 void StonefishRL::ApplyCommands(const std::string& str_cmds) {
@@ -113,6 +120,10 @@ void StonefishRL::BuildScenario() {
     robotNames.clear();
     sensorNames.clear();
     actuatorNames.clear();
+    
+    EnableOcean(0.0);
+    getOcean()->AddVelocityField(new sf::Uniform(sf::Vector3(0.0,0.0,0.0)));
+    getOcean()->EnableCurrents();
 
     // Store entity names for reference
     unsigned int id = 0;
@@ -140,6 +151,8 @@ void StonefishRL::BuildScenario() {
               << sensorNames.size() << " sensors, "
               << actuatorNames.size() << " actuators\n";
 }
+
+
 
 
 std::vector<std::string> StonefishRL::RobotCollisionDetector(std::string& collision_robot)

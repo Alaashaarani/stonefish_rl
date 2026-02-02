@@ -10,6 +10,7 @@
 #include <Stonefish/core/SimulationManager.h>
 #include <Stonefish/core/SimulationApp.h>
 #include <Stonefish/core/ScenarioParser.h>
+#include <Stonefish/entities/forcefields/Uniform.h>
 #include <vector>
 #include <string>
 

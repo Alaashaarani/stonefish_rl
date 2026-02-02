@@ -21,11 +21,15 @@ struct ActionSpec {
 };
 
 // Robot reset information 
-struct RobotResetInfo {
+struct ResetInfo {
     std::string name;
     std::vector<float> position;  // [x, y, z]
     std::vector<float> rotation;  // [roll, pitch, yaw] or [x, y, z, w] for quaternion
+    std::vector<float> velocity;  // [vx, vy, vz]
+    std::vector<float> angular_velocity; // [wx, wy, wz]
+    std::vector<float> current; // in case of using currents 
 };
+
 
 // Configuration structures
 struct ObservationConfig {

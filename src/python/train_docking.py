@@ -1,13 +1,15 @@
 import os
 import subprocess
 import sys
+import datetime as dt
+import time
+import wandb
+
 from stable_baselines3 import SAC,PPO
 from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
-import time
 from EnvStonefishRL import global_path
 from docking_env import dsEnv
-import wandb
 from wandb.integration.sb3 import WandbCallback
 
 def make_env(rank, 
@@ -89,7 +91,6 @@ if __name__ == "__main__":
     # 1. Configuration
     
     log_dir = "./logs/"
-    best_model_path ="SAC_run2.zip"
     os.makedirs(log_dir, exist_ok=True)
 
     run = wandb.init(
@@ -114,7 +115,7 @@ if __name__ == "__main__":
         eval_env,
         best_model_save_path=log_dir,
         log_path=log_dir,
-        eval_freq=500, # Adjust frequency for parallel steps
+        eval_freq=1000, # Adjust frequency for parallel steps
         deterministic=True,
         render=False
     )
@@ -143,14 +144,14 @@ if __name__ == "__main__":
     # Optional: Load previous model
     # model = SAC.load(best_model_path, env=train_env,tenserboard_log=f"runs/{run.id}")
     # model = SAC.load("sac_warm_started", env=train_env, tensorboard_log=f"runs/{run.id}")
-    # model = SAC.load("../logs/sac_run4", env=train_env, tensorboard_log=f"runs/{run.id}")
+    # model = SAC.load("SAC_run3", env=train_env, tensorboard_log=f"runs/{run.id}")
 
     starting_time = time.time()
     # 6. Train the model
     print(f"Starting training with {num_envs} instances...")
     try:
         model.learn(
-            total_timesteps=1500000,
+            total_timesteps=1000_000,
             reset_num_timesteps=False, 
             callback=[eval_callback, WandbCallback(
         gradient_save_freq=100,
@@ -163,12 +164,10 @@ if __name__ == "__main__":
         print("Training interrupted by user.")
     finally:
         # 7. Final Save and Cleanup
-        model.save("SAC_run3")
+        model.save("SAC_run_"+dt.datetime.now().strftime("%Y%m%d_%H%M%S"))
         train_env.close()
         eval_env.close()
 
     end_time = time.time()
     elapsed_time = end_time - starting_time
     print(f"Training completed in {elapsed_time / 60:.2f} minutes.")
-
-    

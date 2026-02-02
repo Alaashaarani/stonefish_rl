@@ -123,8 +123,8 @@ bool CommandProcessor::isValidFloatString(const std::string& s) {
 }
 // end of helper function 
 
-std::vector<RobotResetInfo> CommandProcessor::parseResetCommand(const std::string& command) {
-    std::vector<RobotResetInfo> result;
+std::vector<ResetInfo> CommandProcessor::parseResetCommand(const std::string& command) {
+    std::vector<ResetInfo> result;
     size_t pos = 0;
 
     // Find all objects in the format { ... }
@@ -133,7 +133,7 @@ std::vector<RobotResetInfo> CommandProcessor::parseResetCommand(const std::strin
         if (end == std::string::npos) break;
         
         std::string object_str = command.substr(pos, end - pos + 1);
-        RobotResetInfo obj = parseObjectFromJson(object_str);
+        ResetInfo obj = parseObjectFromJson(object_str);
         result.push_back(obj);
         
         pos = end + 1;
@@ -175,12 +175,15 @@ void CommandProcessor::parseActionCommands(const std::string& command) {
     
 }
 
-RobotResetInfo CommandProcessor::parseObjectFromJson(const std::string& object_str) {
-    RobotResetInfo obj;
+
+ResetInfo CommandProcessor::parseObjectFromJson(const std::string& object_str) {
+    ResetInfo obj;
     
     try {
         json j = json::parse(object_str);
+    
         
+
         // Use helper function to get array with type conversion
         auto getFloatArray = [](const json& j, const std::string& key, 
                                 const std::vector<float>& default_value) -> std::vector<float> {
@@ -208,12 +211,24 @@ RobotResetInfo CommandProcessor::parseObjectFromJson(const std::string& object_s
             }
             return result;
         };
-        
+
+        // if (j.contains("name") && j["name"] == "environment") {
+        //     EnvResetInfo env;
+
+        //     if (j.contains("current")) {
+        //         env.current = j["current"].get<std::vector<float>>();
+                
+        //         // Getting Current Value
+        //         env.current = getFloatArray(j, "current", {0.0f, 0.0f, 0.0f});
+        //         // add wind and wave height later
+        //     }
+        //     return env;
+        // }
         // Get values
         obj.name = j.value("name", "unknown");
         obj.position = getFloatArray(j, "position", {0.0f, 0.0f, 0.0f});
         obj.rotation = getFloatArray(j, "rotation", {0.0f, 0.0f, 0.0f, 1.0f});
-        
+        obj.current = getFloatArray(j, "current", {0.0f, 0.0f, 0.0f});
     } catch (const json::exception& e) {
         std::cerr << "[ERROR] JSON parsing failed: " << e.what() << std::endl;
         throw;  // Or return default object
@@ -221,137 +236,6 @@ RobotResetInfo CommandProcessor::parseObjectFromJson(const std::string& object_s
     
     return obj;
 }
-
-// RobotResetInfo CommandProcessor::parseObjectFromJson(const std::string& object_str) {
-//     RobotResetInfo obj;
-    
-//     // Parse name
-//     size_t name_pos = object_str.find("\"name\"");
-//     if (name_pos != std::string::npos) {
-//         size_t start_quote = object_str.find("\"", name_pos + 6);
-//         size_t end_quote = object_str.find("\"", start_quote + 1);
-//         if (start_quote != std::string::npos && end_quote != std::string::npos) {
-//             obj.name = object_str.substr(start_quote + 1, end_quote - start_quote - 1);
-//         }
-//     }
-
-//     // Parse position
-//     // size_t pos_pos = object_str.find("\"position\"");
-//     // if (pos_pos != std::string::npos) {
-//     //     size_t bracket_start = object_str.find("[", pos_pos);
-//     //     size_t bracket_end = object_str.find("]", bracket_start);
-//     //     if (bracket_start != std::string::npos && bracket_end != std::string::npos) {
-//     //         std::string list = object_str.substr(bracket_start + 1, bracket_end - bracket_start - 1);
-//     //         std::stringstream ss(list);
-//     //         std::string val;
-//     //         while (std::getline(ss, val, ',')) {
-//     //             obj.position.push_back(std::stof(val));
-//     //         }
-//     //     }
-//     // }
-
-//     // Helper function 
-//    size_t pos_pos = object_str.find("\"position\"");
-//     if (pos_pos != std::string::npos) {
-//         size_t bracket_start = object_str.find("[", pos_pos);
-//         size_t bracket_end = object_str.find("]", bracket_start);
-//         if (bracket_start != std::string::npos && bracket_end != std::string::npos) {
-//             std::string list = object_str.substr(bracket_start + 1, bracket_end - bracket_start - 1);
-//             std::stringstream ss(list);
-//             std::string val;
-//             while (std::getline(ss, val, ',')) {
-//                 // Trim whitespace first
-//                 val.erase(0, val.find_first_not_of(" \t\n\r\f\v"));
-//                 val.erase(val.find_last_not_of(" \t\n\r\f\v") + 1);
-                
-//                 if (!val.empty()) {
-//                     try {
-//                         obj.position.push_back(safe_stof(val, " in position array"));
-//                     } catch (const std::exception& e) {
-//                         std::cerr << "[WARNING] Failed to parse position value: '" << val 
-//                                   << "', using 0.0. Error: " << e.what() << std::endl;
-//                         obj.position.push_back(0.0f);
-//                     }
-//                 } else {
-//                     std::cerr << "[WARNING] Empty value in position array, using 0.0" << std::endl;
-//                     obj.position.push_back(0.0f);
-//                 }
-//             }
-//         }
-//     }
-
-//     // Parse rotation
-//     // size_t rot_pos = object_str.find("\"rotation\"");
-//     // if (rot_pos != std::string::npos) {
-//     //     size_t bracket_start = object_str.find("[", rot_pos);
-//     //     size_t bracket_end = object_str.find("]", bracket_start);
-//     //     if (bracket_start != std::string::npos && bracket_end != std::string::npos) {
-//     //         std::string list = object_str.substr(bracket_start + 1, bracket_end - bracket_start - 1);
-//     //         std::stringstream ss(list);
-//     //         std::string val;
-//     //         while (std::getline(ss, val, ',')) {
-//     //             obj.rotation.push_back(std::stof(val));
-//     //         }
-//     //     }
-//     // }
-
-//     // helper function
-//     size_t rot_pos = object_str.find("\"rotation\"");
-//     if (rot_pos != std::string::npos) {
-//         size_t bracket_start = object_str.find("[", rot_pos);
-//         size_t bracket_end = object_str.find("]", bracket_start);
-//         if (bracket_start != std::string::npos && bracket_end != std::string::npos) {
-//             std::string list = object_str.substr(bracket_start + 1, bracket_end - bracket_start - 1);
-//             std::stringstream ss(list);
-//             std::string val;
-//             while (std::getline(ss, val, ',')) {
-//                 // Trim whitespace first
-//                 val.erase(0, val.find_first_not_of(" \t\n\r\f\v"));
-//                 val.erase(val.find_last_not_of(" \t\n\r\f\v") + 1);
-                
-//                 if (!val.empty()) {
-//                     try {
-//                         obj.rotation.push_back(safe_stof(val, " in rotation array"));
-//                     } catch (const std::exception& e) {
-//                         std::cerr << "[WARNING] Failed to parse rotation value: '" << val 
-//                                   << "', using 0.0. Error: " << e.what() << std::endl;
-//                         obj.rotation.push_back(0.0f);
-//                     }
-//                 } else {
-//                     std::cerr << "[WARNING] Empty value in rotation array, using 0.0" << std::endl;
-//                     obj.rotation.push_back(0.0f);
-//                 }
-//             }
-//         }
-//     }
-
-//     return obj;
-// }
-
-// void CommandProcessor::parseCommandToken(const std::string& token) {
-//     std::istringstream tokenStream(token);
-//     std::string actuator_name, action, action_value;
-    
-//     if (std::getline(tokenStream, actuator_name, ':') &&
-//         std::getline(tokenStream, action, ':') &&
-//         std::getline(tokenStream, action_value)) {
-        
-//         try {
-//             float value = std::stof(action_value);
-//             commands_[actuator_name][action] = value;
-//             // debug print
-//             // std::cout << "[CommandProcessor] Command: " << actuator_name << ":" 
-//                     //   << action << " = " << value << std::endl;
-//         }
-//         catch (const std::exception& e) {
-//             std::cerr << "[CommandProcessor] Invalid value for " << actuator_name 
-//                       << ":" << action << " -> '" << token << "': " << e.what() << std::endl;
-//         }
-//     } else {
-//         std::cerr << "[CommandProcessor] Invalid command format: '" << token 
-//                   << "'. Expected: 'actuator:action:value'" << std::endl;
-//     }
-// }
 
 void CommandProcessor::parseCommandToken(const std::string& token) {
     std::istringstream tokenStream(token);

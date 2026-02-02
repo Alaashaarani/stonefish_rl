@@ -28,7 +28,7 @@ public:
     std::vector<std::string> getObservationNames() const;
     
     // Robot management
-    void updateRobotPosition(const std::vector<RobotResetInfo>& robot_info, sf::SimulationManager* sim);
+    void updateRobotPosition(const std::vector<ResetInfo>& robot_info, sf::SimulationManager* sim);
     
     // Utility
     size_t getObservationSize() const { return observation_specs_.size(); }
@@ -68,7 +68,7 @@ private:
     float getCollisionFlag(sf::SimulationManager* sim, const std::string& robot_name);
 
     // Robot positioning helper
-    void positionSingleRobot(const RobotResetInfo& info, sf::SimulationManager* sim);
+    void positionSingleRobot(const ResetInfo& info, sf::SimulationManager* sim);
     // used to extract information from sensors
     /* 
     \param sim is the stonefish class

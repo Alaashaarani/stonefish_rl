@@ -66,6 +66,7 @@ class EnvStonefishRLParallel(gym.Env):
             specs = self.observation_config.get("observation_config", {}).get("specs", [])
             for spec in specs:
                 names.append(spec.get("output_name", "unknown_observation"))
+            print(f"[DEBUG] Added observation name: {names}")
             return names
         except Exception as e:
             print(f"[ERROR] Failed to parse observation names: {e}")
@@ -97,7 +98,7 @@ class EnvStonefishRLParallel(gym.Env):
         except json.JSONDecodeError as e:
             print(f"[ERROR] Failed to decode observation vector: {e}")
             self.state = np.array([], dtype=np.float32)
-        
+
         return self.state
 
     def build_command(self, action_vector):
@@ -246,27 +247,31 @@ class EnvStonefishRLParallel(gym.Env):
 
 
 # this function calls the cpp launcher of stonefish located in main.cpp 
-def launch_stonefish_simulator(scene_relative_path, 
-                               resources_path, 
-                               observation_config_path, 
-                               action_config_path, 
-                               real_time = False,
-                               port=5555,
-                               resolution=300,
-                               graphical=False):
+def launch_stonefish_simulator(rank, config):
     """
     Launch the Stonefish simulator with a specific port for multi-instance support.
     """
     # Path to the Stonefish executable
     stonefish_exe = os.path.join(global_path("build"), "StonefishRLTest")
     
+    observation_config_path= config["env"]["observation_config"]
+    action_config_path= config["env"]["action_config"]
+    port=rank + config["env"]["base_port"]
+    print(f"[INFO] Launching Stonefish on Port {port}...")
+
+    scene_path= config["sim"]["scene_path"]
+    resources_path= config["sim"]["resources_path"]
+    real_time= config["sim"]["realtime"] 
+    resolution=config["sim"]["resolution"]
+    graphical=config["sim"]["graphical_interface"]
+    
     # Run the scene
     # Note: We pass the port as an additional command line argument to the C++ executable
-    print(f"[INFO] Executing Stonefish on Port {port} with the scene: {scene_relative_path}")
+    print(f"[INFO] Executing Stonefish on Port {port} with the scene: {scene_path}")
     
     # We use a process group (start_new_session) so we can kill this specific tree later
     vector = [stonefish_exe, 
-        scene_relative_path, 
+        scene_path, 
         resources_path, 
         observation_config_path, 
         action_config_path, 
@@ -274,6 +279,7 @@ def launch_stonefish_simulator(scene_relative_path,
         str(resolution),
         str(graphical)
         ]
+    
     
     if real_time: 
         vector.append(str(0.0)) # flag for real time,

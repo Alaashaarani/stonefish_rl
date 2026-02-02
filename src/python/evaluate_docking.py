@@ -4,41 +4,40 @@ import numpy as np
 from stable_baselines3 import SAC
 from EnvStonefishRL import global_path
 from docking_env import dsEnv
+import yaml 
 
-if __name__ == "__main__":
-    # 1. Setup Paths
-    obs_path = global_path("include/observations/ds_observation_config.json")
-    act_path = global_path("include/observations/ds_action_config.json")
-    scene_path = global_path("Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn")
-    res_path = global_path("./")
+def load_config(config_path):
+    with open(config_path, 'r') as f:
+        return yaml.safe_load(f)
     
+if __name__ == "__main__":
+    
+    if len(sys.argv) > 1:
+        try:
+            config= load_config(sys.argv[1])
+        except Exception as e:
+            print(f"Error loading config file: {e}, Add config file path as first argument")
+            sys.exit(1)
+
+    else:
+        config = load_config(global_path("include/parameters/evaluation_param.yaml"))
+
     # Path to your best model
     # model_path = "/home/cirs_alaa/repositories/stonefish_rl/src/python/SAC_girona_docking_final.zip"
     model_path = "/home/cirs_alaa/repositories/stonefish_rl/src/python/logs/best_model.zip"
 
-    # 2. Initialize the Single Environment
-    # We set env_id=0 and a specific port to ensure it doesn't 
-    # conflict with any background training processes
-    env = dsEnv(
-        observation_config_path=obs_path,
-        action_config_path=act_path,
-        resolution=600,
-        env_id=0,
-        base_port=5555,
-        scene_path=scene_path,
-        resources_path=res_path,
-        graphical=True, # only one instance
-        episode_duration=120
-    )
+   
+    env = dsEnv(0, config)
 
     # 3. Load the Model
-    # We pass the env to the load function to ensure the action/obs spaces match
     # model = SAC.load(model_path, env=env)
-    model = SAC.load("sac_warm_started.zip", env=env)  # IGNORE
+    # model = SAC.load("SAC_run3.zip", env=env)  
+    model = SAC.load("SAC_run_best.zip", env=env)  
+
     print(f"Model loaded from: {model_path}")
 
     # 4. Evaluation Loop
-    num_episodes = 30
+    num_episodes = 5
     for ep in range(num_episodes):
         obs, _ = env.reset()
         done = False
@@ -50,6 +49,9 @@ if __name__ == "__main__":
 
         while not (done or truncated):
             # deterministic=True is crucial for evaluation!
+            
+            # obs[3] += np.pi/2  # adjust heading observation because ds is oriented with half a pi
+
             action, _ = model.predict(obs, deterministic=True)
 
             # downward actions 

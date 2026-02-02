@@ -1560,6 +1560,6 @@
         </link>
 
 
-        <world_transform  rpy="$(arg rotation)" xyz="$(arg position)"/>
+        <world_transform   xyz="$(arg position)" rpy="$(arg rotation)"/>
     </robot>
 </scenario>

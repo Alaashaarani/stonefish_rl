@@ -29,8 +29,10 @@ struct LearningThreadData
 /*
 These values should match with the values in the enviroment you are using
 */
-double physics_frequency = 200; // frequencey used to compute physics (Number of times physics is computed per sec)  
-double stonefish_steps = 5; // simulation compute each 0.1 sec
+double physics_frequency = 300; // frequencey used to compute physics (Number of times physics is computed per sec)  
+double sf_dt = 0.1; // do 10 steps per sec
+double rl_observation_freq = 5;
+
 
 int learning(void* data) {
     sf::SimulationApp& simApp = static_cast<LearningThreadData*>(data)->sim;
@@ -38,8 +40,6 @@ int learning(void* data) {
     StonefishRL* myManager = static_cast<StonefishRL*>(simManager);
 
     // Extract steps from command (default to 1 if not specified)
-    
-
     while (simApp.getState() == sf::SimulationState::NOT_READY)
     {
         SDL_Delay(10);
@@ -49,22 +49,30 @@ int learning(void* data) {
     simApp.StartSimulation();
     std::string nextStepSim;
 
+    // checking simulation speed and executing the observation frequency accordingly 
+    double time0 = myManager->getSimulationTime();
+    for (int i = 0; i < 10; i++) {
+        simApp.StepSimulation();
+    }   
+    double sim_speed = (myManager->getSimulationTime() - time0)/10;
+    int sim_steps = (1/sim_speed)/rl_observation_freq;  // the simulation steps this amount before calling the RL agent 
+    
+    // wait for 2 sec
+
+
     while(nextStepSim != "EXIT")
     {   
         nextStepSim = myManager->RecieveInstructions(simApp);
         
-        float time0 = simManager->getSimulationTime();
-
-        // std::cout << "[Learning Thread] Simulation Time: " << time0 << "s, Next Step Command: " << nextStepSim << std::endl;
         if(nextStepSim == "CMD"){
             
-            // // Execute multiple simulation steps
-            for(int i = 0; i < stonefish_steps; i++) {
-                simApp.StepSimulation();
-            }
             
             myManager->SendObservations(); // Send observations after all steps
-            }      
+            for (int i = 0;i < sim_steps;i++) {
+                simApp.StepSimulation();
+            }
+                
+        }      
         else if (nextStepSim == "RESET"){
             simApp.StepSimulation();
         }                                               
@@ -77,7 +85,6 @@ int learning(void* data) {
 
 
 int main(int argc, char **argv) {
-    double sf_dt = 1/stonefish_steps; // do 10 steps per sec
 
     if (argc < 8) { // Changed from 4 to 5
         std::cerr << "[ERROR] Usage (ALL STR): SCENE_PATH RESOURCES_PATH OBS_CONFIG_PATH ACTION_CONFIG_PATH PORT RESOLUTION " << std::endl;
@@ -91,10 +98,16 @@ int main(int argc, char **argv) {
     int port = std::stoi(argv[5]); // Parse the port
     int resolution = std::stoi(argv[6]); // Parse the resolution
     std::string graphical_arg = argv[7];
-    std::cout << "[INFO] Using dt: " << sf_dt << " seconds." << std::endl;
-    std::cout << "[INFO] Using arg8: " << argv[8] << argc << " seconds." << std::endl;
     if (argc == 9) sf_dt = std::stod(argv[8]); // Parse the dt if provided
-    std::cout << "[INFO] Using dt: " << sf_dt << " seconds." << std::endl;
+
+
+    // std::cout << "[MAIN] Scene Path: " << scene_path << std::endl;
+    // std::cout << "[MAIN] Resources Path: " << resources_path << std::endl;
+    // std::cout << "[MAIN] Using dt: " << sf_dt << " seconds." << std::endl;
+    // std::cout << "[MAIN] Using arg8: " << argv[8] << " seconds." << std::endl;
+    // std::cout << "[MAIN] Using graphical interface: " << graphical_arg << std::endl;
+    // std::cout << "[MAIN] Using resolution: " << resolution << std::endl;
+    
 
     bool graphical = graphical_arg == "True";
     sf::HelperSettings h;
