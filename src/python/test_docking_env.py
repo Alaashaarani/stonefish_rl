@@ -15,15 +15,14 @@ def make_env(rank, config):
     """
     Utility function for multiprocessed env.
     :param rank: (int) index of the subprocess
-    :param seed: (int) the initial seed for RNG
+    :param config: Yaml file contains all required parameters
     """
     def _init():
         # Paths to your configs
-        
-
         env = dsEnv(rank, config)
         return env
     return _init
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -48,31 +47,26 @@ if __name__ == "__main__":
     
     # Reset all environments
     obs = envs.reset()
-    controller = LogitechController(deadzone=0.1)
-
-    for step in range(10000):
-        # Generate random actions for all environments
-        # action shape will be (num_instances, action_size) randomly sampled
+    if config["controller"]["logitech"]:
+        controller = LogitechController(deadzone=0.1)
+    
+    testing_steps = config["testing"]["episodes"]*config["env"]["episode_duration"]*config["env"]["rl_observation_freq"]
+    for step in range(testing_steps):
+        
         # controller
-        actions = [controller.get_thruster_values() for _ in range(num_instances)]
-        
-        #  random actions
-        # actions = [envs.action_space.sample() for _ in range(num_instances)]
-
-        # downward action (hard coded)
-        # actions = [[0.0, 0.0, 0.0,-1.0,-1.0] for _ in range(num_instances)]
-        
-        # Circular motion
-        # actions = [[0.7,0.1,0.0,-0.0,-0.0]for _ in range(num_instances)]
-        
-        # stable 
-        # actions = [[0.0,0.0,0.0,-0.0,-0.0]for _ in range(num_instances)]
+        if config["controller"]["logitech"]:
+            actions = [controller.get_thruster_values() for _ in range(num_instances)]
+        # random
+        elif config["controller"]["random"]:
+            actions = [envs.action_space.sample() for _ in range(num_instances)]
+        # constant force vector
+        else:
+            actions = [config["controller"]["force_vector"] for _ in range(num_instances)]
 
         # Step all environments simultaneously
         obs, rewards, dones, infos = envs.step(actions)
 
-            
-        if step % 100 == 0:
+        if step %  config["testing"]["step_per_print"] == 0:
             print(f"Step {step} | Rewards: {rewards} | observations[0]: {obs[0]}")
 
     print("Testing finished. Closing environments...")

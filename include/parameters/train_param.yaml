@@ -1,0 +1,71 @@
+# Environment Settings
+env:
+  observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_observation_config.json"
+  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
+  instances: 15
+  base_port: 5555
+  episode_duration: 60
+  rl_observation_freq: 5
+
+
+sim:
+  scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn"
+  resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
+  graphical_interface: False
+  evaluation_graphical_interface: True
+  resolution: 600
+  realtime: False
+
+
+# Model for Evaluation
+# If pretrained is set to True, Model path should be specified 
+model:
+  pretrained: False
+  model_path: "" 
+  algorithm: "PPO"
+
+  # comment param
+  policy: "MlpPolicy"
+  learning_rate: 0.0003
+  buffer_size: 1000000
+  batch_size: 256
+
+  # SAC param
+  tau: 0.005
+  gamma: 0.99
+  train_freq: 1
+  gradient_steps: 1
+  learning_starts: 1000
+
+  # PPO PARAM
+  n_steps: 2048
+  ent_coef: 0.01
+  clip_range: 0.2
+
+  # TD3 param , TO DO , NOT WORKING
+  policy_delay: 2
+
+
+# Neural Network Architecture if needed 
+policy:
+  custom_policy: False
+  net_arch:
+    pi: [256, 256]
+    qf: [256, 256]
+  activation_fn: "relu" # map this string to th.nn.ReLU in Python
+
+# Training Settings
+train:
+  total_timesteps: 500_000
+  reset_num_timesteps: False
+  eval_freq: 5000
+  save_path: "default"
+  save_name: "docking_currents"
+  warm_start_path: "sac_warm_started"
+
+log: 
+  enable_wandb: False
+  project_name: "stonefish_docking"
+  run_name: "default"
+  tags: ["sac", "docking", "stonefish"]
+  log_dir: "./logs/"

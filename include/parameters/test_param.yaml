@@ -4,9 +4,8 @@ env:
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
   instances: 1
   base_port: 5595
-  search_time: 30
+  episode_duration: 30
   rl_observation_freq: 5
-
 
 sim:
   scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn"
@@ -15,4 +14,15 @@ sim:
   resolution: 600
   realtime: False
 
+testing: 
+  episodes: 5
+  step_per_print: 100
 
+# if logitech is True, controller is used as an input
+# if random is true, random actions are applied
+# if both are false, force vector is used as in input (Change the size according to action space) 
+# action space of setpoints [surge1,surge2,sway,heave1,heave2], 
+controller:
+  logitech: True
+  random: False
+  force_vector: [0.0, 0.0, 0.0,-1.0,-1.0] # downward 

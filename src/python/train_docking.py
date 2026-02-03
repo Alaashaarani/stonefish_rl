@@ -4,43 +4,31 @@ import sys
 import datetime as dt
 import time
 import wandb
+import yaml
 
-from stable_baselines3 import SAC,PPO
+from stable_baselines3 import SAC,PPO,TD3
 from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
 from EnvStonefishRL import global_path
 from docking_env import dsEnv
 from wandb.integration.sb3 import WandbCallback
 
-def make_env(rank, 
-             graphical=True,
-             reso=400, 
-             seed=0):
+def load_config(config_path):
+    with open(config_path, 'r') as f:
+        return yaml.safe_load(f)
+    
+def make_env(rank, config):
     """
     Utility function for multiprocessed env.
     :param rank: (int) index of the subprocess
-    :param seed: (int) the initial seed for RNG
+    :param config: Yaml file contains all required parameters
     """
     def _init():
         # Paths to your configs
-        obs_path = global_path("include/observations/ds_observation_config.json")
-        act_path = global_path("include/observations/ds_action_config.json")
-        scene_path = global_path("Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn")
-        res_path = global_path("./")
-
-        env = dsEnv(
-            observation_config_path=obs_path,
-            action_config_path=act_path,
-            resolution=reso,
-            episode_duration=100,
-            env_id=rank,               # Unique ID: 0, 1, etc.
-            base_port=5555,            # Port will be 5555 + rank
-            scene_path=scene_path,
-            resources_path=res_path,
-            graphical=graphical # if true, make sure to have low number of instances 
-        )
+        env = dsEnv(rank, config)
         return env
     return _init
+
 
 if __name__ == "__main__":
     # --- CLEANUP OLD PROCESSES ---
@@ -52,62 +40,35 @@ if __name__ == "__main__":
         pass
 
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--help" or sys.argv[1] == "-h":
-            print("Usage: python train_docking.py [enable_graphical] [num_envs] [windows_resolution] ")
-            sys.exit(0)
-        elif sys.argv[1].lower() in ['true', '1', 'yes','false', '0', 'no']:
-            enable_graphical = sys.argv[1].lower() in ['true', '1', 'yes']
-            num_envs = 2  # default
-            windows_resolution = 400  # default
+        try:
+            config= load_config(sys.argv[1])
+        except Exception as e:
+            print(f"Error loading config file: {e}, Add config file path as first argument")
+            sys.exit(1)
 
-        if len(sys.argv) == 3:
-            if sys.argv[1].lower() in ['true', '1', 'yes','false', '0', 'no']:
-                enable_graphical = not sys.argv[1].lower() in ['false', '0', 'no']
-            if int(sys.argv[2]) > 20:
-                print("WARNING: Number of instances is high.")
-                num_envs = int(input("please re_enter a number of instances to confirm & press enter:"))
-            else: 
-                num_envs = int(sys.argv[2])
-            
-        
-        if len(sys.argv) > 3:
-            if sys.argv[1].lower() in ['true', '1', 'yes','false', '0', 'no']:
-                enable_graphical = sys.argv[1].lower() in ['true', '1', 'yes']
-            
-            if int(sys.argv[2]) > 8 and enable_graphical:
-                print("WARNING: Number of instances is too high for graphical mode.")
-                num_envs = int(input("please re_enter a number of instances to confirm:"))
-            else: 
-                num_envs = int(sys.argv[2])
-            
-            windows_resolution = int(sys.argv[3])
     else:
-        enable_graphical = False
-        windows_resolution = 400
-        num_envs = 2  # Set to 2 for two instances
+        config = load_config(global_path("include/parameters/train_param.yaml"))
+
 
 
 
     # 1. Configuration
-    
-    log_dir = "./logs/"
+    log_dir = config["log"]["log_dir"]
     os.makedirs(log_dir, exist_ok=True)
+        
+        
+    num_instances = config["env"]["instances"]
 
-    run = wandb.init(
-    project="stonefish_docking",
-    sync_tensorboard=True,  # This automatically uploads your SB3 logs
-    monitor_gym=True,       # This upload videos of the robot
-    save_code=True, )
-    
     # 2. Create Parallel Environments
     # VecMonitor logs episode rewards/lengths for tensorboard
-    train_env = SubprocVecEnv([make_env(i,graphical=enable_graphical,reso=windows_resolution) for i in range(num_envs)])
+    train_env = SubprocVecEnv([make_env(i,config) for i in range(num_instances)])
     train_env = VecMonitor(train_env, log_dir)
 
     # 3. Create Evaluation Environment (Separate instance for testing)
-    # This ensures the best model is saved based on clean performance
     time.sleep(2)  # Ensure different ports
-    eval_env = SubprocVecEnv([make_env(num_envs+2,reso=windows_resolution)]) # Use the next available ID
+    if config["sim"]["evaluation_graphical_interface"]:
+        config["sim"]["graphical_interface"] = True
+    eval_env = SubprocVecEnv([make_env(num_instances+2,config)]) # Use the next available ID
     eval_env = VecMonitor(eval_env, log_dir)
 
     # 4. Callback to evaluate and save the best model
@@ -115,56 +76,88 @@ if __name__ == "__main__":
         eval_env,
         best_model_save_path=log_dir,
         log_path=log_dir,
-        eval_freq=1000, # Adjust frequency for parallel steps
+        eval_freq=config["train"]["eval_freq"], # Adjust frequency for parallel steps
         deterministic=True,
         render=False
     )
 
-    # 5. Initialize SAC
+    # wandb initilization 
+    if config["log"]["enable_wandb"]:
+        name = config["model"]["algorithm"]+"_"+config["model"]["policy"]+"_"+ dt.datetime.now().strftime("%Y%m%d_%H")
+        run = wandb.init(
+                    id = name if config["log"]["run_name"]=="default" else config["log"]["run_name"],
+                    project=config["log"]["project_name"],
+                    tags = config["log"]["tags"],
+                    sync_tensorboard=True,  # This automatically uploads your SB3 logs
+                    monitor_gym=True,       # This upload videos of the robot
+                    save_code=True, )
+        
+        callback = [eval_callback, WandbCallback(
+                    gradient_save_freq=100,
+                    model_save_path=f"models/{run.id}",
+                    verbose=2,    )]
+    else: 
+        callback = eval_callback
+
+    # 5. IModel Initilization 
     # MlpPolicy is standard for vector/sensor observations
-    model = SAC(
-        "MlpPolicy", 
-        train_env, 
-        train_freq=(1, "step"), # Collect steps from each env before updating
-        gradient_steps=1,       # Do  gradient updates 
-        verbose=1, 
-        # tensorboard_log=log_dir,
-        tensorboard_log=f"runs/{run.id}",
-        buffer_size=100000, 
-        learning_starts=3000
-    )
+    if config["model"]["pretrained"]: 
+        model = SAC.load(config["model"]["model_path"],
+                          env=train_env, 
+                          tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                          )
+    elif config["model"]["algorithm"]=="SAC": 
+        model = SAC(
+            config["model"]["policy"], 
+            train_env, 
+            train_freq=(1, "step"), # Collect steps from each env before updating
+            gradient_steps=config["model"]["gradient_steps"],       # Do  gradient updates 
+            verbose=1, 
+            learning_rate=config["model"]["learning_rate"],
+            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir,
+            buffer_size=config["model"]["buffer_size"], 
+            learning_starts=config["model"]["learning_starts"]
+        )
+    elif config["model"]["algorithm"]=="PPO":
+        model = PPO(config["model"]["policy"],
+                    env=train_env,
+                    learning_rate= config["model"]["learning_rate"], 
+                    n_steps= config["model"]["n_steps"], 
+                    batch_size= config["model"]["batch_size"], 
+                    ent_coef= config["model"]["ent_coef"], 
+                    clip_range= config["model"]["clip_range"],
+                    tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                    )
+    elif config["model"]["algorithm"]=="TD3":
+        model = TD3(config["model"]["policy"],
+                    env=train_env,
+                    learning_rate= config["model"]["learning_rate"], 
+                    buffer_size=config["model"]["buffer_size"], 
+                    batch_size= config["model"]["batch_size"], 
+                    policy_delay= config["model"]["policy_delay"],
+                    tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                    )
 
-    # model = PPO(
-    #     "MlpPolicy", 
-    #     train_env, 
-    #     verbose=1,
-    #     tensorboard_log=f"runs/{run.id}"
-    # )
 
-    # Optional: Load previous model
-    # model = SAC.load(best_model_path, env=train_env,tenserboard_log=f"runs/{run.id}")
-    # model = SAC.load("sac_warm_started", env=train_env, tensorboard_log=f"runs/{run.id}")
-    # model = SAC.load("SAC_run3", env=train_env, tensorboard_log=f"runs/{run.id}")
-
-    starting_time = time.time()
     # 6. Train the model
-    print(f"Starting training with {num_envs} instances...")
+    print(f"Starting training with {num_instances} instances...")  
+    starting_time = time.time()
     try:
         model.learn(
-            total_timesteps=1000_000,
-            reset_num_timesteps=False, 
-            callback=[eval_callback, WandbCallback(
-        gradient_save_freq=100,
-        model_save_path=f"models/{run.id}",
-        verbose=2,
-        
-        )] )
+            total_timesteps=config["train"]["total_timesteps"],
+            reset_num_timesteps=config["train"]["reset_num_timesteps"], 
+            callback= callback
+                    )
    
     except KeyboardInterrupt:
         print("Training interrupted by user.")
     finally:
+        if config["train"]["save_path"] == "default": 
+            name = config["model"]["algorithm"] + "_" + config["train"]["save_name"] + "_" + dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+        else: 
+            name = config["train"]["save_path"]+"/"+config["model"]["algorithm"] + "_" + config["train"]["save_name"] + "_" + dt.datetime.now().strftime("%Y%m%d_%H%M%S")
         # 7. Final Save and Cleanup
-        model.save("SAC_run_"+dt.datetime.now().strftime("%Y%m%d_%H%M%S"))
+        model.save(name)
         train_env.close()
         eval_env.close()
 

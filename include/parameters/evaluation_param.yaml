@@ -4,39 +4,22 @@ env:
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
   instances: 1
   base_port: 5595
-  search_time: 30
+  episode_duration: 60
   rl_observation_freq: 5
-
 
 sim:
   scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn"
   resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
   graphical_interface: True
-  resolution: 600
+  resolution: 900
   realtime: False
 
+# Model for Evaluation
+evaluate:
+  algorithm: "PPO"
+  model_path: "PPO_docking_currents_20260203_172120.zip"
 
-# Model Hyperparameters
-model:
-  algorithm: "SAC"
-  learning_rate: 0.0003
-  buffer_size: 1000000
-  batch_size: 256
-  tau: 0.005
-  gamma: 0.99
-  train_freq: 1
-  gradient_steps: 1
-  learning_starts: 1000
+  # model_path: "SAC_run_best.zip"
 
-# Neural Network Architecture
-policy:
-  net_arch:
-    pi: [256, 256]
-    qf: [256, 256]
-  activation_fn: "relu" # We will map this string to th.nn.ReLU in Python
-
-# Training Settings
-train:
-  total_timesteps: 500000
-  save_path: "sac_docking_model"
-  warm_start_path: "sac_warm_started"
+  num_episodes: 10
+  step_per_print: 100

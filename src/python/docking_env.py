@@ -13,7 +13,7 @@ class dsEnv(EnvStonefishRLParallel):
 
         
         # 1. Store timing parameters first
-        self.search_time = config["env"]["search_time"]  # seconds
+        self.episode_duration = config["env"]["episode_duration"]  # seconds
         self.rl_observation_freq = config["env"]["rl_observation_freq"]  # Hz
         
         
@@ -29,8 +29,6 @@ class dsEnv(EnvStonefishRLParallel):
         self.step_counter = 0
         self.goal_achieved = False
         self.start_distance_factor = 0.0
-        self.target_threshold = 2
-        self.goal_pose = np.array([-5.5, 0, 5.2])
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
         self.current_action = np.zeros(self.action_size, dtype=np.float32)
         
@@ -204,7 +202,7 @@ class dsEnv(EnvStonefishRLParallel):
 
     def _is_truncated(self):
         """Cleaned truncation logic""" 
-        return self.step_counter/self.rl_observation_freq >= self.search_time
+        return self.step_counter/self.rl_observation_freq >= self.episode_duration
     
     def _auv_observed_ds(self):
         """Check if AUV has observed the docking station"""

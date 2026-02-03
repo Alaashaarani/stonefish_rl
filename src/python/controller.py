@@ -7,7 +7,7 @@ class LogitechController:
         pygame.joystick.init()
         
         if pygame.joystick.get_count() == 0:
-            raise RuntimeError("No Logitech controller found! Is it plugged in?")
+            raise RuntimeError("No Logitech controller found! Is it plugged in? or disable it in the config.")
             
         self.joystick = pygame.joystick.Joystick(0)
         self.joystick.init()

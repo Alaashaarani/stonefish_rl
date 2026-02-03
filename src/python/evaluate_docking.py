@@ -1,7 +1,7 @@
 import os
 import sys
 import numpy as np
-from stable_baselines3 import SAC
+from stable_baselines3 import SAC,PPO,TD3
 from EnvStonefishRL import global_path
 from docking_env import dsEnv
 import yaml 
@@ -24,20 +24,21 @@ if __name__ == "__main__":
 
     # Path to your best model
     # model_path = "/home/cirs_alaa/repositories/stonefish_rl/src/python/SAC_girona_docking_final.zip"
-    model_path = "/home/cirs_alaa/repositories/stonefish_rl/src/python/logs/best_model.zip"
-
-   
+    model_path = config["evaluate"]["model_path"]
     env = dsEnv(0, config)
 
     # 3. Load the Model
-    # model = SAC.load(model_path, env=env)
-    # model = SAC.load("SAC_run3.zip", env=env)  
-    model = SAC.load("SAC_run_best.zip", env=env)  
+    if config["evaluate"]["algorithm"]=="SAC":
+        model = SAC.load(model_path, env=env)
+    elif config["evaluate"]["algorithm"]=="PPO":
+        model = PPO.load(model_path, env=env)
+    elif config["evaluate"]["algorithm"]=="TD3":
+        model = TD3.load(model_path, env=env)
 
     print(f"Model loaded from: {model_path}")
 
     # 4. Evaluation Loop
-    num_episodes = 5
+    num_episodes = config["evaluate"]["num_episodes"]
     for ep in range(num_episodes):
         obs, _ = env.reset()
         done = False
@@ -62,7 +63,7 @@ if __name__ == "__main__":
             total_reward += reward
             step_counter += 1
 
-            if step_counter % 50 == 0:
+            if step_counter % config["evaluate"]["step_per_print"] == 0:
                 print(f"Step: {step_counter} | Current Reward: {reward:.2f} | Total: {total_reward:.2f} \n action: {action}")
 
 

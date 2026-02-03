@@ -188,7 +188,8 @@ ResetInfo CommandProcessor::parseObjectFromJson(const std::string& object_str) {
         auto getFloatArray = [](const json& j, const std::string& key, 
                                 const std::vector<float>& default_value) -> std::vector<float> {
             if (!j.contains(key) || !j[key].is_array()) {
-                std::cerr << "[WARNING] Missing or invalid '" << key << "' field" << std::endl;
+                // debug output
+                // std::cerr << "[WARNING] Missing or invalid '" << key << "' field" << std::endl;
                 return default_value;
             }
             
@@ -212,23 +213,12 @@ ResetInfo CommandProcessor::parseObjectFromJson(const std::string& object_str) {
             return result;
         };
 
-        // if (j.contains("name") && j["name"] == "environment") {
-        //     EnvResetInfo env;
-
-        //     if (j.contains("current")) {
-        //         env.current = j["current"].get<std::vector<float>>();
-                
-        //         // Getting Current Value
-        //         env.current = getFloatArray(j, "current", {0.0f, 0.0f, 0.0f});
-        //         // add wind and wave height later
-        //     }
-        //     return env;
-        // }
         // Get values
         obj.name = j.value("name", "unknown");
         obj.position = getFloatArray(j, "position", {0.0f, 0.0f, 0.0f});
         obj.rotation = getFloatArray(j, "rotation", {0.0f, 0.0f, 0.0f, 1.0f});
-        obj.current = getFloatArray(j, "current", {0.0f, 0.0f, 0.0f});
+        obj.current = getFloatArray(j, "current", {0.0f, 0.0f, 0.0f}); // current need to be added to one robot only
+
     } catch (const json::exception& e) {
         std::cerr << "[ERROR] JSON parsing failed: " << e.what() << std::endl;
         throw;  // Or return default object
