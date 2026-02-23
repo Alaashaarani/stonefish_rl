@@ -7,7 +7,7 @@
 			<sun azimuth="20.0" elevation="40.0"/>
 		</atmosphere>
 		<current type="uniform">
-				<velocity xyz="0.1 0.1 0.0"/>
+				<velocity xyz="0.0 0.0 0.0"/>
 		</current>
 	</environment>
 

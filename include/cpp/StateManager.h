@@ -53,17 +53,23 @@ private:
     std::unordered_map<std::string, std::function<float(sf::SimulationManager*, const std::string&)>> sensor_extractors_;
     // Actuators
     std::unordered_map<std::string, std::function<float(sf::SimulationManager*, const std::string&)>> actuator_extractors_;
+    // Error
+    std::unordered_map<std::string, std::function<float(sf::SimulationManager*, const std::string&, const std::string&)>> error_extractors_;
     
     // Extraction methods
     float extractRobotField(sf::SimulationManager* sim, const ObservationSpec& spec);
     float extractSensorField(sf::SimulationManager* sim, const ObservationSpec& spec);
     float extractActuatorField(sf::SimulationManager* sim, const ObservationSpec& spec);
-    
+    float extractErrorField(sf::SimulationManager* sim, const ObservationSpec& spec);
+
     // Entity finding
     sf::Robot* findRobot(sf::SimulationManager* sim, const std::string& name);
     sf::Sensor* findSensor(sf::SimulationManager* sim, const std::string& name);
     sf::Actuator* findActuator(sf::SimulationManager* sim, const std::string& name);
-    
+
+    // Check if name is error, CAN be improved or removed
+    // bool findError(sf::SimulationManager* sim, const std::string& name);
+
     // Collision detection
     float getCollisionFlag(sf::SimulationManager* sim, const std::string& robot_name);
 
@@ -84,7 +90,9 @@ private:
                                 const std::string& name, sf::ScalarSensorType expected_type);
 
     static double getYawFromQuaternion(std::vector<float> quat);
-
+    
+    static float extractErrorFromRobots(sf::SimulationManager* sim, const std::string& name1, 
+                           const std::string& name2, int channel_index);
     
 };
 

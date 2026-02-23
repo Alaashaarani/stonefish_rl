@@ -59,7 +59,9 @@ ObservationConfig ConfigLoader::parseJsonConfig(const nlohmann::json& j) {
                     spec.field_type = spec_item.value("field_type", "");
                     spec.component = spec_item.value("component", "");
                     spec.output_name = spec_item.value("output_name", "");
-                    
+                    spec.entity_1 = spec_item.value("entity_1","");
+                    spec.entity_2 = spec_item.value("entity_2","");
+
                     if (!spec.entity_name.empty() && !spec.field_type.empty()) {
                         config.specs.push_back(spec);
                         std::cout << "[ConfigLoader] Added spec: " << spec.output_name 

@@ -2,7 +2,7 @@ import os
 import sys
 import numpy as np
 from stable_baselines3 import SAC,PPO,TD3
-from EnvStonefishRL import global_path
+from utils.utils import global_path
 from docking_env import dsEnv
 import yaml 
 

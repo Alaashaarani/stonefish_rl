@@ -1,0 +1,170 @@
+{
+  "observation_config": {
+    "specs": [
+      {
+      "entity_name": "error",
+      "field_type": "position",
+      "component": "x",
+      "entity_1": "ds",
+      "entity_2": "girona500",
+      "output_name": "error_x"
+      },
+      {
+      "entity_name": "error",
+      "field_type": "position",
+      "component": "y",
+      "entity_1": "ds",
+      "entity_2": "girona500",
+      "output_name": "error_y"},
+      {
+      "entity_name": "error",
+      "field_type": "position",
+      "component": "z",
+      "entity_1": "ds",
+      "entity_2": "girona500",
+      "output_name": "error_z"
+      },
+      {
+      "entity_name": "error",
+      "field_type": "rotation",
+      "component": "yaw",
+      "entity_1": "ds",
+      "entity_2": "girona500",
+      "output_name": "error_z"
+      },
+      {
+        "entity_name": "ds",
+        "field_type": "position",
+        "component": "x",
+        "output_name": "ds_pose_x"
+      },
+      {
+        "entity_name": "ds",
+        "field_type": "position",
+        "component": "y",
+        "output_name": "ds_pose_y"
+      },
+      {
+        "entity_name": "ds",
+        "field_type": "position",
+        "component": "z",
+        "output_name": "ds_pose_z"
+      },
+      {
+        "entity_name": "ds",
+        "field_type": "rotation",
+        "component": "yaw",
+        "output_name": "ds_pose_yaw"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.position",
+        "component": "x",
+        "output_name": "auv_pose_x"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.position", 
+        "component": "y",
+        "output_name": "auv_pose_y"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.position",
+        "component": "z", 
+        "output_name": "auv_pose_z"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.rotation", 
+        "component": "yaw",
+        "output_name": "auv_pose_yaw"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.linear.velocity",
+        "component": "x",
+        "output_name": "auv_linear_velocity_x"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.linear.velocity", 
+        "component": "y",
+        "output_name": "auv_linear_velocity_y"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.linear.velocity",
+        "component": "z", 
+        "output_name": "auv_linear_velocity_z"
+      },
+      {
+        "entity_name": "girona500/odometry",
+        "field_type": "odom.angular.velocity",
+        "component": "z", 
+        "output_name": "auv_angular_velocity_z"
+      },
+      {
+        "entity_name": "girona500/imu_filter",
+        "field_type": "imu.rotation",
+        "component": "roll", 
+        "output_name": "imu_rotation_roll"
+      },
+      {
+        "entity_name": "girona500/imu_filter",
+        "field_type": "imu.rotation",
+        "component": "pitch", 
+        "output_name": "imu_rotation_pitch"
+      },
+      {
+        "entity_name": "girona500/imu_filter",
+        "field_type": "imu.rotation",
+        "component": "yaw", 
+        "output_name": "imu_rotation_yaw"
+      },
+      {
+        "entity_name": "girona500/imu_filter",
+        "field_type": "imu.angular_velocity",
+        "component": "x", 
+        "output_name": "imu_angular_velocity_x"
+      },
+      {
+        "entity_name": "girona500/imu_filter",
+        "field_type": "imu.angular_velocity",
+        "component": "y", 
+        "output_name": "imu_angular_velocity_y"
+      },
+      {
+        "entity_name": "girona500/imu_filter",
+        "field_type": "imu.angular_velocity",
+        "component": "z", 
+        "output_name": "imu_angular_velocity_z"
+      },
+      {
+        "entity_name": "girona500/imu_filter",
+        "field_type": "imu.linear_acceleration",
+        "component": "x", 
+        "output_name": "imu_linear_acceleration_x"
+      },
+      {
+        "entity_name": "girona500/imu_filter",
+        "field_type": "imu.linear_acceleration",
+        "component": "y", 
+        "output_name": "imu_linear_acceleration_y"
+      },
+      {
+        "entity_name": "girona500/imu_filter",
+        "field_type": "imu.linear_acceleration",
+        "component": "z", 
+        "output_name": "imu_linear_acceleration_z"
+      },
+      {
+        "entity_name": "girona500",
+        "field_type": "collision",
+        "component": "binary",
+        "output_name": "collision_flag"
+      }
+    ]
+    
+  }
+}

@@ -9,7 +9,7 @@ import yaml
 from stable_baselines3 import SAC,PPO,TD3
 from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
-from EnvStonefishRL import global_path
+from utils.utils import global_path
 from docking_env import dsEnv
 from wandb.integration.sb3 import WandbCallback
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     # wandb initilization 
     if config["log"]["enable_wandb"]:
-        name = config["model"]["algorithm"]+"_"+config["model"]["policy"]+"_"+ dt.datetime.now().strftime("%Y%m%d_%H")
+        name = config["model"]["algorithm"]+"_"+config["model"]["policy"]+"_"+ dt.datetime.now().strftime("%Y%m%d_%H%M")
         run = wandb.init(
                     id = name if config["log"]["run_name"]=="default" else config["log"]["run_name"],
                     project=config["log"]["project_name"],
@@ -101,42 +101,56 @@ if __name__ == "__main__":
 
     # 5. IModel Initilization 
     # MlpPolicy is standard for vector/sensor observations
-    if config["model"]["pretrained"]: 
-        model = SAC.load(config["model"]["model_path"],
-                          env=train_env, 
-                          tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
-                          )
-    elif config["model"]["algorithm"]=="SAC": 
-        model = SAC(
-            config["model"]["policy"], 
-            train_env, 
-            train_freq=(1, "step"), # Collect steps from each env before updating
-            gradient_steps=config["model"]["gradient_steps"],       # Do  gradient updates 
-            verbose=1, 
-            learning_rate=config["model"]["learning_rate"],
-            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir,
-            buffer_size=config["model"]["buffer_size"], 
-            learning_starts=config["model"]["learning_starts"]
-        )
+    if config["model"]["algorithm"]=="SAC": 
+        if config["model"]["pretrained"]: 
+            model = SAC.load(config["model"]["model_path"],
+                            env=train_env, 
+                            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                            )
+        else:
+            model = SAC(
+                config["model"]["policy"], 
+                train_env, 
+                train_freq=(1, "step"), # Collect steps from each env before updating
+                gradient_steps=config["model"]["gradient_steps"],       # Do  gradient updates 
+                verbose=1, 
+                learning_rate=config["model"]["learning_rate"],
+                tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir,
+                buffer_size=config["model"]["buffer_size"], 
+                learning_starts=config["model"]["learning_starts"]
+            )
     elif config["model"]["algorithm"]=="PPO":
-        model = PPO(config["model"]["policy"],
-                    env=train_env,
-                    learning_rate= config["model"]["learning_rate"], 
-                    n_steps= config["model"]["n_steps"], 
-                    batch_size= config["model"]["batch_size"], 
-                    ent_coef= config["model"]["ent_coef"], 
-                    clip_range= config["model"]["clip_range"],
-                    tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
-                    )
+        if config["model"]["pretrained"]: 
+            model = PPO.load(config["model"]["model_path"],
+                            env=train_env, 
+                            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                            )
+        else: 
+            model = PPO(config["model"]["policy"],
+                        env=train_env,
+                        learning_rate= config["model"]["learning_rate"], 
+                        n_steps= config["model"]["n_steps"], 
+                        batch_size= config["model"]["batch_size"], 
+                        ent_coef= config["model"]["ent_coef"], 
+                        clip_range= config["model"]["clip_range"],
+                        tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                        )
+        
     elif config["model"]["algorithm"]=="TD3":
-        model = TD3(config["model"]["policy"],
-                    env=train_env,
-                    learning_rate= config["model"]["learning_rate"], 
-                    buffer_size=config["model"]["buffer_size"], 
-                    batch_size= config["model"]["batch_size"], 
-                    policy_delay= config["model"]["policy_delay"],
-                    tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
-                    )
+        if config["model"]["pretrained"]: 
+            model = TD3.load(config["model"]["model_path"],
+                            env=train_env, 
+                            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                            )
+        else:
+            model = TD3(config["model"]["policy"],
+                        env=train_env,
+                        learning_rate= config["model"]["learning_rate"], 
+                        buffer_size=config["model"]["buffer_size"], 
+                        batch_size= config["model"]["batch_size"], 
+                        policy_delay= config["model"]["policy_delay"],
+                        tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                        )
 
 
     # 6. Train the model

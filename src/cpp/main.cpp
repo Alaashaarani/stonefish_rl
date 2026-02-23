@@ -31,7 +31,7 @@ These values should match with the values in the enviroment you are using
 */
 double physics_frequency = 300; // frequencey used to compute physics (Number of times physics is computed per sec)  
 double sf_dt = 0.1; // do 10 steps per sec
-double rl_observation_freq = 5;
+double rl_observation_freq = 10;
 
 
 int learning(void* data) {
@@ -90,6 +90,7 @@ int main(int argc, char **argv) {
         std::cerr << "[ERROR] Usage (ALL STR): SCENE_PATH RESOURCES_PATH OBS_CONFIG_PATH ACTION_CONFIG_PATH PORT RESOLUTION " << std::endl;
         return 1;
     }
+    std::cout << "[Main] Number of arguments: " << argc << std::endl; 
 
     std::string scene_path = argv[1]; 
     std::string resources_path = argv[2]; 
@@ -98,12 +99,15 @@ int main(int argc, char **argv) {
     int port = std::stoi(argv[5]); // Parse the port
     int resolution = std::stoi(argv[6]); // Parse the resolution
     std::string graphical_arg = argv[7];
-    if (argc == 9) sf_dt = std::stod(argv[8]); // Parse the dt if provided
+    std::cout << "[Main] argument Check: " << argv[8] << std::endl; 
+    rl_observation_freq = std::stod(argv[8]);
+    std::cout << "[Main] argument Check: " << argv[9] << std::endl; 
+    sf_dt = std::stod(argv[9]); // Parse the dt if provided
 
 
     // std::cout << "[MAIN] Scene Path: " << scene_path << std::endl;
     // std::cout << "[MAIN] Resources Path: " << resources_path << std::endl;
-    // std::cout << "[MAIN] Using dt: " << sf_dt << " seconds." << std::endl;
+    std::cout << "[MAIN] Using dt: " << sf_dt << " seconds." << std::endl;
     // std::cout << "[MAIN] Using arg8: " << argv[8] << " seconds." << std::endl;
     // std::cout << "[MAIN] Using graphical interface: " << graphical_arg << std::endl;
     // std::cout << "[MAIN] Using resolution: " << resolution << std::endl;

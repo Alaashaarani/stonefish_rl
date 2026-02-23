@@ -1,11 +1,12 @@
 # Environment Settings
 env:
-  observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_observation_config.json"
+  observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_obser_v2_config.json"
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
+  # only one instance is allowed in evaluation
   instances: 1
   base_port: 5595
   episode_duration: 60
-  rl_observation_freq: 5
+  rl_observation_freq: 10
 
 sim:
   scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn"
@@ -13,13 +14,28 @@ sim:
   graphical_interface: True
   resolution: 900
   realtime: False
+  current: True
+
+
+# This maps the forces (x,y,z,roll,pitch,yaw) of the thusters setpoints
+# It changes the action space size, to match the forces, 
+# The RL output forces, then the code convert forces to setpoint, and Simulation recieves Setpoints
+action: 
+  force_6Dof: True
+  tcm: [[1,1,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,1,1],
+        [0,0,0,0,0],
+        [0,0,0,1,-1],
+        [1,-1,0,0,0]]
+
 
 # Model for Evaluation
 evaluate:
-  algorithm: "PPO"
-  model_path: "PPO_docking_currents_20260203_172120.zip"
+  algorithm: "SAC"
+  # model_path: "PPO_docking_currents_20260203_172120.zip"
 
-  # model_path: "SAC_run_best.zip"
+  model_path: "/home/cirs_alaa/repositories/stonefish_rl/src/python/SAC_docking_current1_20260219_175517.zip"
 
   num_episodes: 10
   step_per_print: 100

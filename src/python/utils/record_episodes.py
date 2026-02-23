@@ -4,7 +4,7 @@ import numpy as np
 import time
 from docking_env import dsEnv
 from EnvStonefishRL import global_path
-from controller import LogitechController
+from python.utils.utils import LogitechController
 from stable_baselines3.common.vec_env import SubprocVecEnv
 import time   
 controller = LogitechController()

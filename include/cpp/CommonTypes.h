@@ -10,7 +10,10 @@ struct ObservationSpec {
     std::string entity_name;    // "girona", "imu_sensor", etc.
     std::string field_type;     // "position", "rotation", "velocity", "collision"
     std::string component;      // "x", "y", "z", "yaw", "binary"
+    std::string entity_1;
+    std::string entity_2;
     std::string output_name;    // "girona_position_x", "collision_flag"
+
 };
 
 // Action specification

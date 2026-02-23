@@ -242,7 +242,37 @@ void StateManager::initializeExtractors() {
             return 0.0f;
         }}
     };
+
+    error_extractors_ = {
+        {"position.x", [](sf::SimulationManager* sim, const std::string& name1, const std::string& name2) -> float{
+           return extractErrorFromRobots(sim, name1,name2, 0);
+        }},
+        {"position.y", [](sf::SimulationManager* sim, const std::string& name1, const std::string& name2) -> float{
+           return extractErrorFromRobots(sim, name1,name2, 1);
+        }},
+        {"position.z", [](sf::SimulationManager* sim, const std::string& name1, const std::string& name2) -> float{
+           return extractErrorFromRobots(sim, name1,name2, 2);
+        }},
+        {"rotation.yaw", [](sf::SimulationManager* sim, const std::string& name1, const std::string& name2) -> float{
+            auto robot1 = sim->getRobot(name1);
+            if (!robot1) return NAN;
+            auto robot2 = sim->getRobot(name2);
+            if (!robot2) return NAN;
+            sf::Scalar yaw1, pitch1, roll1,yaw2, pitch2, roll2 ;
+            robot1->getTransform().getRotation().getEulerZYX(yaw1, pitch1, roll1);
+            robot2->getTransform().getRotation().getEulerZYX(yaw2, pitch2, roll2);
+            return static_cast<float>(yaw1-yaw2);
+        }}
+    };
 }
+float StateManager::extractErrorFromRobots(sf::SimulationManager* sim, const std::string& name1, 
+                           const std::string& name2, int channel_index){
+    auto robot1 = sim->getRobot(name1);
+    auto robot2 = sim->getRobot(name2);
+    float v1 = robot1 ? static_cast<float>(robot1->getTransform().getOrigin()[channel_index]) : NAN;
+    float v2 = robot2 ? static_cast<float>(robot2->getTransform().getOrigin()[channel_index]) : NAN;
+    return v1-v2;
+                           }
 
 // Helper functions
 float StateManager::extractFromSensorType(sf::SimulationManager* sim, const std::string& name, 
@@ -303,6 +333,8 @@ std::vector<float> StateManager::getObservationVector(sf::SimulationManager* sim
         }
         else if (findActuator(sim, spec.entity_name)) {
             value = extractActuatorField(sim, spec);
+        }else if ( spec.entity_name == "error"){
+            value= extractErrorField(sim, spec);
         }
         else {
             std::cerr << "[StateManager] WARNING: Entity not found: " << spec.entity_name << std::endl;
@@ -362,6 +394,25 @@ float StateManager::extractActuatorField(sf::SimulationManager* sim, const Obser
     return 0.0f;
 }
 
+float StateManager::extractErrorField(sf::SimulationManager* sim, const ObservationSpec& spec) {
+    std::string field_key = spec.field_type + "." + spec.component;
+    auto extractor = error_extractors_.find(field_key);
+    
+    if (extractor != error_extractors_.end()) {
+        try {
+            //  print names
+            return extractor->second(sim, spec.entity_1, spec.entity_2);
+        } catch (const std::exception& e) {
+            std::cerr << "[StateManager] ERROR extracting " << field_key << " from " 
+                      << spec.entity_name << ": " << e.what() << std::endl;
+        }
+    } else {
+        std::cerr << "[StateManager] WARNING: No error extractor for field: " << field_key << std::endl;
+    }
+    
+    return 0.0f;
+}
+
 // Entity finding methods
 sf::Robot* StateManager::findRobot(sf::SimulationManager* sim, const std::string& name) {
     unsigned int id = 0;
@@ -393,6 +444,11 @@ sf::Actuator* StateManager::findActuator(sf::SimulationManager* sim, const std::
     }
     return nullptr;
 }
+
+// bool StateManager::findError(sf::SimulationManager* sim, const std::string& name) {
+//     if (name == "error") return true;
+//     return false;
+// }
 
 void StateManager::updateRobotPosition(const std::vector<ResetInfo>& robot_info, sf::SimulationManager* sim) {
     for (const auto& info : robot_info) {

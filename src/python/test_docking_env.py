@@ -3,8 +3,7 @@ import numpy as np
 import time
 import yaml
 from docking_env import dsEnv
-from EnvStonefishRL import global_path
-from controller import LogitechController
+from utils.utils import LogitechController,RealTimePlotter,global_path
 from stable_baselines3.common.vec_env import SubprocVecEnv
 
 def load_config(config_path):
@@ -35,7 +34,8 @@ if __name__ == "__main__":
     else:
         config = load_config(global_path("include/parameters/test_param.yaml"))
 
-    
+    plotter = RealTimePlotter(num_curves=4, max_entries=150)
+
     num_instances = config["env"]["instances"]
     print(f"Starting {num_instances} instances...")
 
@@ -44,15 +44,17 @@ if __name__ == "__main__":
     envs = SubprocVecEnv([make_env(i,config) for i in range(num_instances)])
 
     print(f"\n--- {num_instances} Instances Ready ---")
-    
+
     # Reset all environments
     obs = envs.reset()
     if config["controller"]["logitech"]:
-        controller = LogitechController(deadzone=0.1)
+        controller = LogitechController(deadzone=0.1, use_forces= config["action"]["force_6Dof"])
     
+    #total testing steps
     testing_steps = config["testing"]["episodes"]*config["env"]["episode_duration"]*config["env"]["rl_observation_freq"]
     for step in range(testing_steps):
-        
+        sensor_values = np.array([obs[0][-7],obs[0][-6],obs[0][-5]])
+
         # controller
         if config["controller"]["logitech"]:
             actions = [controller.get_thruster_values() for _ in range(num_instances)]
@@ -65,7 +67,13 @@ if __name__ == "__main__":
 
         # Step all environments simultaneously
         obs, rewards, dones, infos = envs.step(actions)
-
+        
+        difference = np.linalg.norm(sensor_values - np.array([obs[0][-4],obs[0][-3],obs[0][-2]]))
+        mag = 10 if difference > 0.5 else 0
+        plotter.update(obs[0][-16:-12])
+        # print("lenght : ",len(obs[0][-4:]),end="\n")
+        
+        
         if step %  config["testing"]["step_per_print"] == 0:
             print(f"Step {step} | Rewards: {rewards} | observations[0]: {obs[0]}")
 

@@ -3,6 +3,7 @@ import json
 from EnvStonefishRL import EnvStonefishRLParallel,launch_stonefish_simulator
 import gymnasium as gym
 import time
+import gc
 
 class dsEnv(EnvStonefishRLParallel):
     def __init__(self, rank, config,**kwargs):
@@ -22,29 +23,52 @@ class dsEnv(EnvStonefishRLParallel):
         # Give the simulator a moment to bind the socket
         time.sleep(1.0) 
         
-        # 4. Initialize parent (ZMQ connection)
-        super().__init__(obs_path, act_path, rank, config["env"]["base_port"])
+        if  config["action"]["force_6Dof"]: 
+        
+            self.tcm = np.array(config["action"]["tcm"])
+            
+            action_size = self.tcm.shape[0]
+        else: 
+            self.tcm= None
+            action_size = None
+        
+
+        # 4. 
+        super().__init__(obs_path, act_path,action_size, env_id=rank, base_port=config["env"]["base_port"])
+        
+
 
         # 5. Application specific init
         self.step_counter = 0
+        self.n_calls=0
+        self.check_freq = 2100
         self.goal_achieved = False
-        self.start_distance_factor = 0.0
+        self.start_distance_factor = 0.75
+        self.collision_thres = 0.5 
+        self.enable_currents = config["sim"]["current"]
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
         self.current_action = np.zeros(self.action_size, dtype=np.float32)
         
-        
+    def _on_step(self) -> bool:
+        self.n_calls+=1
+        if self.n_calls % self.check_freq == 0:
+            # print("*************** Calling GC *************")
+            gc.collect()  # Force the scan
+            self.n_calls=0
+        return True    
 
     def build_reset_command(self):
         """Build RESET command - specific to this application"""
         # ds_pos = [-3, -1, 5.0]
         # ds_rot = [0.0, 0.0, 0.0]
         # method one of randomization: start_distance_factor increases gradually
-        # if self.goal_achieved:
-        #     if self.start_distance_factor < 1.0:
-        #         self.start_distance_factor += 0.05
+        if self.goal_achieved:
+            if self.start_distance_factor < 1.0:
+                self.start_distance_factor += 0.05
+            else:          
+                self.start_distance_factor = np.random.random()
 
         # method two, random factor each time 
-        self.start_distance_factor = np.random.random()
         # self.start_distance_factor = 0.1
         girona_pos = [
             0.0+ self.start_distance_factor*self.np_random.uniform(-6.0, 6.0),
@@ -68,7 +92,10 @@ class dsEnv(EnvStonefishRLParallel):
             0.0
         ]
 
-        current_vec = [self.np_random.uniform(-.1, 0.1),self.np_random.uniform(-0.1, 0.1), 0.0]
+        if self.enable_currents: 
+            current_vec = [np.random.uniform(-0.1,0.1),np.random.uniform(-0.1,0.1), 0.0]
+        else: 
+            current_vec = [0.0,0.0,0.0]
 
         return [
             {"name": "girona500", "position": girona_pos, "rotation": girona_rot, "current":current_vec},
@@ -83,16 +110,22 @@ class dsEnv(EnvStonefishRLParallel):
         # Use parent reset but send our specific reset command
         response = self.send_command(reset_command)
         self._process_observation_vector(response)
+        obs = self.get_sim_obser()
+        obs = np.concatenate((obs,self.last_action_applied))
         
         self.step_counter = 0
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
         self.goal_achieved = False
-        obs = self.get_observation()
+        
+        self.previous_acceleration = np.zeros(3)
+
+        # with previous action 
+
         info = {}
         
         return obs, info
 
-    def get_observation(self):
+    def get_sim_obser(self):
         """Build observation: state vector + last action"""
         obs = []
         
@@ -110,17 +143,15 @@ class dsEnv(EnvStonefishRLParallel):
 
     def step(self, action):
         """Execute step with cleaned logic"""
+        self._on_step()
         self.step_counter += 1
         self.current_action = np.array(action, dtype=np.float32).flatten()
         
         obs, reward, terminated, truncated, info = super().step(action)
-
+        obs = np.concatenate((obs,self.current_action))
         # Application logic
-        if not self._auv_observed_ds():
-            obs[0:3] += np.random.random(3) # mark as out of sight
-            additional_reward = -6.0 # Penalty for losing sight of the docking station
-        else:
-            additional_reward = self.calculate_additional_reward()
+        
+        additional_reward = self.calculate_additional_reward()
             
         # Update termination/truncation
         terminated = terminated or self._is_terminated()
@@ -131,6 +162,7 @@ class dsEnv(EnvStonefishRLParallel):
         if self.goal_achieved:
             print(f"[Port {self.port}] Goal achieved!")
             terminated = True
+            additional_reward +=500
         
         if truncated:
             additional_reward -= 10.0  # Penalty for timeout
@@ -138,36 +170,50 @@ class dsEnv(EnvStonefishRLParallel):
         total_reward = reward + additional_reward
         self.last_action_applied = self.current_action
         info.update(self._get_additional_info())
-        return np.round(obs,2), total_reward, terminated, truncated, info
+        # return np.zeros(22), 0, terminated, truncated, {}
+        return np.round(obs,2), total_reward, terminated, truncated, {}
     
 
     def calculate_additional_reward(self):
         """Application-specific reward calculation"""
         # Extract relevant observations using their names
-        robot_pos = self._get_observation_by_pattern("auv_pose")
-        ds_pose = self._get_observation_by_pattern("ds_pose")
-        distance_x = robot_pos[0] - ds_pose[0]
-        distance_y = robot_pos[1] - ds_pose[1]
-        distance_z = robot_pos[2] - ds_pose[2]
-        Yaw_error = robot_pos[3] - ds_pose[3]
-
-
-        reward_dist = -abs(distance_x)-abs(distance_y)-(abs(distance_z)-1.25)*0.5
-        reward_yaw = np.exp(-2*abs(Yaw_error))-1
-        smoothing_reward = - abs(self.current_action - self.last_action_applied).sum()/abs(2*np.ones(self.action_size)).sum()
-        # print(f"[Port {self.port}], reward_yaw {reward_yaw:.2f} Action smoothness penalty: {smoothing_reward:.4f}")        
-
+        error = self._get_observation_by_pattern("error")
+        imu_acc = self._get_observation_by_pattern("imu_linear_acceleration")
         
-        # print(f"[DEBUG] dist_to_target: {dist_to_target}, dist_to_goal: {dist_to_goal}, collision_flag: {collision_flag}")
-        reward = reward_dist  + reward_yaw + smoothing_reward# this value makes the weight moving the ball equivalent to reaching the ball
+        
+        if not self._auv_observed_ds():
+            reward = -6.0 # Penalty for losing sight of the docking station
+        else:
+            reward_dist = -abs(error[0])-abs(error[1])-(abs(error[2])-1.25)*0.5
+            reward_yaw = np.exp(-2*abs(error[3]))-1
+            action_difference = abs(self.current_action - self.last_action_applied).sum()
+            
+            if action_difference > 0.5:
+                smoothing_reward = - np.exp(action_difference - 0.5) + 1  # Exponential penalty for large action changes
+                # print(f"[Port {self.port}] Action changed drastically! Difference: {action_difference:.2f}, Smoothing Reward: {smoothing_reward:.2f}")
+            else:
+                smoothing_reward = 0 
+            
+            reward = reward_dist  + reward_yaw + smoothing_reward# this value makes the weight moving the ball equivalent to reaching the ball
+        
+        # Checking Collision
+        if np.linalg.norm(self.previous_acceleration) != 0.0 :
+            difference = np.linalg.norm(self.previous_acceleration - imu_acc)
+            if difference > self.collision_thres : 
+                reward -= 10 
+                self.collision_thres+= self.collision_thres
+                # print("collision Detected,  Reward: ", reward)
+            elif self.collision_thres > 0.5: 
+                self.collision_thres /= 2 
 
-        if abs(distance_z) > 1.27 or abs(distance_x) > 0.15 or abs(distance_y) > 0.15 : 
+        if abs(error[2]) > 1.27 or abs(error[0]) > 0.15 or abs(error[1]) > 0.15 : 
             self.goal_achieved = False
         else:
             self.goal_achieved = True
-            reward += 500.0  # Large reward for reaching the goal
-        print(f"[Port {self.port}] Distance to target: {distance_x:.2f} {distance_y:.2f} {distance_z:.2f} m , reward: {reward:.2f}", end='\r')
 
+        self.previous_acceleration = imu_acc
+        reward /= self.rl_observation_freq    
+        # print(f"[Port {self.port}] Distance to target: {error[0]:.2f} {error[1]:.2f} {error[2]:.2f} m , reward: {reward:.2f}", end='\r')
         # print(f"[DEBUG] Calculated additional reward: {reward}")    
         return reward
 
@@ -206,22 +252,21 @@ class dsEnv(EnvStonefishRLParallel):
     
     def _auv_observed_ds(self):
         """Check if AUV has observed the docking station"""
-        ds_pos = self._get_observation_by_pattern("ds_pose")[:3]
-        auv_pos = self._get_observation_by_pattern("auv_pose")[:3]
+        error = self._get_observation_by_pattern("error")
         
         # check if AUV lies in DS cone field of view
         k = 0.64 # considering the cone size of (2,2,4.4) 
-        xy_plane_distance = np.linalg.norm(ds_pos[:2]-auv_pos[:2])
-        z_distance = k*abs(ds_pos[2]-auv_pos[2])
-        return xy_plane_distance <= z_distance 
+        if k*abs(error[2]) > abs(error[0]) and k*abs(error[2])> abs(error[1]):
+            return True
+        return False
 
 
     def _get_additional_info(self):
         """Additional info for this application"""
-        robot_pos = self._get_observation_by_pattern("auv_pose")
+        # robot_pos = self._get_observation_by_pattern("auv_pose")
         return {
-            "distance_to_target": self._distance_to_target(robot_pos[:3]),
-            "ds_position": self._get_observation_by_pattern("ds_pose").tolist(),
+            # "distance_to_target": self._distance_to_target(robot_pos[:3]),
+            "error": self._get_observation_by_pattern("error").tolist(),
             "ds_observed": self._auv_observed_ds(),
             "step": self.step_counter
         }

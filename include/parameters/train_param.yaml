@@ -1,8 +1,8 @@
 # Environment Settings
 env:
-  observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_observation_config.json"
+  observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_obser_v2_config.json"
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
-  instances: 15
+  instances: 20
   base_port: 5555
   episode_duration: 60
   rl_observation_freq: 5
@@ -13,22 +13,35 @@ sim:
   resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
   graphical_interface: False
   evaluation_graphical_interface: True
-  resolution: 600
+  resolution: 400
   realtime: False
+  current: False
+
+# This maps the forces (x,y,z,roll,pitch,yaw) of the thusters setpoints
+# It changes the action space size, to match the forces, 
+# The RL output forces, then the code convert forces to setpoint, and Simulation recieves Setpoints
+action: 
+  force_6Dof: True
+  tcm: [[1,1,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,1,1],
+        [0,0,0,0,0],
+        [0,0,0,1,-1],
+        [1,-1,0,0,0]]
 
 
 # Model for Evaluation
 # If pretrained is set to True, Model path should be specified 
 model:
   pretrained: False
-  model_path: "" 
+  model_path: "SAC_docking_20260216_194759" 
   algorithm: "PPO"
 
   # comment param
   policy: "MlpPolicy"
-  learning_rate: 0.0003
-  buffer_size: 1000000
-  batch_size: 256
+  learning_rate: 0.0005
+  buffer_size: 500000
+  batch_size: 1024
 
   # SAC param
   tau: 0.005
@@ -56,15 +69,16 @@ policy:
 
 # Training Settings
 train:
-  total_timesteps: 500_000
+  total_timesteps: 6000_000
   reset_num_timesteps: False
-  eval_freq: 5000
+  eval_freq: 1000
   save_path: "default"
-  save_name: "docking_currents"
-  warm_start_path: "sac_warm_started"
+  save_name: "PPO_"
+  warm_start_path: "PPO_"
+  weights_only: True
 
 log: 
-  enable_wandb: False
+  enable_wandb: True
   project_name: "stonefish_docking"
   run_name: "default"
   tags: ["sac", "docking", "stonefish"]

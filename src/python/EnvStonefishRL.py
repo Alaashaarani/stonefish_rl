@@ -4,11 +4,12 @@ import gymnasium as gym
 import numpy as np
 import os 
 import subprocess  
+from utils.utils import global_path
       
 
 class EnvStonefishRLParallel(gym.Env):
 
-    def __init__(self, observation_config_path, action_config_path, 
+    def __init__(self, observation_config_path, action_config_path,action_size=None ,
                  env_id=0, base_port=5555):
         super().__init__()
         self.env_id = env_id
@@ -31,9 +32,15 @@ class EnvStonefishRLParallel(gym.Env):
         self.observation_names = self._get_observation_names()
         self.action_names = self._get_action_names()
         
-        self.observation_size = len(self.observation_names)
-        self.action_size = len(self.action_names)
+
+
+        if isinstance(action_size,int):
+            self.action_size = action_size
+        else : 
+            self.action_size = len(self.action_names)
         
+        self.observation_size = len(self.observation_names) + self.action_size
+
         # Define spaces
         action_low, action_high = self._get_action_bounds()
         self.observation_space = gym.spaces.Box(
@@ -42,7 +49,7 @@ class EnvStonefishRLParallel(gym.Env):
         self.action_space = gym.spaces.Box(
             low=action_low, high=action_high, shape=(self.action_size,), dtype=np.float32
         )
-
+        
         self.state = np.zeros(self.observation_size, dtype=np.float32)
         self.step_count = 0
         self.process = None # Initialize as None; child class will assign the Popen object
@@ -89,7 +96,7 @@ class EnvStonefishRLParallel(gym.Env):
         """Process observation vector from C++"""
         try:
             obs_vector = json.loads(msg)
-            if len(obs_vector) != self.observation_size:
+            if len(obs_vector) != self.observation_size-self.action_size:
                 print(f"[WARNING] Observation size mismatch: expected {self.observation_size}, got {len(obs_vector)}")
             
             self.state = np.array(obs_vector, dtype=np.float32)
@@ -101,12 +108,21 @@ class EnvStonefishRLParallel(gym.Env):
 
         return self.state
 
+    def _process_action_vector(self, action): 
+        # print("Printing action ", action)
+        if isinstance(self.tcm,np.ndarray):
+            return action@self.tcm
+        else :
+            return action
+
     def build_command(self, action_vector):
         """Build CMD string from action vector using action config"""
-        if len(action_vector) != self.action_size:
-            print(f"[ERROR] Action vector size mismatch: expected {self.action_size}, got {len(action_vector)}")
-            return "CMD:;OBS:"
+        # if len(action_vector) != self.action_size:
+        #     print(f"[ERROR] Action vector size mismatch: expected {self.action_size}, got {len(action_vector)}")
+        #     return "CMD:;OBS:"
         
+        action_vector = self._process_action_vector(action_vector)
+
         parts = []
         try:
             specs = self.action_config.get("action_config", {}).get("specs", [])
@@ -203,6 +219,11 @@ class EnvStonefishRLParallel(gym.Env):
                 high = spec.get("max_value", 1.0)
                 lows.append(low)
                 highs.append(high)
+            # This loop is used when we are using force vector. If we are using Setpoints,
+            # this function is not needed. 
+            while len(lows)<self.action_size:
+                lows.append(low)
+                highs.append(high)
                 
             return np.array(lows, dtype=np.float32), np.array(highs, dtype=np.float32)
             
@@ -257,6 +278,7 @@ def launch_stonefish_simulator(rank, config):
     observation_config_path= config["env"]["observation_config"]
     action_config_path= config["env"]["action_config"]
     port=rank + config["env"]["base_port"]
+    rl_freq = config["env"]["rl_observation_freq"]
     print(f"[INFO] Launching Stonefish on Port {port}...")
 
     scene_path= config["sim"]["scene_path"]
@@ -264,7 +286,7 @@ def launch_stonefish_simulator(rank, config):
     real_time= config["sim"]["realtime"] 
     resolution=config["sim"]["resolution"]
     graphical=config["sim"]["graphical_interface"]
-    
+    dt = 0.0 if real_time else 0.1
     # Run the scene
     # Note: We pass the port as an additional command line argument to the C++ executable
     print(f"[INFO] Executing Stonefish on Port {port} with the scene: {scene_path}")
@@ -277,12 +299,10 @@ def launch_stonefish_simulator(rank, config):
         action_config_path, 
         str(port),
         str(resolution),
-        str(graphical)
+        str(graphical),
+        str(rl_freq), 
+        str(dt)
         ]
-    
-    
-    if real_time: 
-        vector.append(str(0.0)) # flag for real time,
     
         
     stonefish_proc = subprocess.Popen(vector,
@@ -302,9 +322,4 @@ def kill_stonefish_process(process):
     except Exception as e:
         print(f"[ERROR] Could not kill Stonefish: {e}")
         
-def global_path(relative_path):
-    """Get absolute path from project root"""
-    # Path to the project root directory
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 
-    return os.path.join(project_root, relative_path)
