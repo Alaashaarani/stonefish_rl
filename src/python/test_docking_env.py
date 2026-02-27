@@ -34,7 +34,7 @@ if __name__ == "__main__":
     else:
         config = load_config(global_path("include/parameters/test_param.yaml"))
 
-    plotter = RealTimePlotter(num_curves=4, max_entries=150)
+    # plotter = RealTimePlotter(num_curves=4, max_entries=150)
 
     num_instances = config["env"]["instances"]
     print(f"Starting {num_instances} instances...")
@@ -53,7 +53,6 @@ if __name__ == "__main__":
     #total testing steps
     testing_steps = config["testing"]["episodes"]*config["env"]["episode_duration"]*config["env"]["rl_observation_freq"]
     for step in range(testing_steps):
-        sensor_values = np.array([obs[0][-7],obs[0][-6],obs[0][-5]])
 
         # controller
         if config["controller"]["logitech"]:
@@ -68,14 +67,13 @@ if __name__ == "__main__":
         # Step all environments simultaneously
         obs, rewards, dones, infos = envs.step(actions)
         
-        difference = np.linalg.norm(sensor_values - np.array([obs[0][-4],obs[0][-3],obs[0][-2]]))
-        mag = 10 if difference > 0.5 else 0
-        plotter.update(obs[0][-16:-12])
+       
+        # plotter.update(obs[0][-16:-12])
         # print("lenght : ",len(obs[0][-4:]),end="\n")
         
-        
+        print(f"step: {step}, actions: {actions}", end="\r")
         if step %  config["testing"]["step_per_print"] == 0:
-            print(f"Step {step} | Rewards: {rewards} | observations[0]: {obs[0]}")
+            print(f"\n Step {step} | Rewards: {rewards} | observations[0]: {obs[0]}")
 
     print("Testing finished. Closing environments...")
     envs.close()

@@ -22,20 +22,20 @@ sim:
 # The RL output forces, then the code convert forces to setpoint, and Simulation recieves Setpoints
 action: 
   force_6Dof: True
-  tcm: [[1,1,0,0,0],
+  tcm: [[-1,-1,0,0,0],
         [0,0,1,0,0],
-        [0,0,0,1,1],
+        [0,0,0,-1,-1],
         [0,0,0,0,0],
         [0,0,0,1,-1],
-        [1,-1,0,0,0]]
+        [-1,1,0,0,0]]
 
 
 # Model for Evaluation
 # If pretrained is set to True, Model path should be specified 
 model:
   pretrained: False
-  model_path: "SAC_docking_20260216_194759" 
-  algorithm: "PPO"
+  model_path: "PPO_PPO_O11_A6_20260226_200005" 
+  algorithm: "SAC"
 
   # comment param
   policy: "MlpPolicy"
@@ -69,11 +69,11 @@ policy:
 
 # Training Settings
 train:
-  total_timesteps: 6000_000
+  total_timesteps: 2000_000
   reset_num_timesteps: False
-  eval_freq: 1000
+  eval_freq: 2000
   save_path: "default"
-  save_name: "PPO_"
+  save_name: "PPO_O11_A6"
   warm_start_path: "PPO_"
   weights_only: True
 
@@ -81,5 +81,5 @@ log:
   enable_wandb: True
   project_name: "stonefish_docking"
   run_name: "default"
-  tags: ["sac", "docking", "stonefish"]
+  tags: ["PPO", "docking", "stonefish"]
   log_dir: "./logs/"

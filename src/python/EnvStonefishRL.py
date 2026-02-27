@@ -39,8 +39,7 @@ class EnvStonefishRLParallel(gym.Env):
         else : 
             self.action_size = len(self.action_names)
         
-        self.observation_size = len(self.observation_names) + self.action_size
-
+        self.observation_size = len(self.observation_names) 
         # Define spaces
         action_low, action_high = self._get_action_bounds()
         self.observation_space = gym.spaces.Box(
@@ -96,7 +95,7 @@ class EnvStonefishRLParallel(gym.Env):
         """Process observation vector from C++"""
         try:
             obs_vector = json.loads(msg)
-            if len(obs_vector) != self.observation_size-self.action_size:
+            if len(obs_vector) != self.observation_size:
                 print(f"[WARNING] Observation size mismatch: expected {self.observation_size}, got {len(obs_vector)}")
             
             self.state = np.array(obs_vector, dtype=np.float32)

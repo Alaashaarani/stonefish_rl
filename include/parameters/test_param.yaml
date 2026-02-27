@@ -3,7 +3,7 @@ env:
   observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_obser_v2_config.json"
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
   instances: 1
-  base_port: 5595
+  base_port: 5596
   episode_duration: 200
   rl_observation_freq: 5
 
@@ -12,7 +12,7 @@ sim:
   resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
   graphical_interface: True
   resolution: 800
-  realtime: False
+  realtime: True
   current: False
 
 # This maps the forces (x,y,z,roll,pitch,yaw) of the thusters setpoints
@@ -20,12 +20,13 @@ sim:
 # The RL output forces, then the code convert forces to setpoint, and Simulation recieves Setpoints
 action: 
   force_6Dof: True
-  tcm: [[1,1,0,0,0],
+  tcm: [[-1,-1,0,0,0],
         [0,0,1,0,0],
-        [0,0,0,1,1],
+        [0,0,0,-1,-1],
         [0,0,0,0,0],
         [0,0,0,1,-1],
-        [1,-1,0,0,0]]
+        [-1,1,0,0,0]]
+
 
 testing: 
   episodes: 10
@@ -38,4 +39,4 @@ testing:
 controller:
   logitech: True
   random: False
-  force_vector: [0.0, 0.0, 0.0,-1.0,-1.0] # downward 
+  force_vector: [0.0,0.0,1.0, 0.0,0.0,0.0] # downward 

@@ -91,8 +91,8 @@ private:
 
     static double getYawFromQuaternion(std::vector<float> quat);
     
-    static float extractErrorFromRobots(sf::SimulationManager* sim, const std::string& name1, 
-                           const std::string& name2, int channel_index);
+    static btTransform extractTfBetweenRobots(sf::SimulationManager* sim, const std::string& name1, 
+                           const std::string& name2);
     
 };
 

@@ -5,31 +5,31 @@
       "entity_name": "error",
       "field_type": "position",
       "component": "x",
-      "entity_1": "ds",
-      "entity_2": "girona500",
+      "entity_1": "girona500",
+      "entity_2": "ds",
       "output_name": "error_x"
       },
       {
       "entity_name": "error",
       "field_type": "position",
       "component": "y",
-      "entity_1": "ds",
-      "entity_2": "girona500",
+      "entity_1": "girona500",
+      "entity_2": "ds",
       "output_name": "error_y"},
       {
       "entity_name": "error",
       "field_type": "position",
       "component": "z",
-      "entity_1": "ds",
-      "entity_2": "girona500",
+      "entity_1": "girona500",
+      "entity_2": "ds",
       "output_name": "error_z"
       },
       {
       "entity_name": "error",
       "field_type": "rotation",
       "component": "yaw",
-      "entity_1": "ds",
-      "entity_2": "girona500",
+      "entity_1": "girona500",
+      "entity_2": "ds",
       "output_name": "error_yaw"
       },
       {

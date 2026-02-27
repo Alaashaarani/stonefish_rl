@@ -34,9 +34,14 @@ if __name__ == "__main__":
         model = PPO.load(model_path, env=env)
     elif config["evaluate"]["algorithm"]=="TD3":
         model = TD3.load(model_path, env=env)
+    elif config["evaluate"]["algorithm"]=="ONNX":
+        import openvino as ov
+        core = ov.Core()
+        model = core.read_model(model_path)
+        model = core.compile_model(model, "CPU") 
 
     print(f"Model loaded from: {model_path}")
-
+    final_reward = 0
     # 4. Evaluation Loop
     num_episodes = config["evaluate"]["num_episodes"]
     for ep in range(num_episodes):
@@ -52,8 +57,12 @@ if __name__ == "__main__":
             # deterministic=True is crucial for evaluation!
             
             # obs[3] += np.pi/2  # adjust heading observation because ds is oriented with half a pi
-
-            action, _ = model.predict(obs, deterministic=True)
+            if config["evaluate"]["algorithm"]=="ONNX":
+                obs = obs.reshape(1,14)
+                result = model(obs)
+                action = result[0].reshape(6)
+            else: 
+                action, _ = model.predict(obs, deterministic=True)
 
             # downward actions 
             # action = np.array([0.0, 0.0, 0.0,-1.0,-1.0])
@@ -66,11 +75,11 @@ if __name__ == "__main__":
             if step_counter % config["evaluate"]["step_per_print"] == 0:
                 print(f"Step: {step_counter} | Current Reward: {reward:.2f} | Total: {total_reward:.2f} \n action: {action}")
 
-
+        final_reward += total_reward
         result_str = "SUCCESS (Goal Reached)" if done else "TIMEOUT (Truncated)"
         print(f"Episode {ep + 1} finished: {result_str}")
         print(f"Total Reward: {total_reward:.2f} in {step_counter} steps.")
 
     # 5. Cleanup
     env.close()
-    print("\nEvaluation complete. Simulator closed.")
+    print(f"\nEvaluation complete. Simulator closed. model: {model_path}, Average Reward: {final_reward/num_episodes:.2f}")

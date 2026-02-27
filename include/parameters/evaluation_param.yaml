@@ -1,6 +1,6 @@
 # Environment Settings
 env:
-  observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_obser_v2_config.json"
+  observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_obser_v1_config.json"
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
   # only one instance is allowed in evaluation
   instances: 1
@@ -14,7 +14,7 @@ sim:
   graphical_interface: True
   resolution: 900
   realtime: False
-  current: True
+  current: False
 
 
 # This maps the forces (x,y,z,roll,pitch,yaw) of the thusters setpoints
@@ -34,8 +34,18 @@ action:
 evaluate:
   algorithm: "SAC"
   # model_path: "PPO_docking_currents_20260203_172120.zip"
-
-  model_path: "/home/cirs_alaa/repositories/stonefish_rl/src/python/SAC_docking_current1_20260219_175517.zip"
-
+  model_path: "/home/cirs_alaa/repositories/stonefish_rl/src/python/SAC.zip"
   num_episodes: 10
   step_per_print: 100
+
+# to do 
+compare:
+  compare: True
+  num_episodes: 10 
+  step_per_print: 100
+  num_models: 2
+  algorithms: ["PPO","PPO"]
+  model_paths: ["/home/cirs_alaa/repositories/stonefish_rl/src/python/PPO_O14_A6.zip",
+                "/home/cirs_alaa/repositories/stonefish_rl/src/python/PPO_PPO_O11_A6_20260226_200005.zip"]
+  
+# Environment Settings

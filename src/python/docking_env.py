@@ -111,7 +111,7 @@ class dsEnv(EnvStonefishRLParallel):
         response = self.send_command(reset_command)
         self._process_observation_vector(response)
         obs = self.get_sim_obser()
-        obs = np.concatenate((obs,self.last_action_applied))
+        # obs = np.concatenate((obs,self.last_action_applied))
         
         self.step_counter = 0
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
@@ -148,7 +148,7 @@ class dsEnv(EnvStonefishRLParallel):
         self.current_action = np.array(action, dtype=np.float32).flatten()
         
         obs, reward, terminated, truncated, info = super().step(action)
-        obs = np.concatenate((obs,self.current_action))
+        # obs = np.concatenate((obs,self.current_action))
         # Application logic
         
         additional_reward = self.calculate_additional_reward()
@@ -171,6 +171,7 @@ class dsEnv(EnvStonefishRLParallel):
         self.last_action_applied = self.current_action
         info.update(self._get_additional_info())
         # return np.zeros(22), 0, terminated, truncated, {}
+        obs[2]-=1.25 # docking offset
         return np.round(obs,2), total_reward, terminated, truncated, {}
     
 
@@ -182,19 +183,19 @@ class dsEnv(EnvStonefishRLParallel):
         
         
         if not self._auv_observed_ds():
-            reward = -6.0 # Penalty for losing sight of the docking station
+            reward = -15.0 # Penalty for losing sight of the docking station
         else:
             reward_dist = -abs(error[0])-abs(error[1])-(abs(error[2])-1.25)*0.5
             reward_yaw = np.exp(-2*abs(error[3]))-1
             action_difference = abs(self.current_action - self.last_action_applied).sum()
             
-            if action_difference > 0.5:
-                smoothing_reward = - np.exp(action_difference - 0.5) + 1  # Exponential penalty for large action changes
-                # print(f"[Port {self.port}] Action changed drastically! Difference: {action_difference:.2f}, Smoothing Reward: {smoothing_reward:.2f}")
-            else:
-                smoothing_reward = 0 
+            # if action_difference > 1:
+            #     smoothing_reward = (-np.exp(action_difference - 1) + 1)/2  # Exponential penalty for large action changes
+            #     # print(f"[Port {self.port}] Action changed drastically! Difference: {action_difference:.2f}, Smoothing Reward: {smoothing_reward:.2f}")
+            # else:
+            smoothing_reward = 0 
             
-            reward = reward_dist  + reward_yaw + smoothing_reward# this value makes the weight moving the ball equivalent to reaching the ball
+            reward = reward_dist  + reward_yaw + smoothing_reward # this value makes the weight moving the ball equivalent to reaching the ball
         
         # Checking Collision
         if np.linalg.norm(self.previous_acceleration) != 0.0 :

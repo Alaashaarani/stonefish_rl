@@ -245,33 +245,53 @@ void StateManager::initializeExtractors() {
 
     error_extractors_ = {
         {"position.x", [](sf::SimulationManager* sim, const std::string& name1, const std::string& name2) -> float{
-           return extractErrorFromRobots(sim, name1,name2, 0);
+            btTransform relative = extractTfBetweenRobots(sim, name1,name2);
+            return relative.getOrigin().getX();
         }},
         {"position.y", [](sf::SimulationManager* sim, const std::string& name1, const std::string& name2) -> float{
-           return extractErrorFromRobots(sim, name1,name2, 1);
+           btTransform relative = extractTfBetweenRobots(sim, name1,name2);
+           return relative.getOrigin().getY();
         }},
         {"position.z", [](sf::SimulationManager* sim, const std::string& name1, const std::string& name2) -> float{
-           return extractErrorFromRobots(sim, name1,name2, 2);
+           btTransform relative = extractTfBetweenRobots(sim, name1,name2);
+           return relative.getOrigin().getZ();
+        }},
+        {"rotation.roll", [](sf::SimulationManager* sim, const std::string& name1, const std::string& name2) -> float{
+            btTransform relative = extractTfBetweenRobots(sim, name1,name2);
+            sf::Scalar yaw, pitch, roll;
+            relative.getRotation().getEulerZYX(yaw, pitch, roll);
+            return static_cast<float>(roll);
+        }},
+        {"rotation.pitch", [](sf::SimulationManager* sim, const std::string& name1, const std::string& name2) -> float{
+            btTransform relative = extractTfBetweenRobots(sim, name1,name2);
+            sf::Scalar yaw, pitch, roll;
+            relative.getRotation().getEulerZYX(yaw, pitch, roll);
+            return static_cast<float>(pitch);
         }},
         {"rotation.yaw", [](sf::SimulationManager* sim, const std::string& name1, const std::string& name2) -> float{
-            auto robot1 = sim->getRobot(name1);
-            if (!robot1) return NAN;
-            auto robot2 = sim->getRobot(name2);
-            if (!robot2) return NAN;
-            sf::Scalar yaw1, pitch1, roll1,yaw2, pitch2, roll2 ;
-            robot1->getTransform().getRotation().getEulerZYX(yaw1, pitch1, roll1);
-            robot2->getTransform().getRotation().getEulerZYX(yaw2, pitch2, roll2);
-            return static_cast<float>(yaw1-yaw2);
+            btTransform relative = extractTfBetweenRobots(sim, name1,name2);
+            sf::Scalar yaw, pitch, roll;
+            relative.getRotation().getEulerZYX(yaw, pitch, roll);
+            return static_cast<float>(yaw);
         }}
     };
 }
-float StateManager::extractErrorFromRobots(sf::SimulationManager* sim, const std::string& name1, 
-                           const std::string& name2, int channel_index){
+btTransform StateManager::extractTfBetweenRobots(sf::SimulationManager* sim, const std::string& name1, 
+                           const std::string& name2){
     auto robot1 = sim->getRobot(name1);
     auto robot2 = sim->getRobot(name2);
-    float v1 = robot1 ? static_cast<float>(robot1->getTransform().getOrigin()[channel_index]) : NAN;
-    float v2 = robot2 ? static_cast<float>(robot2->getTransform().getOrigin()[channel_index]) : NAN;
-    return v1-v2;
+
+    // Safety check: If robots don't exist, return an Identity transform
+    if (!robot1 || !robot2) {
+        return btTransform::getIdentity();
+    }
+
+    btTransform T1 = robot1->getTransform();
+    btTransform T2 = robot2->getTransform();
+
+    btTransform T1_T2 = T1.inverse() * T2;
+
+    return T1_T2;
                            }
 
 // Helper functions
