@@ -19,20 +19,20 @@ public:
     /**
      * @brief Constructor for StonefishRL
      * @param path Path to the .scn file
-     * @param observation_conf_path Path to the observation JSON config
+     * @param state_conf_path Path to the state JSON config
      * @param action_conf_path Path to the action JSON config
      * @param frequency Simulation frequency (Hz)
      * @param port Unique ZMQ port for this instance (default 5555)
      */
     StonefishRL(const std::string &path, 
-                const std::string &observation_conf_path, 
+                const std::string &state_conf_path, 
                 const std::string &action_conf_path, 
                 double frequency,
                 int port = 5555);
 
     // Core RL Communication loop
     std::string RecieveInstructions(sf::SimulationApp& simApp);
-    void SendObservations();
+    void SendStates();
     void ApplyCommands(const std::string& str_cmds);
     
     // Stonefish lifecycle overrides

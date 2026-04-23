@@ -21,24 +21,24 @@ public:
     StateManager();
     
     // Configuration
-    void setObservationConfig(const ObservationConfig& config);
+    void setStateConfig(const StateConfig& config);
     
-    // Observation methods
-    std::vector<float> getObservationVector(sf::SimulationManager* sim);
-    std::vector<std::string> getObservationNames() const;
+    // State methods
+    std::vector<float> getStateVector(sf::SimulationManager* sim);
+    std::vector<std::string> getStateNames() const;
     
     // Robot management
     void updateRobotPosition(const std::vector<ResetInfo>& robot_info, sf::SimulationManager* sim);
     
     // Utility
-    size_t getObservationSize() const { return observation_specs_.size(); }
-    void printObservationSpecs() const;
+    size_t getStateSize() const { return state_specs_.size(); }
+    void printStateSpecs() const;
 
     
 
 private:
-    ObservationConfig observation_config_;
-    std::vector<ObservationSpec> observation_specs_;
+    StateConfig state_config_;
+    std::vector<StateSpec> state_specs_;
     
     // Initialization
     void initializeExtractors();
@@ -57,10 +57,10 @@ private:
     std::unordered_map<std::string, std::function<float(sf::SimulationManager*, const std::string&, const std::string&)>> error_extractors_;
     
     // Extraction methods
-    float extractRobotField(sf::SimulationManager* sim, const ObservationSpec& spec);
-    float extractSensorField(sf::SimulationManager* sim, const ObservationSpec& spec);
-    float extractActuatorField(sf::SimulationManager* sim, const ObservationSpec& spec);
-    float extractErrorField(sf::SimulationManager* sim, const ObservationSpec& spec);
+    float extractRobotField(sf::SimulationManager* sim, const StateSpec& spec);
+    float extractSensorField(sf::SimulationManager* sim, const StateSpec& spec);
+    float extractActuatorField(sf::SimulationManager* sim, const StateSpec& spec);
+    float extractErrorField(sf::SimulationManager* sim, const StateSpec& spec);
 
     // Entity finding
     sf::Robot* findRobot(sf::SimulationManager* sim, const std::string& name);

@@ -9,9 +9,21 @@ from utils.utils import global_path
 
 class EnvStonefishRLParallel(gym.Env):
 
-    def __init__(self, observation_config_path, action_config_path,action_size=None ,
-                 env_id=0, base_port=5555):
+    def __init__(self,
+                 action_size, 
+                 env_id=0, 
+                 base_port=5555):
         super().__init__()
+
+        """ Defined Values in the child CLASS: 
+        self.state_path 
+        self.act_path 
+        self.tcm 
+        self.action_size
+        self.observation_history
+        self.observe_actions
+        """ 
+
         self.env_id = env_id
         self.port = base_port + env_id
         self.ip = f"tcp://localhost:{self.port}"
@@ -25,31 +37,41 @@ class EnvStonefishRLParallel(gym.Env):
         self.socket.setsockopt(zmq.LINGER, 0)
         self.socket.connect(self.ip)
         
-        # Load configurations
-        self.observation_config = self._load_config(observation_config_path)
-        self.action_config = self._load_config(action_config_path)
+        # Load configurations (paths are defined in the Child Class)
+        self.state_config = self._load_config(self.state_path)
+        self.action_config = self._load_config(self.act_path)
         
-        self.observation_names = self._get_observation_names()
+        self.state_names = self._get_state_names()
         self.action_names = self._get_action_names()
         
-
 
         if isinstance(action_size,int):
             self.action_size = action_size
         else : 
             self.action_size = len(self.action_names)
+
         
-        self.observation_size = len(self.observation_names) 
+        self.state_size = len(self.state_names)
+        # adding action to observations
+        if self.observe_actions:
+            obs_size = self.state_size + self.action_size
+        else: 
+            obs_size = self.state_size
+    
+        # increasing the total size to save history observations
+        self.total_obs_size = obs_size * (1+self.history_length)
+        
         # Define spaces
         action_low, action_high = self._get_action_bounds()
+        
         self.observation_space = gym.spaces.Box(
-            low=-np.inf, high=np.inf, shape=(self.observation_size,), dtype=np.float32
+            low=-np.inf, high=np.inf, shape=(self.total_obs_size,), dtype=np.float32
         )
         self.action_space = gym.spaces.Box(
             low=action_low, high=action_high, shape=(self.action_size,), dtype=np.float32
         )
         
-        self.state = np.zeros(self.observation_size, dtype=np.float32)
+        self.state = np.zeros(self.total_obs_size, dtype=np.float32)
         self.step_count = 0
         self.process = None # Initialize as None; child class will assign the Popen object
         
@@ -65,11 +87,11 @@ class EnvStonefishRLParallel(gym.Env):
             print(f"[ERROR] Failed to parse {config_path}: {e}")
             return {}
 
-    def _get_observation_names(self):
+    def _get_state_names(self):
         """Extract observation names from observation config"""
         names = []
         try:
-            specs = self.observation_config.get("observation_config", {}).get("specs", [])
+            specs = self.state_config.get("state_config", {}).get("specs", [])
             for spec in specs:
                 names.append(spec.get("output_name", "unknown_observation"))
             print(f"[DEBUG] Added observation name: {names}")
@@ -91,24 +113,26 @@ class EnvStonefishRLParallel(gym.Env):
             print(f"[ERROR] Failed to parse action names: {e}")
             return []
 
-    def _process_observation_vector(self, msg):
-        """Process observation vector from C++"""
+    def _process_state_vector(self, msg):
+        """Process state vector from C++"""
         try:
-            obs_vector = json.loads(msg)
-            if len(obs_vector) != self.observation_size:
-                print(f"[WARNING] Observation size mismatch: expected {self.observation_size}, got {len(obs_vector)}")
-            
-            self.state = np.array(obs_vector, dtype=np.float32)
-            # print(f"[DEBUG] Processed {len(self.state)} observations")
+            state_vector = json.loads(msg)
+            if len(state_vector) != self.state_size:
+                print(f"[WARNING_here] State size mismatch: expected {self.state_size}, got {len(state_vector)}")
+
+            self.state = np.array(state_vector, dtype=np.float32)
+            # print(f"[DEBUG] Processed {len(self.state)} states")
             
         except json.JSONDecodeError as e:
-            print(f"[ERROR] Failed to decode observation vector: {e}")
+            print(f"[ERROR] Failed to decode state vector: {e}")
             self.state = np.array([], dtype=np.float32)
 
         return self.state
 
-    def _process_action_vector(self, action): 
-        # print("Printing action ", action)
+    def _process_action_vector(self, action):
+        '''
+        TCM is defined in the Child Class, because it is loaded from the config file 
+        '''
         if isinstance(self.tcm,np.ndarray):
             return action@self.tcm
         else :
@@ -120,6 +144,7 @@ class EnvStonefishRLParallel(gym.Env):
         #     print(f"[ERROR] Action vector size mismatch: expected {self.action_size}, got {len(action_vector)}")
         #     return "CMD:;OBS:"
         
+
         action_vector = self._process_action_vector(action_vector)
 
         parts = []
@@ -197,7 +222,7 @@ class EnvStonefishRLParallel(gym.Env):
         
         try:
             response = self.send_command(reset_msg)
-            self._process_observation_vector(response)
+            self._process_state_vector(response)
         except Exception as e:
             print(f"[ENV {self.env_id}] Reset timeout/failure: {e}")
             # Optional: Add logic here to re-launch the specific simulator instance
@@ -235,7 +260,7 @@ class EnvStonefishRLParallel(gym.Env):
         try:
             message = self.build_command(action)
             msg = self.send_command(message)
-            self._process_observation_vector(msg)
+            self._process_state_vector(msg)
             
             reward = self._calculate_reward()
             done = self._is_done()
@@ -259,10 +284,10 @@ class EnvStonefishRLParallel(gym.Env):
         """Get additional info - to be overridden by child classes"""
         return {}
 
-    def print_observation(self):
-        """Print current observation with names"""
-        print(f"[DEBUG] Observation ({len(self.state)} elements):")
-        for i, (name, value) in enumerate(zip(self.observation_names, self.state)):
+    def print_state(self):
+        """Print current state with names"""
+        print(f"[DEBUG] State ({len(self.state)} elements):")
+        for i, (name, value) in enumerate(zip(self.state_names, self.state)):
             print(f"  [{i}] {name}: {value}")
 
 
@@ -274,7 +299,7 @@ def launch_stonefish_simulator(rank, config):
     # Path to the Stonefish executable
     stonefish_exe = os.path.join(global_path("build"), "StonefishRLTest")
     
-    observation_config_path= config["env"]["observation_config"]
+    state_config_path= config["env"]["state_config"]
     action_config_path= config["env"]["action_config"]
     port=rank + config["env"]["base_port"]
     rl_freq = config["env"]["rl_observation_freq"]
@@ -294,7 +319,7 @@ def launch_stonefish_simulator(rank, config):
     vector = [stonefish_exe, 
         scene_path, 
         resources_path, 
-        observation_config_path, 
+        state_config_path, 
         action_config_path, 
         str(port),
         str(resolution),

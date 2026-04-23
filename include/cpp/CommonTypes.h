@@ -5,8 +5,8 @@
 #include <vector>
 #include <unordered_map>
 
-// Simple observation specification
-struct ObservationSpec {
+// Simple state specification
+struct StateSpec {
     std::string entity_name;    // "girona", "imu_sensor", etc.
     std::string field_type;     // "position", "rotation", "velocity", "collision"
     std::string component;      // "x", "y", "z", "yaw", "binary"
@@ -35,8 +35,8 @@ struct ResetInfo {
 
 
 // Configuration structures
-struct ObservationConfig {
-    std::vector<ObservationSpec> specs;
+struct StateConfig {
+    std::vector<StateSpec> specs;
 };
 
 struct ActionConfig {
@@ -44,7 +44,7 @@ struct ActionConfig {
 };
 
 struct SimulationConfig {
-    ObservationConfig observation_config;
+    StateConfig state_config;
     ActionConfig action_config;
 };
 

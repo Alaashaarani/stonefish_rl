@@ -47,7 +47,7 @@
  	</looks>
 
 	<!-- Environment -->
-	<static name="Tank" type="model">
+	<!-- <static name="Tank" type="model">
 		<physical>
 			<mesh filename="Resources/g500/data/pool/cirs_pool_2025.obj" scale="1.0"/>
 			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
@@ -59,6 +59,14 @@
 		<material name="Neutral"/>
 		<look name="cirs_tank"/>
 		<world_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+	</static> -->
+
+	<static name="Bottom" type="terrain">
+		<height_map filename="Resources/girona_ds/texture/height_map.png"/>
+		<dimensions scalex="0.1" scaley="0.2" height="1.0"/>
+		<material name="Rock"/>
+		<look name="gray"/>
+		<world_transform xyz="0.0 0.0 10.0" rpy="0.0 0.0 0.0"/>
 	</static>
 
 	<!-- Robot -->
@@ -68,7 +76,7 @@
 		<arg name="rpy_girona" value="0.0 0.0 0.0"/>
 	</include> -->
 
-	<include file="Resources/girona_ds/scenarios/girona500_v2.scn">
+	<include file="Resources/girona_ds/scenarios/girona1000_v2.scn">
 		<arg name="robot_name" value="girona500"/>
 		<arg name="position" value="0.0 0.0 0.0"/>
 		<arg name="rpy_girona" value="0.0 0.0 0.0"/>

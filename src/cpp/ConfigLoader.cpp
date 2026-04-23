@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-ObservationConfig ConfigLoader::loadFromFile(const std::string& filepath) {
+StateConfig ConfigLoader::loadFromFile(const std::string& filepath) {
     try {
         std::ifstream file(filepath);
         if (!file.is_open()) {
@@ -22,10 +22,10 @@ ObservationConfig ConfigLoader::loadFromFile(const std::string& filepath) {
     }
 }
 
-ObservationConfig ConfigLoader::loadFromString(const std::string& json_str) {
+StateConfig ConfigLoader::loadFromString(const std::string& json_str) {
     try {
         nlohmann::json j = nlohmann::json::parse(json_str);
-        ObservationConfig config = parseJsonConfig(j);
+        StateConfig config = parseJsonConfig(j);
         
         if (!validateConfig(config)) {
             std::cerr << "[ConfigLoader] WARNING: Config validation failed, using default" << std::endl;
@@ -33,7 +33,7 @@ ObservationConfig ConfigLoader::loadFromString(const std::string& json_str) {
         }
         
         std::cout << "[ConfigLoader] Config loaded successfully: " 
-                  << config.specs.size() << " observation specs" << std::endl;
+                  << config.specs.size() << " state specs" << std::endl;
         
         return config;
         
@@ -43,18 +43,18 @@ ObservationConfig ConfigLoader::loadFromString(const std::string& json_str) {
     }
 }
 
-ObservationConfig ConfigLoader::parseJsonConfig(const nlohmann::json& j) {
-    ObservationConfig config;
+StateConfig ConfigLoader::parseJsonConfig(const nlohmann::json& j) {
+    StateConfig config;
     
     try {
-        // Parse observation_config section
-        if (j.contains("observation_config")) {
-            const auto& obs_config = j["observation_config"];
+        // Parse state_config section
+        if (j.contains("state_config")) {
+            const auto& obs_config = j["state_config"];
             
             // Parse specs array
             if (obs_config.contains("specs")) {
                 for (const auto& spec_item : obs_config["specs"]) {
-                    ObservationSpec spec;
+                    StateSpec spec;
                     spec.entity_name = spec_item.value("entity_name", "");
                     spec.field_type = spec_item.value("field_type", "");
                     spec.component = spec_item.value("component", "");
@@ -72,10 +72,10 @@ ObservationConfig ConfigLoader::parseJsonConfig(const nlohmann::json& j) {
             }
         }
         
-        // If no observation_config found, try root level specs
+        // If no state_config found, try root level specs
         else if (j.contains("specs")) {
             for (const auto& spec_item : j["specs"]) {
-                ObservationSpec spec;
+                StateSpec spec;
                 spec.entity_name = spec_item.value("entity_name", "");
                 spec.field_type = spec_item.value("field_type", "");
                 spec.component = spec_item.value("component", "");
@@ -94,10 +94,10 @@ ObservationConfig ConfigLoader::parseJsonConfig(const nlohmann::json& j) {
     return config;
 }
 
-bool ConfigLoader::validateConfig(const ObservationConfig& config) {
+bool ConfigLoader::validateConfig(const StateConfig& config) {
     // Basic validation
     if (config.specs.empty()) {
-        std::cerr << "[ConfigLoader] WARNING: No observation specs configured" << std::endl;
+        std::cerr << "[ConfigLoader] WARNING: No state specs configured" << std::endl;
         return false;
     }
     
@@ -116,8 +116,8 @@ bool ConfigLoader::validateConfig(const ObservationConfig& config) {
     return true;
 }
 
-ObservationConfig ConfigLoader::getDefaultConfig() {
-    ObservationConfig config;
+StateConfig ConfigLoader::getDefaultConfig() {
+    StateConfig config;
     
     // Default: observe robot position and yaw
     config.specs.push_back({"girona", "position", "x", "robot_x"});

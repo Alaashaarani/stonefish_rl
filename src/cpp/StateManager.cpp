@@ -7,11 +7,11 @@ StateManager::StateManager() {
     std::cout << "[StateManager] Dynamic StateManager initialized" << std::endl;
 }
 
-void StateManager::setObservationConfig(const ObservationConfig& config) {
-    observation_config_ = config;
-    observation_specs_ = config.specs;
-    std::cout << "[StateManager] Observation config set with " << observation_specs_.size() << " specs" << std::endl;
-    printObservationSpecs();
+void StateManager::setStateConfig(const StateConfig& config) {
+    state_config_ = config;
+    state_specs_ = config.specs;
+    std::cout << "[StateManager] State config set with " << state_specs_.size() << " specs" << std::endl;
+    printStateSpecs();
 }
 
 void StateManager::initializeExtractors() {
@@ -334,11 +334,11 @@ double StateManager::getYawFromQuaternion(std::vector<float> quat) {
 }
 
 
-std::vector<float> StateManager::getObservationVector(sf::SimulationManager* sim) {
-    std::vector<float> observations;
-    observations.reserve(observation_specs_.size());
+std::vector<float> StateManager::getStateVector(sf::SimulationManager* sim) {
+    std::vector<float> states;
+    states.reserve(state_specs_.size());
     
-    for (const auto& spec : observation_specs_) {
+    for (const auto& spec : state_specs_) {
         float value = NAN;
         
         // Determine entity type and extract accordingly
@@ -361,16 +361,16 @@ std::vector<float> StateManager::getObservationVector(sf::SimulationManager* sim
             value = 0.0f; // Default to 0 instead of NaN for robustness
         }
         
-        observations.push_back(value);
+        states.push_back(value);
     }
     // int id = 0;
-    // for(const float& spec_: observations){
+    // for(const float& spec_: states){
     //         std::cout << "[state_manager] Value stored "<< id++ <<" is: " << spec_ << std::endl; 
     // }
-    return observations;
+    return states;
 }
 
-float StateManager::extractRobotField(sf::SimulationManager* sim, const ObservationSpec& spec) {
+float StateManager::extractRobotField(sf::SimulationManager* sim, const StateSpec& spec) {
     std::string field_key = spec.field_type + "." + spec.component;
     auto extractor = robot_extractors_.find(field_key);
     
@@ -388,7 +388,7 @@ float StateManager::extractRobotField(sf::SimulationManager* sim, const Observat
     return 0.0f;
 }
 
-float StateManager::extractSensorField(sf::SimulationManager* sim, const ObservationSpec& spec) {
+float StateManager::extractSensorField(sf::SimulationManager* sim, const StateSpec& spec) {
     std::string field_key = spec.field_type + "." + spec.component;
     auto extractor = sensor_extractors_.find(field_key);
     if (extractor != sensor_extractors_.end()) {
@@ -407,14 +407,14 @@ float StateManager::extractSensorField(sf::SimulationManager* sim, const Observa
     return 0.0f;
 }
 
-float StateManager::extractActuatorField(sf::SimulationManager* sim, const ObservationSpec& spec) {
+float StateManager::extractActuatorField(sf::SimulationManager* sim, const StateSpec& spec) {
     // Implement actuator field extraction  
     std::cerr << "[StateManager] WARNING: Actuator extraction not yet implemented for " 
               << spec.entity_name << std::endl;
     return 0.0f;
 }
 
-float StateManager::extractErrorField(sf::SimulationManager* sim, const ObservationSpec& spec) {
+float StateManager::extractErrorField(sf::SimulationManager* sim, const StateSpec& spec) {
     std::string field_key = spec.field_type + "." + spec.component;
     auto extractor = error_extractors_.find(field_key);
     
@@ -517,17 +517,17 @@ float StateManager::getCollisionFlag(sf::SimulationManager* sim, const std::stri
     return 0.0f;
 }
 
-std::vector<std::string> StateManager::getObservationNames() const {
+std::vector<std::string> StateManager::getStateNames() const {
     std::vector<std::string> names;
-    for (const auto& spec : observation_specs_) {
+    for (const auto& spec : state_specs_) {
         names.push_back(spec.output_name);
     }
     return names;
 }
 
-void StateManager::printObservationSpecs() const {
-    std::cout << "[StateManager] Observation Specifications:" << std::endl;
-    for (const auto& spec : observation_specs_) {
+void StateManager::printStateSpecs() const {
+    std::cout << "[StateManager] State Specifications:" << std::endl;
+    for (const auto& spec : state_specs_) {
         std::cout << "  " << spec.output_name << " <- " << spec.entity_name 
                   << "." << spec.field_type << "." << spec.component << std::endl;
     }

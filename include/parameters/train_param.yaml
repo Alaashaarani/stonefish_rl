@@ -1,12 +1,48 @@
-# Environment Settings
+# GYM Environment Settings:
+  # This defines the observation and action space, and how many instances to run in parallel.
+    # state config:
+    #   - The state space is defined in the state config file, it is a json. This includes the values
+    # that are sent by stonefish to the python code.
+    # History length:
+    #   - Zero: no history is passed, only current observation is passed.
+    #   - One: the last observation is concatenated with the current observation.
+    # Action config: 
+    #   - The action space is defined in the action config file, it is a json file. 
+    # Observe actions: 
+    #   - if true, the last action is concatenated to the observation, and passed to the RL algorithm.
+    # instances:
+    #   - number of parallel environments to run, each environment will run on a different port, starting from base_port.
+    # base_port:
+    #   - the starting port for the first environment, the rest of the environments will use consecutive ports. this port is used by stonefish
+    # to send and recieve data from the python code. 
+    # episode_duration:
+    #   - the duration of each episode in seconds.
+    # rl_observation_freq:
+    #   - the frequency of observations in Hz, or steps per second.
+
 env:
-  observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_obser_v2_config.json"
+  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.json"
+  history_length: 10
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
-  instances: 20
+  observe_actions: True
+  instances: 10
   base_port: 5555
   episode_duration: 60
   rl_observation_freq: 5
 
+# Sim Settings
+  # Graphical_interface: 
+  #   - if True, the simulation will be rendered, otherwise it will run in headless mode
+  #   - if False the simulation senario cannot have any graphical element (camera,...), otherwise stonefish will crash
+  # evaluate_graphical_interface:
+  #   - if True, the simulation will be rendered the evaluation gui (stonefish env) only one. 
+  # realtime: 
+  #   - if False will run with the max allowed speed of the simulation. if True will run in real time.  
+  #   - Their is another factor that affect the simulation speed and is called physics_frequency. it is set to 300, you can find this param in the cpp main file. 
+  # current:
+  #   - water current in x and y direction, in m/s 
+  # current_unifrom: 
+  #   - if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
 
 sim:
   scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn"
@@ -15,11 +51,23 @@ sim:
   evaluation_graphical_interface: True
   resolution: 400
   realtime: False
-  current: False
+  current: True
+  current_value: [0.2,0.2] 
+  current_uniform: True 
 
-# This maps the forces (x,y,z,roll,pitch,yaw) of the thusters setpoints
-# It changes the action space size, to match the forces, 
-# The RL output forces, then the code convert forces to setpoint, and Simulation recieves Setpoints
+# action space settings
+  # force_6Dof: 
+  #   - if true, the action space defined in the Config action as thrusters setpoints will be maped to force request in the (x,y,z,roll,pitch,yaw) 
+  #   - if false, the action space defined in the Config action as thrusters setpoints is used
+  #   - This is done this way because stonefish accepts setpoint, if we want to use forces and define it in the configuration file, then we need to 
+  # hard code the mapping in stonefish files (the CPP section of the Library). 
+  # tcm:  
+  #   - This is the mapping matrix between the action space (setpoints) defined in the configuration file and the forces in (x,y,z,roll,pitch,yaw).
+  #   - The size of the tcm is (number of thrusters, 6), where 6 is the number of forces in (x,y,z,roll,pitch,yaw).
+  #   - The forces are calculated as follows: setpoint = forces@tcm.T , where setpoints are defined in the action_config file, 
+  # and forces are the output of the RL algorithm (action space). The RL output forces, then the code convert forces to setpoint, 
+  # and Simulation recieves Setpoints
+
 action: 
   force_6Dof: True
   tcm: [[-1,-1,0,0,0],
@@ -33,15 +81,16 @@ action:
 # Model for Evaluation
 # If pretrained is set to True, Model path should be specified 
 model:
-  pretrained: False
-  model_path: "PPO_PPO_O11_A6_20260226_200005" 
-  algorithm: "SAC"
+  pretrained: True
+  model_path: "PPO_O11_A6_20260301_030008.zip" 
+  algorithm: "PPO"
 
   # comment param
   policy: "MlpPolicy"
   learning_rate: 0.0005
   buffer_size: 500000
   batch_size: 1024
+  weights_only: True
 
   # SAC param
   tau: 0.005
@@ -51,7 +100,7 @@ model:
   learning_starts: 1000
 
   # PPO PARAM
-  n_steps: 2048
+  n_steps: 512
   ent_coef: 0.01
   clip_range: 0.2
 
@@ -69,11 +118,11 @@ policy:
 
 # Training Settings
 train:
-  total_timesteps: 2000_000
+  total_timesteps: 1000_000
   reset_num_timesteps: False
   eval_freq: 2000
   save_path: "default"
-  save_name: "PPO_O11_A6"
+  save_name: "O11_A6"
   warm_start_path: "PPO_"
   weights_only: True
 

@@ -1,6 +1,6 @@
 # Environment Settings
 env:
-  observation_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_obser_v1_config.json"
+  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.json"
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
   # only one instance is allowed in evaluation
   instances: 1
@@ -14,7 +14,11 @@ sim:
   graphical_interface: True
   resolution: 900
   realtime: False
-  current: False
+  # current in x and y direction, in m/s 
+  current: True
+  current_value: [0.2,0.2] 
+  # if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
+  current_uniform: False
 
 
 # This maps the forces (x,y,z,roll,pitch,yaw) of the thusters setpoints
@@ -22,19 +26,19 @@ sim:
 # The RL output forces, then the code convert forces to setpoint, and Simulation recieves Setpoints
 action: 
   force_6Dof: True
-  tcm: [[1,1,0,0,0],
+  tcm: [[-1,-1,0,0,0],
         [0,0,1,0,0],
-        [0,0,0,1,1],
+        [0,0,0,-1,-1],
         [0,0,0,0,0],
         [0,0,0,1,-1],
-        [1,-1,0,0,0]]
+        [-1,1,0,0,0]]
 
 
 # Model for Evaluation
 evaluate:
-  algorithm: "SAC"
+  algorithm: "ONNX"
   # model_path: "PPO_docking_currents_20260203_172120.zip"
-  model_path: "/home/cirs_alaa/repositories/stonefish_rl/src/python/SAC.zip"
+  model_path: "/home/cirs_alaa/repositories/stonefish_rl/src/python/models/Last_models_O11_A6/PPO_O11_A6.onnx"
   num_episodes: 10
   step_per_print: 100
 

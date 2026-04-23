@@ -34,7 +34,7 @@ if __name__ == "__main__":
     else:
         config = load_config(global_path("include/parameters/test_param.yaml"))
 
-    # plotter = RealTimePlotter(num_curves=4, max_entries=150)
+    plotter = RealTimePlotter(num_curves=1, max_entries=150)
 
     num_instances = config["env"]["instances"]
     print(f"Starting {num_instances} instances...")
@@ -67,13 +67,13 @@ if __name__ == "__main__":
         # Step all environments simultaneously
         obs, rewards, dones, infos = envs.step(actions)
         
-       
-        # plotter.update(obs[0][-16:-12])
+        velocity = np.linalg.norm([obs[0][4], obs[0][5]])
+        plotter.update([velocity])
         # print("lenght : ",len(obs[0][-4:]),end="\n")
         
-        print(f"step: {step}, actions: {actions}", end="\r")
         if step %  config["testing"]["step_per_print"] == 0:
             print(f"\n Step {step} | Rewards: {rewards} | observations[0]: {obs[0]}")
+            print(f"step: {step}, actions: {actions}", end="\n")
 
     print("Testing finished. Closing environments...")
     envs.close()

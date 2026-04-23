@@ -18,7 +18,7 @@ public:
     std::vector<ResetInfo> parseResetCommand(const std::string& command);
 
     
-    // Parse action commands and observation filters
+    // Parse action commands and state filters
     void parseActionCommands(const std::string& command);
     
     // Getters
@@ -26,14 +26,14 @@ public:
         return commands_; 
     }
     
-    const std::unordered_set<std::string>& getRelevantObservations() const { 
+    const std::unordered_set<std::string>& getRelevantStates() const { 
         return relevant_obs_names_; 
     }
     
     // Clear all stored commands and filters
     void clear();
     
-    // Check if an object should be included in observations
+    // Check if an object should be included in states
     bool isObjectRelevant(const std::string& objectName) const;
 
 private:
@@ -47,7 +47,7 @@ private:
     // Helper methods
     ResetInfo parseObjectFromJson(const std::string& object_str);
     void parseCommandToken(const std::string& token);
-    void parseObservationFilter(const std::string& obs_str);
+    void parseStateFilter(const std::string& obs_str);
 };
 
 #endif // COMMANDPROCESSOR_H

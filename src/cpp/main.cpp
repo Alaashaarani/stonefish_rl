@@ -3,13 +3,10 @@
 #include <thread>
 #include <chrono>
 #include <cmath>
-
 #include <Stonefish/core/GraphicalSimulationApp.h>
 #include <Stonefish/core/ConsoleSimulationApp.h>
-
 #include <Stonefish/core/SimulationApp.h>
 #include <Stonefish/core/SimulationManager.h>
-
 #include <Stonefish/sensors/scalar/RotaryEncoder.h>
 #include <Stonefish/sensors/scalar/IMU.h>
 #include <Stonefish/sensors/ScalarSensor.h>
@@ -31,7 +28,7 @@ These values should match with the values in the enviroment you are using
 */
 double physics_frequency = 300; // frequencey used to compute physics (Number of times physics is computed per sec)  
 double sf_dt = 0.1; // do 10 steps per sec
-double rl_observation_freq = 10;
+double rl_observation_freq = 10; // default value, can be specified through the config file yaml
 
 
 int learning(void* data) {
@@ -67,7 +64,7 @@ int learning(void* data) {
         if(nextStepSim == "CMD"){
             
             
-            myManager->SendObservations(); // Send observations after all steps
+            myManager->SendStates(); // Send states after all steps
             for (int i = 0;i < sim_steps;i++) {
                 simApp.StepSimulation();
             }
@@ -94,7 +91,7 @@ int main(int argc, char **argv) {
 
     std::string scene_path = argv[1]; 
     std::string resources_path = argv[2]; 
-    std::string obser_conf_path = argv[3]; 
+    std::string state_conf_path = argv[3]; 
     std::string action_conf_path = argv[4]; 
     int port = std::stoi(argv[5]); // Parse the port
     int resolution = std::stoi(argv[6]); // Parse the resolution
@@ -122,7 +119,7 @@ int main(int argc, char **argv) {
     
     sf::SimulationApp* app = nullptr;
 
-    StonefishRL* simManager = new StonefishRL(scene_path, obser_conf_path, action_conf_path, physics_frequency, port); 
+    StonefishRL* simManager = new StonefishRL(scene_path, state_conf_path, action_conf_path, physics_frequency, port); 
     
     if (graphical) {
         // Create the graphical simulation app

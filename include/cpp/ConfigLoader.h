@@ -10,14 +10,14 @@ class ConfigLoader {
 public:
     ConfigLoader() = default;
     
-    ObservationConfig loadFromFile(const std::string& filepath);
-    ObservationConfig loadFromString(const std::string& json_str);
+    StateConfig loadFromFile(const std::string& filepath);
+    StateConfig loadFromString(const std::string& json_str);
     
-    static ObservationConfig getDefaultConfig();
+    static StateConfig getDefaultConfig();
 
 private:
-    ObservationConfig parseJsonConfig(const nlohmann::json& j);  // Fixed signature
-    bool validateConfig(const ObservationConfig& config);
+    StateConfig parseJsonConfig(const nlohmann::json& j);  // Fixed signature
+    bool validateConfig(const StateConfig& config);
 };
 
 #endif // CONFIGLOADER_H

@@ -58,7 +58,7 @@ if __name__ == "__main__":
             
             # obs[3] += np.pi/2  # adjust heading observation because ds is oriented with half a pi
             if config["evaluate"]["algorithm"]=="ONNX":
-                obs = obs.reshape(1,14)
+                obs = obs.reshape(1,11)
                 result = model(obs)
                 action = result[0].reshape(6)
             else: 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
             
             total_reward += reward
             step_counter += 1
-
+            print(f"obs: {obs[3]:.2f}", end="\r")  
             if step_counter % config["evaluate"]["step_per_print"] == 0:
                 print(f"Step: {step_counter} | Current Reward: {reward:.2f} | Total: {total_reward:.2f} \n action: {action}")
 

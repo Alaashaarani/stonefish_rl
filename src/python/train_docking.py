@@ -49,13 +49,9 @@ if __name__ == "__main__":
     else:
         config = load_config(global_path("include/parameters/train_param.yaml"))
 
-
-
-
     # 1. Configuration
     log_dir = config["log"]["log_dir"]
     os.makedirs(log_dir, exist_ok=True)
-        
         
     num_instances = config["env"]["instances"]
 
@@ -105,7 +101,8 @@ if __name__ == "__main__":
         if config["model"]["pretrained"]: 
             model = SAC.load(config["model"]["model_path"],
                             env=train_env, 
-                            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir,
+                            weights_only=config["model"]["weights_only"]
                             )
         else:
             model = SAC(
@@ -123,7 +120,8 @@ if __name__ == "__main__":
         if config["model"]["pretrained"]: 
             model = PPO.load(config["model"]["model_path"],
                             env=train_env, 
-                            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir,
+                            weights_only=config["model"]["weights_only"]
                             )
         else: 
             model = PPO(config["model"]["policy"],
@@ -140,7 +138,8 @@ if __name__ == "__main__":
         if config["model"]["pretrained"]: 
             model = TD3.load(config["model"]["model_path"],
                             env=train_env, 
-                            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir
+                            tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir,
+                             weights_only=config["model"]["weights_only"]
                             )
         else:
             model = TD3(config["model"]["policy"],

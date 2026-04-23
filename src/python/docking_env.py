@@ -9,8 +9,8 @@ class dsEnv(EnvStonefishRLParallel):
     def __init__(self, rank, config,**kwargs):
         
         
-        obs_path = config["env"]["observation_config"]
-        act_path = config["env"]["action_config"]
+        self.state_path = config["env"]["state_config"]
+        self.act_path = config["env"]["action_config"]
 
         
         # 1. Store timing parameters first
@@ -23,6 +23,8 @@ class dsEnv(EnvStonefishRLParallel):
         # Give the simulator a moment to bind the socket
         time.sleep(1.0) 
         
+
+        """ Their should be a better way to define the action size """
         if  config["action"]["force_6Dof"]: 
         
             self.tcm = np.array(config["action"]["tcm"])
@@ -31,12 +33,19 @@ class dsEnv(EnvStonefishRLParallel):
         else: 
             self.tcm= None
             action_size = None
+
+        self.observe_actions = config["env"]["observe_actions"]
         
+        self.history_length = config["env"]["history_length"]
+        if self.history_length <= 0: 
+            self.history_length = 0
+
 
         # 4. 
-        super().__init__(obs_path, act_path,action_size, env_id=rank, base_port=config["env"]["base_port"])
+        super().__init__(action_size, env_id=rank, base_port=config["env"]["base_port"])
         
-
+        self.observation = np.array([], dtype=np.float32)
+        self.observation_history = []
 
         # 5. Application specific init
         self.step_counter = 0
@@ -44,8 +53,12 @@ class dsEnv(EnvStonefishRLParallel):
         self.check_freq = 2100
         self.goal_achieved = False
         self.start_distance_factor = 0.75
-        self.collision_thres = 0.5 
+        self.collision_thres = 1.0 
         self.enable_currents = config["sim"]["current"]
+        self.current_x = config["sim"]["current_value"][0]
+        self.current_y = config["sim"]["current_value"][1]
+        self.currnet_uniform = config["sim"]["current_uniform"]
+
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
         self.current_action = np.zeros(self.action_size, dtype=np.float32)
         
@@ -56,6 +69,7 @@ class dsEnv(EnvStonefishRLParallel):
             gc.collect()  # Force the scan
             self.n_calls=0
         return True    
+
 
     def build_reset_command(self):
         """Build RESET command - specific to this application"""
@@ -87,13 +101,16 @@ class dsEnv(EnvStonefishRLParallel):
             5.5
         ]
         ds_rot = [
-            0.0+0.5*self.start_distance_factor*self.np_random.uniform(-np.pi, np.pi),
+            0.0+self.start_distance_factor*self.np_random.uniform(-np.pi, np.pi),
             0.0,
             0.0
         ]
 
         if self.enable_currents: 
-            current_vec = [np.random.uniform(-0.1,0.1),np.random.uniform(-0.1,0.1), 0.0]
+            if self.currnet_uniform:
+                current_vec = [np.random.uniform(-self.current_x,self.current_x),np.random.uniform(-self.current_y,self.current_y), 0.0]
+            else: 
+                current_vec = [self.current_x,self.current_y, 0.0]
         else: 
             current_vec = [0.0,0.0,0.0]
 
@@ -109,9 +126,10 @@ class dsEnv(EnvStonefishRLParallel):
         
         # Use parent reset but send our specific reset command
         response = self.send_command(reset_command)
-        self._process_observation_vector(response)
+
+        
+        self._process_state_vector(response)
         obs = self.get_sim_obser()
-        # obs = np.concatenate((obs,self.last_action_applied))
         
         self.step_counter = 0
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
@@ -122,7 +140,7 @@ class dsEnv(EnvStonefishRLParallel):
         # with previous action 
 
         info = {}
-        
+        print(f" observation size in reset: {len(obs)}")
         return obs, info
 
     def get_sim_obser(self):
@@ -134,8 +152,12 @@ class dsEnv(EnvStonefishRLParallel):
             obs.extend(self.state.tolist())
         else:
             # Fallback: zeros
-            obs.extend([0.0] * self.observation_size)
+            obs.extend([0.0] * self.total_obs_size)
         
+        if self.observe_actions:
+            obs = np.concatenate((obs,self.last_action_applied))
+        
+
         # Add last action
         # obs.extend(self.last_action_applied.tolist())
 
@@ -148,7 +170,8 @@ class dsEnv(EnvStonefishRLParallel):
         self.current_action = np.array(action, dtype=np.float32).flatten()
         
         obs, reward, terminated, truncated, info = super().step(action)
-        # obs = np.concatenate((obs,self.current_action))
+        if self.observe_actions:
+            obs = np.concatenate((obs,self.current_action))
         # Application logic
         
         additional_reward = self.calculate_additional_reward()
@@ -171,31 +194,64 @@ class dsEnv(EnvStonefishRLParallel):
         self.last_action_applied = self.current_action
         info.update(self._get_additional_info())
         # return np.zeros(22), 0, terminated, truncated, {}
+
         obs[2]-=1.25 # docking offset
-        return np.round(obs,2), total_reward, terminated, truncated, {}
+        error = np.linalg.norm(self._get_state_by_pattern("error")[:3])/6 # add noise to observations if ds is observed to prevent overfitting to perfect observations
+
+        if not self._auv_observed_ds(): 
+            obs[:3] += np.random.normal(0,error,3) # add noise to observations if ds is observed to prevent overfitting to perfect observations
+        obs[:3] += np.random.normal(0,error/2,3)
+        
+        obs[3] = abs(np.clip(obs[3]+np.random.normal(0,0.1), -np.pi, np.pi))  # add noise to yaw error observation to prevent overfitting to perfect observations
+        # print(f"obs length before history: {len(obs)}")
+        self.concatenate_history(obs)
+
+        return np.round(self.observation,2), total_reward, terminated, truncated, {}
     
+
+    def concatenate_history(self, obs): 
+        """Concatenate observation history: 
+
+            observation_history stores only the needed items for the observation,
+            this can be improved by storing more history steps. Then select the needed
+            items for the observation from the history.
+        """
+        # print(f"obs: \n {obs}, \n history : \n {self.observation_history}")
+        self.observation_history.append(obs)
+
+        # print(f"observation history length: {len(self.observation_history)}")
+        if len(self.observation_history) > self.history_length+1:
+            self.observation_history.pop(0)
+        
+        self.observation = np.concatenate((self.observation_history), axis=0)
+        # print(f"observation size after concatenation: {len(self.observation)}/{self.total_obs_size}")
+
+        length = self.total_obs_size - len(self.observation)
+        if length > 0:
+            self.observation = np.concatenate((self.observation, np.zeros(length)))
+
+        # print(f"observation size after IF: {len(self.observation)}/{self.total_obs_size}")
 
     def calculate_additional_reward(self):
         """Application-specific reward calculation"""
         # Extract relevant observations using their names
-        error = self._get_observation_by_pattern("error")
-        imu_acc = self._get_observation_by_pattern("imu_linear_acceleration")
+        error = self._get_state_by_pattern("error")
+        imu_acc = self._get_state_by_pattern("imu_linear_acceleration")
         
-        
+        reward = 0.0 
+
         if not self._auv_observed_ds():
-            reward = -15.0 # Penalty for losing sight of the docking station
-        else:
-            reward_dist = -abs(error[0])-abs(error[1])-(abs(error[2])-1.25)*0.5
-            reward_yaw = np.exp(-2*abs(error[3]))-1
-            action_difference = abs(self.current_action - self.last_action_applied).sum()
-            
-            # if action_difference > 1:
-            #     smoothing_reward = (-np.exp(action_difference - 1) + 1)/2  # Exponential penalty for large action changes
+            reward += -1.0 # Penalty for losing sight of the docking station
+    
+        reward_dist = -abs(error[0])-abs(error[1])-(abs(error[2]))*0.5
+        reward_yaw = np.exp(-2*abs(error[3]))-1
+        action_difference = abs(self.current_action - self.last_action_applied).sum()
+        
+        smoothing_reward = -np.exp(action_difference)/(self.action_size*10)   # Exponential penalty for large action changes
             #     # print(f"[Port {self.port}] Action changed drastically! Difference: {action_difference:.2f}, Smoothing Reward: {smoothing_reward:.2f}")
-            # else:
-            smoothing_reward = 0 
+            # smoothing_reward = 0 
             
-            reward = reward_dist  + reward_yaw + smoothing_reward # this value makes the weight moving the ball equivalent to reaching the ball
+        reward = reward_dist  + reward_yaw + smoothing_reward # this value makes the weight moving the ball equivalent to reaching the ball
         
         # Checking Collision
         if np.linalg.norm(self.previous_acceleration) != 0.0 :
@@ -204,9 +260,11 @@ class dsEnv(EnvStonefishRLParallel):
                 reward -= 10 
                 self.collision_thres+= self.collision_thres
                 # print("collision Detected,  Reward: ", reward)
-            elif self.collision_thres > 0.5: 
+            elif self.collision_thres > 1.0: 
                 self.collision_thres /= 2 
 
+        # print(f"[Port {self.port}] reward_dist: {reward_dist:.2f}, reward_yaw: {reward_yaw:.2f}, collision: {difference}, action_diff: {action_difference:.2f}, smoothing_reward: {smoothing_reward:.2f}")
+        
         if abs(error[2]) > 1.27 or abs(error[0]) > 0.15 or abs(error[1]) > 0.15 : 
             self.goal_achieved = False
         else:
@@ -218,11 +276,11 @@ class dsEnv(EnvStonefishRLParallel):
         # print(f"[DEBUG] Calculated additional reward: {reward}")    
         return reward
 
-    def _get_observation_by_pattern(self, pattern, default=0.0):
+    def _get_state_by_pattern(self, pattern, default=0.0):
         """Get observation value by name pattern"""
-        # print("[DEBUG] self.observation_names", self.observation_names)
+        # print("[DEBUG] self.state_names", self.state_names)
         value = []
-        for i, name in enumerate(self.observation_names):
+        for i, name in enumerate(self.state_names):
 
             if pattern in name and i < len(self.state):
                 # print("Matched")
@@ -232,15 +290,15 @@ class dsEnv(EnvStonefishRLParallel):
     def _distance_to_target(self, robot_pos):
         """Distance to target (ds)"""
         # target_pos = np.array([0.0, 0.0, 5.0])
-        target_pos = self._get_observation_by_pattern("ds_pose")[:3]
+        target_pos = self._get_state_by_pattern("ds_pose")[:3]
         return np.linalg.norm(robot_pos - target_pos)
 
 
 
     def _is_terminated(self):
         """Application-specific termination conditions"""
-        robot_pos = self._get_observation_by_pattern("auv_pose")
-        collision_flag = self._get_observation_by_pattern("collision", default=0.0)
+        robot_pos = self._get_state_by_pattern("auv_pose")
+        collision_flag = self._get_state_by_pattern("collision", default=0.0)
         # Terminate if collision
         if collision_flag > 0.5:
             return True
@@ -253,7 +311,7 @@ class dsEnv(EnvStonefishRLParallel):
     
     def _auv_observed_ds(self):
         """Check if AUV has observed the docking station"""
-        error = self._get_observation_by_pattern("error")
+        error = self._get_state_by_pattern("error")
         
         # check if AUV lies in DS cone field of view
         k = 0.64 # considering the cone size of (2,2,4.4) 
@@ -264,10 +322,10 @@ class dsEnv(EnvStonefishRLParallel):
 
     def _get_additional_info(self):
         """Additional info for this application"""
-        # robot_pos = self._get_observation_by_pattern("auv_pose")
+        # robot_pos = self._get_state_by_pattern("auv_pose")
         return {
             # "distance_to_target": self._distance_to_target(robot_pos[:3]),
-            "error": self._get_observation_by_pattern("error").tolist(),
+            "error": self._get_state_by_pattern("error").tolist(),
             "ds_observed": self._auv_observed_ds(),
             "step": self.step_counter
         }

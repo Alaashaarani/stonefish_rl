@@ -4,7 +4,7 @@
 
 
 StonefishRL::StonefishRL(const std::string &path, 
-                         const std::string &observation_conf_path, 
+                         const std::string &state_conf_path, 
                          const std::string &action_conf_path, 
                          double frequency,
                          int port) 
@@ -19,14 +19,14 @@ StonefishRL::StonefishRL(const std::string &path,
     communicator = new ZMQCommunicator(port);  
     std::cout << "[StonefishRL] Initialized on port " << port << std::endl;
 
-    // 2. Load and set Observation Configuration
+    // 2. Load and set State Configuration
     ConfigLoader loader;
     try {
-        ObservationConfig config = loader.loadFromFile(observation_conf_path);
-        state_manager_.setObservationConfig(config);
-        std::cout << "[StonefishRL] Observation config loaded successfully." << std::endl;
+        StateConfig config = loader.loadFromFile(state_conf_path);
+        state_manager_.setStateConfig(config);
+        std::cout << "[StonefishRL] State config loaded successfully." << std::endl;
     } catch (const std::exception& e) {
-        std::cerr << "[StonefishRL] Error loading observation config: " << e.what() << std::endl;
+        std::cerr << "[StonefishRL] Error loading state config: " << e.what() << std::endl;
     }
     
     // Note: actuator_controller_ is stateless and doesn't require action_conf_path here.
@@ -52,6 +52,9 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
         std::vector<ResetInfo> command_data = command_processor_.parseResetCommand(cmd);
         state_manager_.updateRobotPosition(command_data, this);
         
+        // checking if this function works
+        getOcean()->ResetVelocityField();
+
         sf::Vector3 currentVec(
             command_data[0].current[0], 
             command_data[0].current[1], 
@@ -61,8 +64,8 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
         //           << currentVec[0] << ", " << currentVec[1] << ", " << currentVec[2] << ")\n";
         getOcean()->AddVelocityField(new sf::Uniform(currentVec));    
 
-        // Send observations using new vector approach
-        SendObservations();
+        // Send states using new vector approach
+        SendStates();
         // std::cout << "[StonefishRL] Received RESET command\n";
         return "RESET";
     }
@@ -83,15 +86,15 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
 }
 
 
-void StonefishRL::SendObservations() {
-    // Get observation vector from new StateManager
-    std::vector<float> observations = state_manager_.getObservationVector(this);
+void StonefishRL::SendStates() {
+    // Get state vector from new StateManager
+    std::vector<float> states = state_manager_.getStateVector(this);
     
     // Convert to JSON array for sending
     std::string obs_json = "[";
-    for (size_t i = 0; i < observations.size(); ++i) {
-        obs_json += std::to_string(observations[i]);
-        if (i < observations.size() - 1) obs_json += ",";
+    for (size_t i = 0; i < states.size(); ++i) {
+        obs_json += std::to_string(states[i]);
+        if (i < states.size() - 1) obs_json += ",";
     }
     obs_json += "]";
     communicator->sendJson(obs_json);

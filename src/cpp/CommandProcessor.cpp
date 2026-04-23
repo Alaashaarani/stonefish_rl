@@ -165,13 +165,13 @@ void CommandProcessor::parseActionCommands(const std::string& command) {
         }
     }
 
-    // Parse observation filters
+    // Parse state filters
     if (!obs_str.empty()) {
-        parseObservationFilter(obs_str);
+        parseStateFilter(obs_str);
     }
     //  Debug output 
     // std::cout << "[CommandProcessor] Parsed " << commands_.size() << " actuators, " 
-    // << relevant_obs_names_.size() << " observation filters" << std::endl;
+    // << relevant_obs_names_.size() << " state filters" << std::endl;
     
 }
 
@@ -265,14 +265,14 @@ void CommandProcessor::parseCommandToken(const std::string& token) {
     }
 }
 
-void CommandProcessor::parseObservationFilter(const std::string& obs_str) {
+void CommandProcessor::parseStateFilter(const std::string& obs_str) {
     std::istringstream obsStream(obs_str);
     std::string obj_name;
 
     while (std::getline(obsStream, obj_name, ';')) {
         if (!obj_name.empty()) {
             relevant_obs_names_.insert(obj_name);
-            // std::cout << "[CommandProcessor] Observation filter: " << obj_name << std::endl;
+            // std::cout << "[CommandProcessor] State filter: " << obj_name << std::endl;
         }
     }
 }
