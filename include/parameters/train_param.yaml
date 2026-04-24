@@ -141,4 +141,4 @@ log:
   project_name: "stonefish_docking"
   run_name: "default"
   tags: ["PPO", "docking", "stonefish"]
-  log_dir: "./logs/"
+  log_dir: "../../logs/"

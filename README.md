@@ -2,6 +2,14 @@
 
 This repository contains several simulation environments based on **Stonefish** and controlled via **Python**.
 
+##  Building
+    1. Clone repository.
+    2. cd stonefish_rl
+    3. mkdir build
+    4. cd build
+    5. cmake ..
+    6. make [-jX]
+    8. sudo make install
 
 ## Available Environments
 - [AcrobotEnv](./docs/README_acrobot.md) – Control a two-link pendulum to reach a target height.
@@ -30,58 +38,45 @@ This project is built on the Stonefish simulator. For full details about the sim
 ## Project Structure   
 ```
 stonefish_rl/
-├── include/                         # C++ headers
-│   └── StonefishRL.h
-├── logs/                            # PPO models and training evaluation files
-│   ├── best_model.zip
-│   └── evaluations.npz
-├── requirements.txt                 # Python dependencies
-├── Resources/                       # Scenes, models and textures for Stonefish 
-│   ├── acrobot/
-│   │   └── acrobot_scene.xml
-│   ├── minimal/
-│   │   └── minimal_scene.xml
-│   ├── tests_sensors_actuators/
-|   |   ├── data/
-|   |   |    └── ...
-|   |   └── scenarios/
-|   |        ├── girona1000_basic.scn
-|   |        └── vehicles/
-|   |             └── girona1000_eca5emicro_gripper.scn  
-│   └── g500/
-|       ├── data/
-|       |    └── ...
-|       └── scenarios/
-|            ├── girona1000_basic.scn
-|            └── vehicles/
-|                 ├── girona1000.scn
-|                 └── girona1000_eca5emicro_gripper.scn  
-├── scripts/                         # Python code for each environment
-│   ├── acrobot/
-│   │   ├── AcrobotEnv.py
-│   │   ├── acro_training.py
-│   │   ├── __init__.py
-│   │   ├── evaluate_acro.py
-│   │   └── test_acrobot.py
-│   ├── g500/
-│   │   ├── G500Env.py
-│   │   ├── G500_training_ppo.py
-│   │   ├── __init__.py
-│   │   ├── evaluate_g500.py
-│   │   └── test_g500.py
-│   ├── core/
-│   │   ├── EnvStonefishRL.py
-│   │   └── launch_stonefish.py
-│   └── tests_sensors_actuators/
-│       ├── G500TestEnv.py
-│       └── test.py
-├── src/                             # C++ source code
-│   ├── main.cpp
-│   └── StonefishRL.cpp
-└── docs/                            # Documentation for each environment
-    ├── README_acrobot.md
-    ├── README_girona1000.md
-    ├── README_tests.md
-    ├── README_installation.md
-    └── README_manual.md
+├── src/
+|   ├── cpp  # 
+|   │   ├── ActuatorController.cpp
+|   │   ├── CommandProcessor.cpp
+|   │   ├── ConfigLoader.cpp
+|   │   ├── main.cpp
+|   │   ├── StateManager.cpp
+|   │   ├── StonefishRL.cpp
+|   │   └── ZQMCommunicator.cpp
+|   └── python
+|       ├── docking_env.py
+|       ├── EnvStonefishRL.py
+|       ├── evaluate_docking.py
+|       ├── test_docking_env.py
+|       ├── train_docking.py
+|       └── utils
+|           ├── .... 
+├── include/
+|   ├── cpp
+|   │   ├── ActuatorController.h
+|   │   ├── CommandProcessor.h
+|   │   ├── CommonTypes.h
+|   │   ├── ConfigLoader.h
+|   │   ├── StateManager.h
+|   │   ├── StonefishRL.h
+|   │   └── ZMQCommunicator.h
+|   ├── observations
+|   │   ├── ds_action_config.json
+|   │   ├── ds_state_v1_config.json
+|   │   └── ds_state_v2_config.json
+|   └── parameters
+|       ├── evaluation_param.yaml
+|       ├── test_param.yaml
+|       └── train_param.yaml
+├── Resources/
+    ├── data
+    │   ├── ...
+    ├── scenarios
+    │   ├── ...
+    └── texture
+        └── ...
     
