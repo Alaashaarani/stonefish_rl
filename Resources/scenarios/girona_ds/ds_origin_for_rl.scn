@@ -1,0 +1,1427 @@
+<?xml version="1.0"?>
+<scenario>
+    <robot name="$(arg ds_name)" fixed="true" self_collisions="false">
+        <base_link name="Base" type="compound" physics="submerged">
+            <external_part name="electronic" type="model" physics="submerged" buoyant="false">
+				<physical>
+					<mesh filename="Resources/data/ds_origin/cylinder1.obj" scale="1.0"/>
+					<thickness value="0.003"/>
+					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+				</physical>
+				<visual>
+					<mesh filename="Resources/data/ds_origin/cylinder1.obj" scale="1.0"/>
+					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+				</visual>
+				<material name="Aluminium"/>
+				<look name="steel"/>
+				<compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+			</external_part>
+
+            <!-- Modem in the DS -->
+            <!-- <external_part name="USBL" type="model" physics="submerged" buoyant="false">
+				<physical>
+					<mesh filename="Resources/data/ds_origin/usbl_cylinder.obj" scale="1.0"/>
+					<thickness value="0.003"/>
+					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+				</physical>
+				<visual>
+					<mesh filename="Resources/data/ds_origin/usbl_cylinder.obj" scale="1.0"/>
+					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+				</visual>
+				<material name="Aluminium"/>
+				<look name="steel"/>
+				<compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+			</external_part> -->
+        </base_link>
+        
+        <!-- joints -->
+        <!-- <joint name="lock/lock1" type="prismatic">
+            <parent name="Base"/>
+            <child name="lock1"/>
+            <origin xyz="0.005 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <axis xyz="0.0 1.0 0.0"/>
+            <limits min="0" max="0.25"/>
+        </joint>
+        <joint name="lock/lock2" type="prismatic">
+            <parent name="Base"/>
+            <child name="lock2"/>
+            <origin xyz="-0.005 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <axis xyz="0.0 -1.0 0.0"/>
+            <limits min="0" max="0.25"/>
+        </joint> -->
+        <joint name="body_joint" type="fixed">
+            <parent name="Base"/>
+            <child name="body"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <axis xyz="1.0 0.0 0.0"/>
+        </joint>
+        <joint name="funnel_joint" type="fixed">
+            <parent name="Base"/>
+            <child name="funnels"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <axis xyz="1.0 0.0 0.0"/>
+        </joint>
+
+        <!-- links -->
+        <!-- <link name="lock1" type="compound" physics="surface">
+            <external_part name="lockleft" type="model" physics="submerged" buoyant="false">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/lock1.obj" scale="1.0"/>
+                    <thickness value="0.003"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/lock1.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Aluminium"/>
+                <look name="steel"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+        </link>
+        <link name="lock2" type="compound" physics="surface">
+            <external_part name="lockright" type="model" physics="submerged" buoyant="false">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/lock2.obj" scale="1.0"/>
+                    <thickness value="0.003"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/lock2.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Aluminium"/>
+                <look name="steel"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+        </link> -->
+
+        <!-- actuator -->
+        <!-- <actuator name="ServoLock1" type="servo">
+            <controller position_gain="1.0" velocity_gain="1.0" max_torque="100.0"/>
+            <joint name="lock/lock1"/>
+        </actuator>
+        <actuator name="ServoLock2" type="servo">
+            <controller position_gain="1.0" velocity_gain="1.0" max_torque="100.0"/>
+            <joint name="lock/lock2"/>
+        </actuator> -->
+
+        <link name="body" type="compound" physics="submerged">
+            <!-- main body for DS -->
+            <external_part name="DS_structure" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/structure_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/structure_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Aluminium"/>
+                <look name="girona_docking_station_steel"/>
+                <comm name="DS_modem_1" device_id="5" type="acoustic_modem">
+                    <specs min_vertical_fov="0.0" max_vertical_fov="220.0" range="2000.0"/>
+                    <connect device_id="2"/>
+                    <origin xyz="-0.9 1.05 -1.85" rpy="0.0 0.0 0.0"/>
+                </comm>
+
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <!-- walls -->
+            <external_part name="Leftwall" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/left_wall_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/left_wall_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Aluminium"/>
+                <look name="girona_docking_station_steel"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="DS_front_wall" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/front_wall_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/front_wall_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Aluminium"/>
+                <look name="girona_docking_station_steel"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="ds_rightwall" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/left_wall_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/left_wall_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Aluminium"/>
+                <look name="girona_docking_station_steel"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="DS_back_safe" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/front_wall_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/front_wall_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Aluminium"/>
+                <look name="girona_docking_station_steel"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+        </link>
+        
+        <link name="funnels" type="compound" physics="submerged">
+            <!-- Safety_funnel -->
+            <external_part name="DS_right_safe" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/right_safe_guide_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/right_safe_guide_phy.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="DS_front_safe" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/front_safe_guide_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/front_safe_guide_phy.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="DS_left_safe" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/right_safe_guide_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/right_safe_guide_phy.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="DS_back_safe" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/front_safe_guide_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/front_safe_guide_phy.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <!-- guide_x1 -->
+            <external_part name="funnel_Xaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p1_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="funnel_Xaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p2_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="funnel_Xaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p3_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="funnel_Xaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p4_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="funnel_Xaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p5_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+            <!-- Guide 2- in X with shift +0.85-->
+            <external_part name="funnel_Xaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p1_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p2_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p3_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p4_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p5_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- Guide 3- X with shift -0.85 and rotate pi -->
+            <external_part name="funnel_Xaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p1_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p2_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p3_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p4_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p5_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- Guide 4 in x with rotation pi -->
+            <external_part name="funnel_Xaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p1_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p2_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p3_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p4_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock1_Xaxis_p5_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- Guide 5 in x  -->
+            <external_part name="funnel_Xaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p1_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="1.152 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p2_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="1.152 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p3_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="1.152 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p4_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="1.152 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p5_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="1.152 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- Guide 6 in x with rotation pi -->
+            <external_part name="funnel_Xaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p1_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-1.152 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p2_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-1.152 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p3_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-1.152 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p4_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-1.152 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p5_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-1.152 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- Guide 7 in x - Shift -0.85  -->
+            <external_part name="funnel_Xaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p1_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="1.152 -0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p2_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="1.152 -0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p3_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="1.152 -0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p4_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="1.152 -0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p5_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="1.152 -0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- Guide 8 in x with rotation pi and shift 0.85 -->
+            <external_part name="funnel_Xaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p1_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-1.152 0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p2_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-1.152 0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p3_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-1.152 0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p4_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-1.152 0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Xaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnelwithLock2_Xaxis_p5_phy.obj" scale="1.0" convex="true" />
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.85 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Xaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-1.152 0.85 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- Guide in Y -->
+            <external_part name="funnel_Yaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p1_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p2_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p3_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p4_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p5_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p6" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p6_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p6_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p7" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p7_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p7_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p8" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p8_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p8_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p9" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p9_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p9_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p10" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p10_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p10_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p11" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p11_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p11_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- Guide in Y with shift -->
+            <external_part name="funnel_Yaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p1_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p2_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p3_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p4_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p5_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p6" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p6_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p6_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p7" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p7_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p7_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p8" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p8_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p8_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p9" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p9_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p9_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p10" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p10_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p10_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p11" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p11_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p11_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- Guide in Y rotated 180 -->
+            <external_part name="funnel_Yaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p1_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p2_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p3_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p4_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p5_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p6" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p6_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p6_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p7" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p7_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p7_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p8" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p8_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p8_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p9" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p9_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p9_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p10" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p10_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p10_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p11" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p11_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p11_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- guide in Y with rotation and shift -->
+            <external_part name="funnel_Yaxis_p1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p1_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p1_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p2_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p2_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p3_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p3_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p4_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p4_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p5_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p5_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p6" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p6_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p6_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p7" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p7_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p7_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p8" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p8_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p8_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p9" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p9_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p9_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p10" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p10_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p10_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+            <external_part name="funnel_Yaxis_p11" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p11_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_origin/funnel_Yaxis_p11_vis.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 -0.23 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="girona_docking_station_guides"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+
+        </link>
+
+
+        <world_transform   xyz="$(arg position)" rpy="$(arg rotation)"/>
+    </robot>
+</scenario>

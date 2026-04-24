@@ -40,7 +40,7 @@ env:
   #   - if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
 
 sim:
-  scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn"
+  scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
   resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
   graphical_interface: True
   resolution: 800

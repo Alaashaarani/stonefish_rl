@@ -22,10 +22,10 @@
 
 env:
   state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.json"
-  history_length: 10
+  history_length: 5
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
   observe_actions: True
-  instances: 10
+  instances: 20
   base_port: 5555
   episode_duration: 60
   rl_observation_freq: 5
@@ -35,7 +35,7 @@ env:
   #   - if True, the simulation will be rendered, otherwise it will run in headless mode
   #   - if False the simulation senario cannot have any graphical element (camera,...), otherwise stonefish will crash
   # evaluate_graphical_interface:
-  #   - if True, the simulation will be rendered the evaluation gui (stonefish env) only one. 
+  #   - if True, the simulation will be rendered the evaluation gui (stonefish env) only one. It will use resolution parameter
   # realtime: 
   #   - if False will run with the max allowed speed of the simulation. if True will run in real time.  
   #   - Their is another factor that affect the simulation speed and is called physics_frequency. it is set to 300, you can find this param in the cpp main file. 
@@ -45,11 +45,11 @@ env:
   #   - if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
 
 sim:
-  scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn"
+  scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
   resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
   graphical_interface: False
   evaluation_graphical_interface: True
-  resolution: 400
+  resolution: 800
   realtime: False
   current: True
   current_value: [0.2,0.2] 
@@ -78,18 +78,28 @@ action:
         [-1,1,0,0,0]]
 
 
-# Model for Evaluation
-# If pretrained is set to True, Model path should be specified 
+# Model Settings:
+  # pretrained: 
+  #   - if true, the model will be loaded from the specified path, and training will continue from there. 
+  # make sure to have the same vector size between the tranied model and the environment. 
+  #   - if false, a new model will be created and trained from scratch. 
+  # algorithm: 
+  #   - the RL algorithm to use, currently supports PPO and SAC. 
+  # model_path: 
+  #   - the path to the pretrained model, if pretrained is set to true.
+  # batch_size:
+  #   - We recommend using a `batch_size` that is a factor of `n_steps * n_envs`.
+
 model:
-  pretrained: True
-  model_path: "PPO_O11_A6_20260301_030008.zip" 
+  pretrained: False
   algorithm: "PPO"
+  model_path: "PPO_O11_A6_20260301_030008.zip" 
 
   # comment param
   policy: "MlpPolicy"
   learning_rate: 0.0005
   buffer_size: 500000
-  batch_size: 1024
+  batch_size: 10240
   weights_only: True
 
   # SAC param
@@ -127,7 +137,7 @@ train:
   weights_only: True
 
 log: 
-  enable_wandb: True
+  enable_wandb: False
   project_name: "stonefish_docking"
   run_name: "default"
   tags: ["PPO", "docking", "stonefish"]

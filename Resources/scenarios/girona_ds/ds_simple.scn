@@ -1,0 +1,848 @@
+<?xml version="1.0"?>
+<scenario>
+    <robot name="$(arg ds_name)" fixed="true" self_collisions="false">
+        <base_link name="Base" type="compound" physics="submerged">
+			<external_part name="Semi_structure" type="model" physics="submerged" buoyant="false">
+				<physical>
+					<mesh filename="Resources/data/ds_simple/phy_ds_structure.obj" scale="1.0" convex="true"/>
+					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+				</physical>
+				<visual>
+					<mesh filename="Resources/data/ds_simple/vis_ds_structure.obj" scale="1.0"/>
+					<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+				</visual>
+				<material name="Aluminium"/>
+				<look name="steel"/>
+				<compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+			</external_part>
+		</base_link>
+
+		<!-- links -->
+        <link name="lock1" type="compound" physics="surface">
+            <external_part name="lockleft" type="model" physics="submerged" buoyant="false">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/lock1.obj" scale="1.0"/>
+                    <thickness value="0.003"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/lock1.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Aluminium"/>
+                <look name="steel"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+        </link>
+        <link name="lock2" type="compound" physics="surface">
+            <external_part name="lockright" type="model" physics="submerged" buoyant="false">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/lock2.obj" scale="1.0"/>
+                    <thickness value="0.003"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/lock2.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Aluminium"/>
+                <look name="steel"/>
+                <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+            </external_part>
+        </link>
+
+		<!-- vlc definition -->
+		<link name="LinkVlc" type="cylinder" physics="submerged">
+			<dimensions radius="0.03" height="0.126"/>
+			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+			<material name="Steel"/>
+			<look name="Neutral"/>
+		</link>
+
+        <!-- <light name="Spot">
+            <specs radius="0.02" cone_angle="20.0" illuminance="500000.0"/>
+            <color rgb="0.1 0.1 1.0"/>
+            <origin xyz="0.0 0.0 -0.05" rpy="0.0 0.0 0.0"/>
+            <link name="LinkVlc"/>
+        </light> -->
+
+		<!-- joints -->
+        <joint name="lock/lock1" type="prismatic">
+            <parent name="Base"/>
+            <child name="lock1"/>
+            <origin rpy="0.0 0.0 0.0" xyz=" 0.02 0.02 -0.02" />
+            <axis xyz="-1.0 0.0 0.0"/>
+            <limits min="0" max="0.25"/>
+        </joint>
+        <joint name="lock/lock2" type="prismatic">
+            <parent name="Base"/>
+            <child name="lock2"/>
+            <origin rpy="0.0 0.0 0.0" xyz=" 0.02 0.01 -0.02" />
+            <axis xyz="1.0 0.0 0.0"/>
+            <limits min="0" max="0.25"/>
+        </joint>
+		<joint name="light_joint" type="fixed">
+			<parent name="Base"/>
+			<child name="LinkVlc"/>
+			<origin xyz="-0.875 -0.58 -1.46" rpy="0.0 1.571 -1.46"/>
+			<axis xyz="0.0 1.0 0.0"/>
+		</joint>
+        
+        
+        <joint name="funnel_joint" type="fixed">
+            <parent name="Base"/>
+            <child name="funnels"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <axis xyz="1.0 0.0 0.0"/>
+        </joint>
+
+
+        <link name="funnels" type="compound" physics="submerged">
+            <!-- x_funnel holder -->
+            <external_part name="x_funnel_holder" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_0_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_0.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_holder2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_0_phy.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz=" 0.0 -1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_0.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz=" 0.0 -1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- x_funnel origin -->
+            <external_part name="x_funnel_1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_1.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_1.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_2.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_2.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_3.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_3.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_4.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_4.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_5.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_5.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- x_funnel sifted -1.118 in Y -->
+            <external_part name="x_funnel_1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_1.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_1.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_2.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_2.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_3.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_3.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_4.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_4.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_5.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_5.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 -1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- x_funnel rotated 180 -->
+            <external_part name="x_funnel_1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_1.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_1.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_2.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_2.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_3.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_3.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_4.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_4.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_5.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_5.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+
+            <!-- x_funnel rotated 180 and shift 1.118m -->
+            <external_part name="x_funnel_1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_1.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_1.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_2.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_2.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_3.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_3.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_4.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_4.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="x_funnel_5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_5.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 1.118 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_x_5.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 1.118 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+
+
+            <!-- y_funnel origin -->
+            <external_part name="y_funnel_0" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_0.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_0.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_1.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_1.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_2.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_2.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_3.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_3.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_4.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_4.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_5.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_5.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_6" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_6.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_6.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_7" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_7.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_7.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+
+
+
+                <!--  y_funnel with shift 0.256  -->
+            <external_part name="y_funnel_0" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_0.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_0.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_1.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_1.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_2.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_2.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_3.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_3.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_4.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_4.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_5.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_5.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_6" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_6.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_6.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_7" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_7.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_7.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 0.0" xyz="-0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+
+
+
+            <!-- Y funnel 180 rotation -->
+                <external_part name="y_funnel_0" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_0.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_0.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_1.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_1.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_2.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_2.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_3.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_3.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_4.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_4.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_5.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_5.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_6" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_6.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_6.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_7" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_7.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_7.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+
+
+            <!-- Y funnel 180 rotation with shift 0.256 -->
+            <external_part name="y_funnel_0" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_0.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_0.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_1" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_1.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_1.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_2" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_2.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_2.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_3" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_3.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_3.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_4" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_4.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_4.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_5" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_5.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_5.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_6" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_6.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_6.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+            <external_part name="y_funnel_7" type="model">
+                <physical>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_7.obj" scale="1.0" convex="true"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </physical>
+                <visual>
+                    <mesh filename="Resources/data/ds_simple/ds_funnel_y_7.obj" scale="1.0"/>
+                    <origin rpy="0.0 0.0 ${pi}" xyz="0.256 0.0  0.0"/>
+                </visual>
+                <material name="Fiberglass"/>
+                <look name="guide"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+        </link>
+
+        <!-- actuator -->
+        <actuator name="ServoLock1" type="servo">
+            <controller position_gain="1.0" velocity_gain="1.0" max_torque="100.0"/>
+            <joint name="lock/lock1"/>
+        </actuator>
+        <actuator name="ServoLock2" type="servo">
+            <controller position_gain="1.0" velocity_gain="1.0" max_torque="100.0"/>
+            <joint name="lock/lock2"/>
+        </actuator>
+        <!-- <ros_control_interface namespace="/$(arg ds_name)/lock" type="velocity">
+            <joint name="lock/lock1"/>
+            <joint name="lock/lock2"/>
+        </ros_control_interface> -->
+
+
+
+		<!-- <ros_publisher servos="/$(arg ds_name)/my_joint_state"/>
+        <ros_subscriber servos="/$(arg ds_name)/my_joint_setpoints"/> -->
+		<world_transform  xyz="$(arg position)" rpy="$(arg rotation)"/>
+	</robot>
+</scenario>

@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     obs_path = global_path("include/observations/ds_observation_config.json")
     act_path = global_path("include/observations/ds_action_config.json")
-    scene_path = global_path("Resources/girona_ds/scenarios/girona500_docking_sim_pool.scn")
+    scene_path = global_path("Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn")
     res_path = global_path("./")
 
     env = env = dsEnv(

@@ -78,7 +78,7 @@ private:
     // used to extract information from sensors
     /* 
     \param sim is the stonefish class
-    \param name is the sensors name ex(ROBOT/Sensor, girona500/gps.......)
+    \param name is the sensors name ex(ROBOT/Sensor, girona1000/gps.......)
     \param expected_type 
     \param channel_index the position of this value in the msg(ex, 0,1,2,3,4,5 .... )
     */

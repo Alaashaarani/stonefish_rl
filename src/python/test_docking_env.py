@@ -68,7 +68,8 @@ if __name__ == "__main__":
         obs, rewards, dones, infos = envs.step(actions)
         
         velocity = np.linalg.norm([obs[0][4], obs[0][5]])
-        plotter.update([velocity])
+        
+        plotter.update([obs[0][3]])
         # print("lenght : ",len(obs[0][-4:]),end="\n")
         
         if step %  config["testing"]["step_per_print"] == 0:

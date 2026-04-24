@@ -37,11 +37,12 @@ class LogitechController:
         pygame.event.pump() # Necessary to update internal axis states
         
         # Read axes (Note: Pygame returns 1.0 for 'Down', so we invert Y axes)
-        fwd = self.joystick.get_axis(self.axes["fwd"])
+        fwd = -self.joystick.get_axis(self.axes["fwd"])
         lat = self.joystick.get_axis(self.axes["lat"])
-        ver = -self.joystick.get_axis(self.axes["ver"])
+        ver = self.joystick.get_axis(self.axes["ver"])
         pitch = self.joystick.get_axis(self.axes["pitch1"])-self.joystick.get_axis(self.axes["pitch2"])
-        yaw = -self.joystick.get_axis(self.axes["yaw"])
+        pitch = np.clip(pitch, -1.0, 1.0)  # Ensure pitch is within bounds
+        yaw = self.joystick.get_axis(self.axes["yaw"])
         
         if self.forces_6dof: 
             action = np.array([fwd,lat,ver,0.0,pitch,yaw], dtype=np.float32)

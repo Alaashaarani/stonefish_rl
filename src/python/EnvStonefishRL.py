@@ -19,7 +19,6 @@ class EnvStonefishRLParallel(gym.Env):
         self.state_path 
         self.act_path 
         self.tcm 
-        self.action_size
         self.observation_history
         self.observe_actions
         """ 
@@ -54,12 +53,12 @@ class EnvStonefishRLParallel(gym.Env):
         self.state_size = len(self.state_names)
         # adding action to observations
         if self.observe_actions:
-            obs_size = self.state_size + self.action_size
+            self.obs_size = self.state_size + self.action_size
         else: 
-            obs_size = self.state_size
+            self.obs_size = self.state_size
     
         # increasing the total size to save history observations
-        self.total_obs_size = obs_size * (1+self.history_length)
+        self.total_obs_size = self.obs_size * (1+self.history_length)
         
         # Define spaces
         action_low, action_high = self._get_action_bounds()

@@ -115,7 +115,7 @@ class dsEnv(EnvStonefishRLParallel):
             current_vec = [0.0,0.0,0.0]
 
         return [
-            {"name": "girona500", "position": girona_pos, "rotation": girona_rot, "current":current_vec},
+            {"name": "girona1000", "position": girona_pos, "rotation": girona_rot, "current":current_vec},
             {"name": "ds", "position": ds_pos, "rotation": ds_rot},
         ]
 
@@ -133,6 +133,7 @@ class dsEnv(EnvStonefishRLParallel):
         
         self.step_counter = 0
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
+        self.observation_history = []
         self.goal_achieved = False
         
         self.previous_acceleration = np.zeros(3)
@@ -140,28 +141,12 @@ class dsEnv(EnvStonefishRLParallel):
         # with previous action 
 
         info = {}
-        print(f" observation size in reset: {len(obs)}")
+
         return obs, info
 
     def get_sim_obser(self):
-        """Build observation: state vector + last action"""
-        obs = []
-        
-        # Add the observation vector from C++
-        if len(self.state) > 0:
-            obs.extend(self.state.tolist())
-        else:
-            # Fallback: zeros
-            obs.extend([0.0] * self.total_obs_size)
-        
-        if self.observe_actions:
-            obs = np.concatenate((obs,self.last_action_applied))
-        
-
-        # Add last action
-        # obs.extend(self.last_action_applied.tolist())
-
-        return np.array(obs, dtype=np.float32)
+        """Build observation: state vector + last action + zeros from history"""
+        return self.concatenate_history()
 
     def step(self, action):
         """Execute step with cleaned logic"""
@@ -169,18 +154,20 @@ class dsEnv(EnvStonefishRLParallel):
         self.step_counter += 1
         self.current_action = np.array(action, dtype=np.float32).flatten()
         
+        # Getting the robot STATE from simulator. 
         obs, reward, terminated, truncated, info = super().step(action)
+
         if self.observe_actions:
             obs = np.concatenate((obs,self.current_action))
         # Application logic
         
+        # Calculate the main rewards for the robot current state
         additional_reward = self.calculate_additional_reward()
             
         # Update termination/truncation
         terminated = terminated or self._is_terminated()
         truncated = truncated or self._is_truncated()
             
-        
         # Goal check
         if self.goal_achieved:
             print(f"[Port {self.port}] Goal achieved!")
@@ -189,13 +176,18 @@ class dsEnv(EnvStonefishRLParallel):
         
         if truncated:
             additional_reward -= 10.0  # Penalty for timeout
-            
+        
+        # reward comes from the parrent class and additional_reward comes from the child class
         total_reward = reward + additional_reward
+
+        # Used for the smoothing reward
         self.last_action_applied = self.current_action
+
         info.update(self._get_additional_info())
-        # return np.zeros(22), 0, terminated, truncated, {}
+        # adjusting state space to fit the observation requirements (adding offset,wrap, noise etc.)
 
         obs[2]-=1.25 # docking offset
+        obs[3] += np.pi/2 
         error = np.linalg.norm(self._get_state_by_pattern("error")[:3])/6 # add noise to observations if ds is observed to prevent overfitting to perfect observations
 
         if not self._auv_observed_ds(): 
@@ -203,21 +195,28 @@ class dsEnv(EnvStonefishRLParallel):
         obs[:3] += np.random.normal(0,error/2,3)
         
         obs[3] = abs(np.clip(obs[3]+np.random.normal(0,0.1), -np.pi, np.pi))  # add noise to yaw error observation to prevent overfitting to perfect observations
-        # print(f"obs length before history: {len(obs)}")
+
         self.concatenate_history(obs)
 
-        return np.round(self.observation,2), total_reward, terminated, truncated, {}
+        return np.round(self.observation,3), total_reward, terminated, truncated, {}
     
-
-    def concatenate_history(self, obs): 
+    def concatenate_history(self, obs=None): 
         """Concatenate observation history: 
 
             observation_history stores only the needed items for the observation,
             this can be improved by storing more history steps. Then select the needed
             items for the observation from the history.
         """
+
+        if not isinstance(obs, np.ndarray) and len(self.observation) == 0:
+            observation_history = np.zeros((self.history_length,self.obs_size))
+            self.observation_history = list(observation_history)
+            # return np.zeros(self.total_obs_size, dtype=np.float32)
+             
+        
         # print(f"obs: \n {obs}, \n history : \n {self.observation_history}")
-        self.observation_history.append(obs)
+        if isinstance(obs, np.ndarray):
+            self.observation_history.append(obs)
 
         # print(f"observation history length: {len(self.observation_history)}")
         if len(self.observation_history) > self.history_length+1:
@@ -230,7 +229,7 @@ class dsEnv(EnvStonefishRLParallel):
         if length > 0:
             self.observation = np.concatenate((self.observation, np.zeros(length)))
 
-        # print(f"observation size after IF: {len(self.observation)}/{self.total_obs_size}")
+        return self.observation
 
     def calculate_additional_reward(self):
         """Application-specific reward calculation"""

@@ -5,7 +5,7 @@ This repository contains several simulation environments based on **Stonefish** 
 
 ## Available Environments
 - [AcrobotEnv](./docs/README_acrobot.md) – Control a two-link pendulum to reach a target height.
-- [G500Env](./docs/README_girona500.md) – Girona500 robot with a gripper to approach a target object (Ball)-
+- [G500Env](./docs/README_girona1000.md) – girona1000 robot with a gripper to approach a target object (Ball)-
 - [G500TestEnv](./docs/README_tests.md) – Testing environment for sensors and actuators.
 
 
@@ -45,17 +45,17 @@ stonefish_rl/
 |   |   ├── data/
 |   |   |    └── ...
 |   |   └── scenarios/
-|   |        ├── girona500_basic.scn
+|   |        ├── girona1000_basic.scn
 |   |        └── vehicles/
-|   |             └── girona500_eca5emicro_gripper.scn  
+|   |             └── girona1000_eca5emicro_gripper.scn  
 │   └── g500/
 |       ├── data/
 |       |    └── ...
 |       └── scenarios/
-|            ├── girona500_basic.scn
+|            ├── girona1000_basic.scn
 |            └── vehicles/
-|                 ├── girona500.scn
-|                 └── girona500_eca5emicro_gripper.scn  
+|                 ├── girona1000.scn
+|                 └── girona1000_eca5emicro_gripper.scn  
 ├── scripts/                         # Python code for each environment
 │   ├── acrobot/
 │   │   ├── AcrobotEnv.py
@@ -80,7 +80,7 @@ stonefish_rl/
 │   └── StonefishRL.cpp
 └── docs/                            # Documentation for each environment
     ├── README_acrobot.md
-    ├── README_girona500.md
+    ├── README_girona1000.md
     ├── README_tests.md
     ├── README_installation.md
     └── README_manual.md
