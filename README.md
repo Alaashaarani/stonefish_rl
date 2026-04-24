@@ -9,7 +9,7 @@ This repository contains several simulation environments based on **Stonefish** 
     4. cd build
     5. cmake ..
     6. make [-jX]
-    8. sudo make install
+    
 
 ## Available Environments
 - [AcrobotEnv](./docs/README_acrobot.md) – Control a two-link pendulum to reach a target height.
