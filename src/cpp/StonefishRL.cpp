@@ -89,6 +89,7 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
 void StonefishRL::SendStates() {
     // Get state vector from new StateManager
     std::vector<float> states = state_manager_.getStateVector(this);
+    // std::cout << "[StonefishRL] Sending state vector of size: " << states.size() << std::endl;
     
     // Convert to JSON array for sending
     std::string obs_json = "[";
@@ -157,7 +158,7 @@ void StonefishRL::BuildScenario() {
 
 
 
-
+// This function is not used
 std::vector<std::string> StonefishRL::RobotCollisionDetector(std::string& collision_robot)
 {
     sf::Entity* entA;

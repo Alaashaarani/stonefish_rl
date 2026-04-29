@@ -49,7 +49,7 @@ if __name__ == "__main__":
     obs = envs.reset()
     if config["controller"]["logitech"]:
         controller = LogitechController(deadzone=0.1, use_forces= config["action"]["force_6Dof"])
-    
+    total_reward = 0
     #total testing steps
     testing_steps = config["testing"]["episodes"]*config["env"]["episode_duration"]*config["env"]["rl_observation_freq"]
     for step in range(testing_steps):
@@ -65,16 +65,28 @@ if __name__ == "__main__":
             actions = [config["controller"]["force_vector"] for _ in range(num_instances)]
 
         # Step all environments simultaneously
-        obs, rewards, dones, infos = envs.step(actions)
+        obs, rewards, done, infos = envs.step(actions)
+        # print(envs.step(actions))
+
         
+        # I dont know why I cannot pass inf through the envs.step directly. 
+        # infos = envs.get_attr('info')
+
         velocity = np.linalg.norm([obs[0][4], obs[0][5]])
-        
-        plotter.update([obs[0][3]])
+        try: 
+            value = infos[0]["smoothing_reward"] 
+        except:
+            value = 0.0
+        plotter.update([value])
         # print("lenght : ",len(obs[0][-4:]),end="\n")
-        
-        if step %  config["testing"]["step_per_print"] == 0:
-            print(f"\n Step {step} | Rewards: {rewards} | observations[0]: {obs[0]}")
-            print(f"step: {step}, actions: {actions}", end="\n")
+        # if terminate or truncated:
+        #     print(f"\nEpisode finished at step {step}. Resetting environment... due to {'truncation' if truncated else 'terminate'}")
+        #     obs = envs.reset()
+        # total_reward += rewards
+        # print(f"\r Step {step} | Reward: {total_reward}", end="")
+        # if step %  config["testing"]["step_per_print"] == 0:
+        #     print(f"\n Step {step} | Rewards: {rewards} | observations[0]: {obs[0]}, infos: {infos}", end="\n")
+        #     print(f"step: {step}, actions: {actions}", end="\n")
 
     print("Testing finished. Closing environments...")
     envs.close()

@@ -19,12 +19,12 @@
     #   - the frequency of observations in Hz, or steps per second.
 env:
   state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.json"
-  history_length: 10
+  history_length: 1
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
   observe_actions: True
   instances: 1
   base_port: 5595
-  episode_duration: 60
+  episode_duration: 30
   rl_observation_freq: 5
 
 # Sim Settings
@@ -44,8 +44,8 @@ sim:
   resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
   graphical_interface: True
   resolution: 800
-  realtime: False
-  current: True
+  realtime: True
+  current: False
   current_value: [0.2,0.2] 
   current_uniform: True 
 
@@ -74,7 +74,7 @@ action:
 
 testing: 
   episodes: 20
-  step_per_print: 10
+  step_per_print: 100
 
 # if logitech is True, controller is used as an input
 # if random is true, random actions are applied

@@ -38,11 +38,12 @@ public:
     // Stonefish lifecycle overrides
     virtual void BuildScenario() override;
     void ExitRequest();
-
+    
+    ZMQCommunicator* communicator;
+    
 private:
     // Communication & Configuration
     std::string scenePath;
-    ZMQCommunicator* communicator;
     CommandProcessor command_processor_;
     StateManager state_manager_;
     ActuatorController actuator_controller_;

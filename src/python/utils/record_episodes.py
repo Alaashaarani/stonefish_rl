@@ -19,7 +19,7 @@ if __name__ == "__main__":
     num_instances = 1  # Set to 2 for two instances
 
 
-    obs_path = global_path("include/observations/ds_observation_config.json")
+    obs_path = global_path("include/observations/ds_state_v2_config.json")
     act_path = global_path("include/observations/ds_action_config.json")
     scene_path = global_path("Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn")
     res_path = global_path("./")

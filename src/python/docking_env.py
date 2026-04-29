@@ -46,6 +46,7 @@ class dsEnv(EnvStonefishRLParallel):
         
         self.observation = np.array([], dtype=np.float32)
         self.observation_history = []
+        self.info = {}
 
         # 5. Application specific init
         self.step_counter = 0
@@ -54,6 +55,17 @@ class dsEnv(EnvStonefishRLParallel):
         self.goal_achieved = False
         self.start_distance_factor = 0.75
         self.collision_thres = 1.0 
+        self.previous_distance_error = np.zeros(3)
+        self.max_dist = 10.0
+        self.yaw_max = np.pi
+        self.previous_yaw = np.pi
+
+        self.x_offset = 0.0
+        self.y_offset = 0.0
+        self.z_offset = -1.25
+        self.yaw_offset = np.pi/2 
+        self.total_yaw_reward= 0.0 
+
         self.enable_currents = config["sim"]["current"]
         self.current_x = config["sim"]["current_value"][0]
         self.current_y = config["sim"]["current_value"][1]
@@ -121,28 +133,33 @@ class dsEnv(EnvStonefishRLParallel):
 
     def reset(self, seed=None, options=None):
         """Reset environment"""
-        command = self.build_reset_command()
-        reset_command = "RESET:" + json.dumps(command) + ";"
-        
-        # Use parent reset but send our specific reset command
-        response = self.send_command(reset_command)
+        super().reset(seed=seed)
 
         
-        self._process_state_vector(response)
         obs = self.get_sim_obser()
         
         self.step_counter = 0
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
         self.observation_history = []
+        
+        # Distance Reset variables
+        self.max_dist = 10.0
+        self.previous_distance_error = np.zeros(3)
+
+        # Yaw Reset variables
+        self.yaw_max = np.pi
+        self.previous_yaw = np.pi
+
+
         self.goal_achieved = False
         
         self.previous_acceleration = np.zeros(3)
 
         # with previous action 
 
-        info = {}
+        self.info = {}
 
-        return obs, info
+        return obs, self.info
 
     def get_sim_obser(self):
         """Build observation: state vector + last action + zeros from history"""
@@ -155,7 +172,7 @@ class dsEnv(EnvStonefishRLParallel):
         self.current_action = np.array(action, dtype=np.float32).flatten()
         
         # Getting the robot STATE from simulator. 
-        obs, reward, terminated, truncated, info = super().step(action)
+        obs, reward, done, info_super = super().step(action)
 
         if self.observe_actions:
             obs = np.concatenate((obs,self.current_action))
@@ -165,17 +182,17 @@ class dsEnv(EnvStonefishRLParallel):
         additional_reward = self.calculate_additional_reward()
             
         # Update termination/truncation
-        terminated = terminated or self._is_terminated()
-        truncated = truncated or self._is_truncated()
-            
+        truncated = self._is_truncated()
+           
         # Goal check
         if self.goal_achieved:
             print(f"[Port {self.port}] Goal achieved!")
-            terminated = True
-            additional_reward +=500
+            done = True
+            # additional_reward +=500
         
         if truncated:
-            additional_reward -= 10.0  # Penalty for timeout
+            additional_reward -= self.episode_duration*self.rl_observation_freq # Penalty for timeout
+            done = True
         
         # reward comes from the parrent class and additional_reward comes from the child class
         total_reward = reward + additional_reward
@@ -183,11 +200,15 @@ class dsEnv(EnvStonefishRLParallel):
         # Used for the smoothing reward
         self.last_action_applied = self.current_action
 
-        info.update(self._get_additional_info())
+        self.info.update(self._get_additional_info())
         # adjusting state space to fit the observation requirements (adding offset,wrap, noise etc.)
 
-        obs[2]-=1.25 # docking offset
-        obs[3] += np.pi/2 
+        obs[2] += self.z_offset # docking offset
+        obs[3] += self.yaw_offset # yaw offset
+
+        if obs[3] > np.pi:
+            obs[3] -= 2*np.pi
+        
         error = np.linalg.norm(self._get_state_by_pattern("error")[:3])/6 # add noise to observations if ds is observed to prevent overfitting to perfect observations
 
         if not self._auv_observed_ds(): 
@@ -198,7 +219,7 @@ class dsEnv(EnvStonefishRLParallel):
 
         self.concatenate_history(obs)
 
-        return np.round(self.observation,3), total_reward, terminated, truncated, {}
+        return np.round(self.observation,3), total_reward, done, truncated, {}
     
     def concatenate_history(self, obs=None): 
         """Concatenate observation history: 
@@ -208,7 +229,7 @@ class dsEnv(EnvStonefishRLParallel):
             items for the observation from the history.
         """
 
-        if not isinstance(obs, np.ndarray) and len(self.observation) == 0:
+        if not isinstance(obs, np.ndarray):
             observation_history = np.zeros((self.history_length,self.obs_size))
             self.observation_history = list(observation_history)
             # return np.zeros(self.total_obs_size, dtype=np.float32)
@@ -222,7 +243,11 @@ class dsEnv(EnvStonefishRLParallel):
         if len(self.observation_history) > self.history_length+1:
             self.observation_history.pop(0)
         
-        self.observation = np.concatenate((self.observation_history), axis=0)
+        try:
+            self.observation = np.concatenate((self.observation_history), axis=0)
+        except ValueError as e:
+            # print(f"Error concatenating history: {e}")
+            self.observation = np.zeros(self.total_obs_size, dtype=np.float32)
         # print(f"observation size after concatenation: {len(self.observation)}/{self.total_obs_size}")
 
         length = self.total_obs_size - len(self.observation)
@@ -239,19 +264,61 @@ class dsEnv(EnvStonefishRLParallel):
         
         reward = 0.0 
 
+         
+        # Penalty for losing sight of the docking station
         if not self._auv_observed_ds():
-            reward += -1.0 # Penalty for losing sight of the docking station
-    
-        reward_dist = -abs(error[0])-abs(error[1])-(abs(error[2]))*0.5
-        reward_yaw = np.exp(-2*abs(error[3]))-1
-        action_difference = abs(self.current_action - self.last_action_applied).sum()
+            reward += -1.0 
+
+        # new distance reward: 
+        current_dist_error = np.array([abs(error[0]+self.x_offset), abs(error[1]+self.y_offset), abs(error[2]+self.z_offset)]) 
+        distance_error_var = current_dist_error - self.previous_distance_error
+        reward_dist = 0.0
+
+        if np.linalg.norm(current_dist_error) < self.max_dist:
+                self.max_dist = np.linalg.norm(current_dist_error)   
+                # print(f"[Port {self.port}] New closest distance: {self.max_dist:.2f} m")
+        elif np.linalg.norm(current_dist_error) > self.max_dist + 0.5: 
+            reward_dist -= np.linalg.norm(current_dist_error) - np.linalg.norm(self.previous_distance_error) # Penalty for moving away from the target
+            # print(f"[Port {self.port}] Moving away from target, distance error change: {distance_error_var}")
+
+
+        self.previous_distance_error = current_dist_error
+        # old distance reward:
+        # reward_dist = -abs(error[0])-abs(error[1])-(abs(error[2]))*0.5
         
-        smoothing_reward = -np.exp(action_difference)/(self.action_size*10)   # Exponential penalty for large action changes
-            #     # print(f"[Port {self.port}] Action changed drastically! Difference: {action_difference:.2f}, Smoothing Reward: {smoothing_reward:.2f}")
-            # smoothing_reward = 0 
+        # Yaw reward: 
+        reward_yaw = 0.0
+        current_yaw = error[3]+self.yaw_offset
+        if current_yaw > np.pi:
+            current_yaw -= 2*np.pi
+        current_yaw = abs(current_yaw)
+        
+        yaw_change = current_yaw - self.previous_yaw
+        
+        if current_yaw > self.yaw_max+np.pi/8:
+            reward_yaw = -yaw_change # Reward for reducing yaw error
+        elif current_yaw < self.yaw_max: 
+            self.yaw_max = current_yaw
+        
+        self.total_yaw_reward += reward_yaw
+        self.previous_yaw = current_yaw
+        # reward_yaw = np.exp(-2*abs(error[3]+self.yaw_offset))-1
+
+        action_difference = abs(self.current_action - self.last_action_applied)
+        
+        # Smoothing reward 
+        smoothing_reward = 0.0
+        for difference in action_difference: 
+            if difference > 0.2: 
+                smoothing_reward -= 0.1 * difference # Penalty for large action changes
+
+        # Old smoothing        
+        # smoothing_reward = -np.exp(action_difference)/(self.action_size*10)   # Exponential penalty for large action changes
+        
             
         reward = reward_dist  + reward_yaw + smoothing_reward # this value makes the weight moving the ball equivalent to reaching the ball
-        
+        self.info.update({"reward_dist": reward_dist, "reward_yaw": reward_yaw, "smoothing_reward": smoothing_reward})
+
         # Checking Collision
         if np.linalg.norm(self.previous_acceleration) != 0.0 :
             difference = np.linalg.norm(self.previous_acceleration - imu_acc)
@@ -264,7 +331,7 @@ class dsEnv(EnvStonefishRLParallel):
 
         # print(f"[Port {self.port}] reward_dist: {reward_dist:.2f}, reward_yaw: {reward_yaw:.2f}, collision: {difference}, action_diff: {action_difference:.2f}, smoothing_reward: {smoothing_reward:.2f}")
         
-        if abs(error[2]) > 1.27 or abs(error[0]) > 0.15 or abs(error[1]) > 0.15 : 
+        if abs(error[2]+self.z_offset) > 0.05 or abs(error[0]+self.x_offset) > 0.15 or abs(error[1]+self.y_offset) > 0.15 : 
             self.goal_achieved = False
         else:
             self.goal_achieved = True
@@ -314,7 +381,7 @@ class dsEnv(EnvStonefishRLParallel):
         
         # check if AUV lies in DS cone field of view
         k = 0.64 # considering the cone size of (2,2,4.4) 
-        if k*abs(error[2]) > abs(error[0]) and k*abs(error[2])> abs(error[1]):
+        if k*abs(error[2]+self.z_offset) > abs(error[0]) and k*abs(error[2])> abs(error[1]):
             return True
         return False
 
@@ -322,6 +389,8 @@ class dsEnv(EnvStonefishRLParallel):
     def _get_additional_info(self):
         """Additional info for this application"""
         # robot_pos = self._get_state_by_pattern("auv_pose")
+        
+        
         return {
             # "distance_to_target": self._distance_to_target(robot_pos[:3]),
             "error": self._get_state_by_pattern("error").tolist(),

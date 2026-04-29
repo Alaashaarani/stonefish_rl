@@ -67,7 +67,7 @@ if __name__ == "__main__":
             # downward actions 
             # action = np.array([0.0, 0.0, 0.0,-1.0,-1.0])
 
-            obs, reward, done, truncated, info = env.step(action)
+            obs, reward, done, info = env.step(action)
             
             total_reward += reward
             step_counter += 1

@@ -22,10 +22,10 @@
 
 env:
   state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.json"
-  history_length: 5
+  history_length: 0
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
   observe_actions: True
-  instances: 20
+  instances: 75
   base_port: 5555
   episode_duration: 60
   rl_observation_freq: 5
@@ -50,7 +50,7 @@ sim:
   graphical_interface: False
   evaluation_graphical_interface: True
   resolution: 800
-  realtime: False
+  realtime: True
   current: True
   current_value: [0.2,0.2] 
   current_uniform: True 
@@ -92,14 +92,14 @@ action:
 
 model:
   pretrained: False
-  algorithm: "PPO"
+  algorithm: "SAC"
   model_path: "PPO_O11_A6_20260301_030008.zip" 
 
   # comment param
   policy: "MlpPolicy"
   learning_rate: 0.0005
-  buffer_size: 500000
-  batch_size: 10240
+  buffer_size: 98304 # 8*batch_size
+  batch_size: 14336 
   weights_only: True
 
   # SAC param
@@ -128,7 +128,7 @@ policy:
 
 # Training Settings
 train:
-  total_timesteps: 1000_000
+  total_timesteps: 6000_000
   reset_num_timesteps: False
   eval_freq: 2000
   save_path: "default"
@@ -137,7 +137,7 @@ train:
   weights_only: True
 
 log: 
-  enable_wandb: False
+  enable_wandb: True
   project_name: "stonefish_docking"
   run_name: "default"
   tags: ["PPO", "docking", "stonefish"]

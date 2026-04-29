@@ -265,11 +265,11 @@ class EnvStonefishRLParallel(gym.Env):
             done = self._is_done()
             info = self._get_info()
             
-            return self.state, reward, done, False, info
+            return self.state, reward, done, info
             
         except Exception as e:
             print(f"[ERROR] Step failed: {e}")
-            return self.state, 0.0, True, False, {}
+            return self.state, 0.0, False, {}
 
     def _calculate_reward(self):
         """Calculate reward - to be overridden by child classes"""
@@ -309,7 +309,7 @@ def launch_stonefish_simulator(rank, config):
     real_time= config["sim"]["realtime"] 
     resolution=config["sim"]["resolution"]
     graphical=config["sim"]["graphical_interface"]
-    dt = 0.0 if real_time else 0.1
+    dt = 0.0 if real_time else 0.005
     # Run the scene
     # Note: We pass the port as an additional command line argument to the C++ executable
     print(f"[INFO] Executing Stonefish on Port {port} with the scene: {scene_path}")

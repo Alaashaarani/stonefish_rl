@@ -23,16 +23,17 @@ public:
 
     // Send JSON string (simple wrapper)
     void sendJson(const std::string& json_str);
-
     // Receive methods
     zmq::message_t receive();
     bool receive(zmq::message_t& msg, zmq::recv_flags flags = zmq::recv_flags::none);
     
+    void reset();
+    
     ~ZMQCommunicator();
-
 private:
     zmq::context_t context;
     zmq::socket_t socket;
+    int m_port;
 };
 
 #endif // ZMQCOMMUNICATOR_H

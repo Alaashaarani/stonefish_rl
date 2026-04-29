@@ -1,12 +1,50 @@
-# Environment Settings
+# GYM Environment Settings:
+  # This defines the observation and action space, and how many instances to run in parallel.
+    # state config:
+    #   - The state space is defined in the state config file, it is a json. This includes the values
+    # that are sent by stonefish to the python code.
+    # History length:
+    #   - Zero: no history is passed, only current observation is passed.
+    #   - One: the last observation is concatenated with the current observation.
+    # Action config: 
+    #   - The action space is defined in the action config file, it is a json file. 
+    # Observe actions: 
+    #   - if true, the last action is concatenated to the observation, and passed to the RL algorithm.
+    # instances:
+    #   - number of parallel environments to run, each environment will run on a different port, starting from base_port.
+    # base_port:
+    #   - the starting port for the first environment, the rest of the environments will use consecutive ports. this port is used by stonefish
+    # to send and recieve data from the python code. 
+    # episode_duration:
+    #   - the duration of each episode in seconds.
+    # rl_observation_freq:
+    #   - the frequency of observations in Hz, or steps per second.
+
 env:
   state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.json"
+  history_length: 5
   action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
+  observe_actions: True
+
   # only one instance is allowed in evaluation
   instances: 1
   base_port: 5595
   episode_duration: 60
-  rl_observation_freq: 10
+  rl_observation_freq: 5
+
+# Sim Settings
+  # Graphical_interface: 
+  #   - if True, the simulation will be rendered, otherwise it will run in headless mode
+  #   - if False the simulation senario cannot have any graphical element (camera,...), otherwise stonefish will crash
+  # evaluate_graphical_interface:
+  #   - if True, the simulation will be rendered the evaluation gui (stonefish env) only one. It will use resolution parameter
+  # realtime: 
+  #   - if False will run with the max allowed speed of the simulation. if True will run in real time.  
+  #   - Their is another factor that affect the simulation speed and is called physics_frequency. it is set to 300, you can find this param in the cpp main file. 
+  # current:
+  #   - water current in x and y direction, in m/s 
+  # current_unifrom: 
+  #   - if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
 
 sim:
   scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
@@ -17,13 +55,21 @@ sim:
   # current in x and y direction, in m/s 
   current: True
   current_value: [0.2,0.2] 
-  # if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
-  current_uniform: False
+  current_uniform: True 
 
+# action space settings
+  # force_6Dof: 
+  #   - if true, the action space defined in the Config action as thrusters setpoints will be maped to force request in the (x,y,z,roll,pitch,yaw) 
+  #   - if false, the action space defined in the Config action as thrusters setpoints is used
+  #   - This is done this way because stonefish accepts setpoint, if we want to use forces and define it in the configuration file, then we need to 
+  # hard code the mapping in stonefish files (the CPP section of the Library). 
+  # tcm:  
+  #   - This is the mapping matrix between the action space (setpoints) defined in the configuration file and the forces in (x,y,z,roll,pitch,yaw).
+  #   - The size of the tcm is (number of thrusters, 6), where 6 is the number of forces in (x,y,z,roll,pitch,yaw).
+  #   - The forces are calculated as follows: setpoint = forces@tcm.T , where setpoints are defined in the action_config file, 
+  # and forces are the output of the RL algorithm (action space). The RL output forces, then the code convert forces to setpoint, 
+  # and Simulation recieves Setpoints
 
-# This maps the forces (x,y,z,roll,pitch,yaw) of the thusters setpoints
-# It changes the action space size, to match the forces, 
-# The RL output forces, then the code convert forces to setpoint, and Simulation recieves Setpoints
 action: 
   force_6Dof: True
   tcm: [[-1,-1,0,0,0],
@@ -36,9 +82,9 @@ action:
 
 # Model for Evaluation
 evaluate:
-  algorithm: "ONNX"
+  algorithm: "SAC"
   # model_path: "PPO_docking_currents_20260203_172120.zip"
-  model_path: "/home/cirs_alaa/repositories/stonefish_rl/src/python/models/Last_models_O11_A6/PPO_O11_A6.onnx"
+  model_path: "/home/cirs_alaa/repositories/stonefish_rl/src/python/SAC_O11_A6_20260427_212449.zip"
   num_episodes: 10
   step_per_print: 100
 

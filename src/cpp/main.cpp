@@ -48,29 +48,40 @@ int learning(void* data) {
 
     // checking simulation speed and executing the observation frequency accordingly 
     double time0 = myManager->getSimulationTime();
+    int count = 0;
     for (int i = 0; i < 10; i++) {
         simApp.StepSimulation();
+        count ++;
     }   
-    double sim_speed = (myManager->getSimulationTime() - time0)/10;
-    int sim_steps = (1/sim_speed)/rl_observation_freq;  // the simulation steps this amount before calling the RL agent 
+    double sim_speed = count/(myManager->getSimulationTime() - time0);
+    int sim_steps = (sim_speed)/rl_observation_freq;  // the simulation steps this amount before calling the RL agent 
     
     // wait for 2 sec
-
 
     while(nextStepSim != "EXIT")
     {   
         nextStepSim = myManager->RecieveInstructions(simApp);
         
         if(nextStepSim == "CMD"){
-            
-            
             myManager->SendStates(); // Send states after all steps
             for (int i = 0;i < sim_steps;i++) {
                 simApp.StepSimulation();
+                // counting 
+                count ++;
             }
                 
         }      
         else if (nextStepSim == "RESET"){
+
+            // checking simulation speed and adjusting sim_steps accordingly
+            sim_speed = count/ (myManager->getSimulationTime() - time0);
+            sim_steps = (sim_speed)/rl_observation_freq;
+            if (sim_steps == 0) sim_steps = 1; // Ensure at least 1 step
+            count = 1; 
+            time0 = myManager->getSimulationTime();
+
+            std::cout << "[INFO] Simulation reset. New sim speed: " << sim_speed << " steps per second. Adjusted sim_steps to: " << sim_steps << std::endl;
+            // myManager->communicator->reset();
             simApp.StepSimulation();
         }                                               
     }
