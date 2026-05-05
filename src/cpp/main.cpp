@@ -23,12 +23,8 @@ struct LearningThreadData
     sf::SimulationApp& sim;
 };
 
-/*
-These values should match with the values in the enviroment you are using
-*/
-double physics_frequency = 300; // frequencey used to compute physics (Number of times physics is computed per sec)  
-double sf_dt = 0.1; // do 10 steps per sec
-double rl_observation_freq = 10; // default value, can be specified through the config file yaml
+
+double physics_frequency = 200; // frequencey used to compute physics (Number of times physics is computed per sec)  
 
 
 int learning(void* data) {
@@ -43,50 +39,24 @@ int learning(void* data) {
     }
 
     // Start the simulation (includes building the scenario)
-    simApp.StartSimulation();
     std::string nextStepSim;
 
-    // checking simulation speed and executing the observation frequency accordingly 
-    double time0 = myManager->getSimulationTime();
-    int count = 0;
-    for (int i = 0; i < 10; i++) {
-        simApp.StepSimulation();
-        count ++;
-    }   
-    double sim_speed = count/(myManager->getSimulationTime() - time0);
-    int sim_steps = (sim_speed)/rl_observation_freq;  // the simulation steps this amount before calling the RL agent 
-    
-    // wait for 2 sec
-
+    double time0= 0.0;
     while(nextStepSim != "EXIT")
     {   
+        // std::cout << " SimulationTime " << myManager->getSimulationTime()-time0 << std::endl;
         nextStepSim = myManager->RecieveInstructions(simApp);
-        
         if(nextStepSim == "CMD"){
             myManager->SendStates(); // Send states after all steps
-            for (int i = 0;i < sim_steps;i++) {
-                simApp.StepSimulation();
-                // counting 
-                count ++;
-            }
-                
-        }      
-        else if (nextStepSim == "RESET"){
-
-            // checking simulation speed and adjusting sim_steps accordingly
-            sim_speed = count/ (myManager->getSimulationTime() - time0);
-            sim_steps = (sim_speed)/rl_observation_freq;
-            if (sim_steps == 0) sim_steps = 1; // Ensure at least 1 step
-            count = 1; 
-            time0 = myManager->getSimulationTime();
-
-            std::cout << "[INFO] Simulation reset. New sim speed: " << sim_speed << " steps per second. Adjusted sim_steps to: " << sim_steps << std::endl;
-            // myManager->communicator->reset();
+            
             simApp.StepSimulation();
-        }                                               
+        }      
+        else{ // THis includes the RESET or others
+            // time0 = myManager->getSimulationTime();
+            simApp.StepSimulation();
+        }                               
     }
 
-    std::cout << "[INFO] Learning thread finished." << std::endl;
     myManager->ExitRequest();
     return 0;
 }
@@ -95,10 +65,9 @@ int learning(void* data) {
 int main(int argc, char **argv) {
 
     if (argc < 8) { // Changed from 4 to 5
-        std::cerr << "[ERROR] Usage (ALL STR): SCENE_PATH RESOURCES_PATH OBS_CONFIG_PATH ACTION_CONFIG_PATH PORT RESOLUTION " << std::endl;
+        std::cerr << "[ERROR] Usage (ALL STR): SCENE_PATH RESOURCES_PATH STATE_CONFIG_PATH ACTION_CONFIG_PATH PORT RESOLUTION GRAPHICAL_ENABLE STEP_TIME" << std::endl;
         return 1;
     }
-    std::cout << "[Main] Number of arguments: " << argc << std::endl; 
 
     std::string scene_path = argv[1]; 
     std::string resources_path = argv[2]; 
@@ -107,18 +76,9 @@ int main(int argc, char **argv) {
     int port = std::stoi(argv[5]); // Parse the port
     int resolution = std::stoi(argv[6]); // Parse the resolution
     std::string graphical_arg = argv[7];
-    std::cout << "[Main] argument Check: " << argv[8] << std::endl; 
-    rl_observation_freq = std::stod(argv[8]);
-    std::cout << "[Main] argument Check: " << argv[9] << std::endl; 
-    sf_dt = std::stod(argv[9]); // Parse the dt if provided
+    double sf_dt = std::stod(argv[8]); // Parse the dt if provided
 
 
-    // std::cout << "[MAIN] Scene Path: " << scene_path << std::endl;
-    // std::cout << "[MAIN] Resources Path: " << resources_path << std::endl;
-    std::cout << "[MAIN] Using dt: " << sf_dt << " seconds." << std::endl;
-    // std::cout << "[MAIN] Using arg8: " << argv[8] << " seconds." << std::endl;
-    // std::cout << "[MAIN] Using graphical interface: " << graphical_arg << std::endl;
-    // std::cout << "[MAIN] Using resolution: " << resolution << std::endl;
     
 
     bool graphical = graphical_arg == "True";
@@ -143,10 +103,8 @@ int main(int argc, char **argv) {
     LearningThreadData data {*app}; 
     SDL_Thread* learningThread = SDL_CreateThread(learning, "learningThread", &data);
 
-
-
     app->Run(true, false, sf::Scalar(sf_dt));
     SDL_WaitThread(learningThread, nullptr);
     delete app;
-    return 0;
+    return 0; 
 }

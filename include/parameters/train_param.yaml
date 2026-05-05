@@ -1,13 +1,13 @@
 # GYM Environment Settings:
   # This defines the observation and action space, and how many instances to run in parallel.
     # state config:
-    #   - The state space is defined in the state config file, it is a json. This includes the values
+    #   - The state space is defined in the state config file, it is a yaml. This includes the values
     # that are sent by stonefish to the python code.
     # History length:
     #   - Zero: no history is passed, only current observation is passed.
     #   - One: the last observation is concatenated with the current observation.
     # Action config: 
-    #   - The action space is defined in the action config file, it is a json file. 
+    #   - The action space is defined in the action config file, it is a yaml file. 
     # Observe actions: 
     #   - if true, the last action is concatenated to the observation, and passed to the RL algorithm.
     # instances:
@@ -21,14 +21,14 @@
     #   - the frequency of observations in Hz, or steps per second.
 
 env:
-  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.json"
-  history_length: 0
-  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
+  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.yaml"
+  history_length: 1
+  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.yaml"
   observe_actions: True
-  instances: 75
+  instances: 50
   base_port: 5555
   episode_duration: 60
-  rl_observation_freq: 5
+  rl_observation_freq: 10
 
 # Sim Settings
   # Graphical_interface: 
@@ -50,10 +50,12 @@ sim:
   graphical_interface: False
   evaluation_graphical_interface: True
   resolution: 800
-  realtime: True
-  current: True
+  # realtime: False
+  current: False
   current_value: [0.2,0.2] 
   current_uniform: True 
+  enable_noise: True
+
 
 # action space settings
   # force_6Dof: 
@@ -74,7 +76,7 @@ action:
         [0,0,1,0,0],
         [0,0,0,-1,-1],
         [0,0,0,0,0],
-        [0,0,0,1,-1],
+        [0,0,0,0.5,-0.5],
         [-1,1,0,0,0]]
 
 
@@ -91,16 +93,18 @@ action:
   #   - We recommend using a `batch_size` that is a factor of `n_steps * n_envs`.
 
 model:
-  pretrained: False
+  pretrained: True
   algorithm: "SAC"
-  model_path: "PPO_O11_A6_20260301_030008.zip" 
+  model_path: "SAC_Test_H1_A1_20260505_195427.zip" 
 
   # comment param
   policy: "MlpPolicy"
-  learning_rate: 0.0005
-  buffer_size: 98304 # 8*batch_size
-  batch_size: 14336 
+  learning_rate_start: 0.001
+  learning_rate_end: 0.00005
+  buffer_size: 500000 # 8*batch_size
+  batch_size: 51200 # n_step*instances (50 = 25600, 100 = 51200 )
   weights_only: True
+  ent_coef: auto_0.1
 
   # SAC param
   tau: 0.005
@@ -111,7 +115,6 @@ model:
 
   # PPO PARAM
   n_steps: 512
-  ent_coef: 0.01
   clip_range: 0.2
 
   # TD3 param , TO DO , NOT WORKING
@@ -128,11 +131,11 @@ policy:
 
 # Training Settings
 train:
-  total_timesteps: 6000_000
+  total_timesteps: 13000_000
   reset_num_timesteps: False
   eval_freq: 2000
   save_path: "default"
-  save_name: "O11_A6"
+  save_name: "Test_H1_A1"
   warm_start_path: "PPO_"
   weights_only: True
 

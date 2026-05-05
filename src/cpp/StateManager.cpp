@@ -363,10 +363,7 @@ std::vector<float> StateManager::getStateVector(sf::SimulationManager* sim) {
         
         states.push_back(value);
     }
-    // int id = 0;
-    // for(const float& spec_: states){
-    //         std::cout << "[state_manager] Value stored "<< id++ <<" is: " << spec_ << std::endl; 
-    // }
+
     return states;
 }
 

@@ -1,13 +1,13 @@
 # GYM Environment Settings:
   # This defines the observation and action space, and how many instances to run in parallel.
     # state config:
-    #   - The state space is defined in the state config file, it is a json. This includes the values
+    #   - The state space is defined in the state config file, it is a yaml. This includes the values
     # that are sent by stonefish to the python code.
     # History length:
     #   - Zero: no history is passed, only current observation is passed.
     #   - One: the last observation is concatenated with the current observation.
     # Action config: 
-    #   - The action space is defined in the action config file, it is a json file. 
+    #   - The action space is defined in the action config file, it is a yaml file. 
     # Observe actions: 
     #   - if true, the last action is concatenated to the observation, and passed to the RL algorithm.
     # instances:
@@ -21,9 +21,9 @@
     #   - the frequency of observations in Hz, or steps per second.
 
 env:
-  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.json"
+  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.yaml"
   history_length: 5
-  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
+  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.yaml"
   observe_actions: True
 
   # only one instance is allowed in evaluation

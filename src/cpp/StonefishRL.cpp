@@ -16,7 +16,9 @@ StonefishRL::StonefishRL(const std::string &path,
 {
     // 1. Initialize ZMQ communicator
     std::cout << "[StonefishRL,cpp] Initializing ZMQ communicator..." << port << std::endl;
-    communicator = new ZMQCommunicator(port);  
+    
+    communicator.reset(new ZMQCommunicator(port));
+
     std::cout << "[StonefishRL] Initialized on port " << port << std::endl;
 
     // 2. Load and set State Configuration
@@ -35,9 +37,10 @@ StonefishRL::StonefishRL(const std::string &path,
     std::cout << "[StonefishRL] Initialized with scene: " << scenePath << std::endl;
 }
 
+
 std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
     zmq::message_t request;
-    auto result = communicator->receive(request, zmq::recv_flags::none);
+    auto result = communicator->receive(request);
 
     std::string cmd = request.to_string();
     // debug output
@@ -50,9 +53,11 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
     if (prefix == "RESET") {
         // Updated: Use ResetInfo instead of InfoObject
         std::vector<ResetInfo> command_data = command_processor_.parseResetCommand(cmd);
+
+
+        
         state_manager_.updateRobotPosition(command_data, this);
         
-        // checking if this function works
         getOcean()->ResetVelocityField();
 
         sf::Vector3 currentVec(
@@ -71,7 +76,7 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
     }
     else if (prefix == "EXIT") {
         std::cout << "[StonefishRL] Received EXIT command\n";
-        communicator->sendJson("EXIT OK");
+        communicator->sendMessage("EXIT OK");
         return "EXIT";
     }
     else if (prefix == "CMD") {
@@ -91,14 +96,14 @@ void StonefishRL::SendStates() {
     std::vector<float> states = state_manager_.getStateVector(this);
     // std::cout << "[StonefishRL] Sending state vector of size: " << states.size() << std::endl;
     
-    // Convert to JSON array for sending
-    std::string obs_json = "[";
+    // Convert to YAML array for sending
+    std::string obs_yaml = "[";
     for (size_t i = 0; i < states.size(); ++i) {
-        obs_json += std::to_string(states[i]);
-        if (i < states.size() - 1) obs_json += ",";
+        obs_yaml += std::to_string(states[i]);
+        if (i < states.size() - 1) obs_yaml += ",";
     }
-    obs_json += "]";
-    communicator->sendJson(obs_json);
+    obs_yaml += "]";
+    communicator->sendMessage(obs_yaml);
 }
 
 void StonefishRL::ApplyCommands(const std::string& str_cmds) {
@@ -230,7 +235,6 @@ bool StonefishRL::CheckNameForCollision(std::string name, std::string name2, std
 void StonefishRL::ExitRequest() {
     // socket.close();
     // context.close();
-    delete communicator;
 
     std::cout << "[INFO] Simulation finished." << std::endl;
     std::exit(0);

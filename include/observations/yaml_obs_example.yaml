@@ -1,0 +1,65 @@
+state_config:
+  specs:
+    - entity_name: error
+      field_type: position
+      component: x
+      entity_1: girona1000
+      entity_2: ds
+      output_name: error_x
+
+    - entity_name: error
+      field_type: position
+      component: y
+      entity_1: girona1000
+      entity_2: ds
+      output_name: error_y
+
+    - entity_name: error
+      field_type: position
+      component: z
+      entity_1: girona1000
+      entity_2: ds
+      output_name: error_z
+
+    - entity_name: error
+      field_type: rotation
+      component: yaw
+      entity_1: girona1000
+      entity_2: ds
+      output_name: error_yaw
+
+    - entity_name: girona1000/odometry
+      field_type: odom.linear.velocity
+      component: x
+      output_name: auv_linear_velocity_x
+
+    - entity_name: girona1000/odometry
+      field_type: odom.linear.velocity
+      component: y
+      output_name: auv_linear_velocity_y
+
+    - entity_name: girona1000/odometry
+      field_type: odom.linear.velocity
+      component: z
+      output_name: auv_linear_velocity_z
+
+    - entity_name: girona1000/odometry
+      field_type: odom.angular.velocity
+      component: z
+      output_name: auv_angular_velocity_z
+
+    
+    - entity_name: girona1000/imu_filter
+      field_type: imu.linear_acceleration
+      component: x
+      output_name: imu_linear_acceleration_x
+
+    - entity_name: girona1000/imu_filter
+      field_type: imu.linear_acceleration
+      component: y
+      output_name: imu_linear_acceleration_y
+
+    - entity_name: girona1000/imu_filter
+      field_type: imu.linear_acceleration
+      component: z
+      output_name: imu_linear_acceleration_z

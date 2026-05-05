@@ -1,0 +1,31 @@
+action_config:
+  specs:
+    - actuator_name: girona1000/ThrusterSurgePort
+      action_type: setPoint
+      output_name: thruster_surge_port
+      min_value: -1.0
+      max_value: 1.0
+
+    - actuator_name: girona1000/ThrusterSurgeStarboard
+      action_type: setPoint
+      output_name: thruster_surge_starboard
+      min_value: -1.0
+      max_value: 1.0
+
+    - actuator_name: girona1000/ThrusterSway
+      action_type: setPoint
+      output_name: thruster_sway
+      min_value: -1.0
+      max_value: 1.0
+
+    - actuator_name: girona1000/ThrusterHeaveBow
+      action_type: setPoint
+      output_name: thruster_heave_bow
+      min_value: -1.0
+      max_value: 1.0
+
+    - actuator_name: girona1000/ThrusterHeaveStern
+      action_type: setPoint
+      output_name: thruster_heave_stern
+      min_value: -1.0
+      max_value: 1.0

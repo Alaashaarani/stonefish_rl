@@ -1,12 +1,12 @@
 # GYM Environment Settings:
   # This defines the observation and action space, and how many instances to run in parallel.
     # Observation config:
-    #   - The observation space is defined in the observation config file, it is a json.
+    #   - The observation space is defined in the observation config file, it is a yaml.
     # History length:
     #   - Zero: no history is passed, only current observation is passed.
     #   - One: the last observation is concatenated with the current observation.
     # Action config: 
-    #   - The action space is defined in the action config file, it is a json file. 
+    #   - The action space is defined in the action config file, it is a yaml file. 
     # Observe actions: 
     #   - if true, the last action is concatenated to the observation, and passed to the RL algorithm.
     # instances:
@@ -18,14 +18,14 @@
     # rl_observation_freq:
     #   - the frequency of observations in Hz, or steps per second.
 env:
-  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.json"
-  history_length: 1
-  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.json"
+  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.yaml"
+  history_length: 0
+  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.yaml"
   observe_actions: True
   instances: 1
-  base_port: 5595
-  episode_duration: 30
-  rl_observation_freq: 5
+  base_port: 5650
+  episode_duration: 60
+  rl_observation_freq: 10
 
 # Sim Settings
   # Graphical_interface: 
@@ -44,10 +44,11 @@ sim:
   resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
   graphical_interface: True
   resolution: 800
-  realtime: True
+  realtime: False
   current: False
   current_value: [0.2,0.2] 
   current_uniform: True 
+  enable_noise: False
 
 # action space settings
   # force_6Dof: 
@@ -68,13 +69,13 @@ action:
         [0,0,1,0,0],
         [0,0,0,-1,-1],
         [0,0,0,0,0],
-        [0,0,0,1,-1],
+        [0,0,0,0.5,-0.5],
         [-1,1,0,0,0]]
 
 
 testing: 
-  episodes: 20
-  step_per_print: 100
+  episodes: 10
+  step_per_print: 1
 
 # if logitech is True, controller is used as an input
 # if random is true, random actions are applied

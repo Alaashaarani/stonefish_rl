@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <iostream>
 
 // Simple state specification
 struct StateSpec {
@@ -31,6 +32,35 @@ struct ResetInfo {
     std::vector<float> velocity;  // [vx, vy, vz]
     std::vector<float> angular_velocity; // [wx, wy, wz]
     std::vector<float> current; // in case of using currents 
+
+
+    void print() const{
+        std::cout << "Name: " << name << "\n";
+        std::cout << "position: ";
+        for (auto x : position)
+          std::cout << x << " ";
+        std::cout << "\n";
+
+                std::cout << "rotation: ";
+        for (auto x : rotation)
+          std::cout << x << " ";
+        std::cout << "\n";
+
+        //         std::cout << "velocity: ";
+        // for (auto x : velocity)
+        //   std::cout << x << " ";
+        // std::cout << "\n";
+
+        //         std::cout << "angular_velocity: ";
+        // for (auto x : angular_velocity)
+        //   std::cout << x << " ";
+        // std::cout << "\n";
+
+                std::cout << "current: ";
+        for (auto x : current)
+          std::cout << x << " ";
+        std::cout << "\n";
+    }
 };
 
 

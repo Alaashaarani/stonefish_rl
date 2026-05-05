@@ -65,9 +65,9 @@ stonefish_rl/
 |   │   ├── StonefishRL.h
 |   │   └── ZMQCommunicator.h
 |   ├── observations
-|   │   ├── ds_action_config.json
-|   │   ├── ds_state_v1_config.json
-|   │   └── ds_state_v2_config.json
+|   │   ├── ds_action_config.yaml
+|   │   ├── ds_state_v1_config.yaml
+|   │   └── ds_state_v2_config.yaml
 |   └── parameters
 |       ├── evaluation_param.yaml
 |       ├── test_param.yaml

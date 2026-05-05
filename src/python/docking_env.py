@@ -1,9 +1,10 @@
 import numpy as np
-import json
 from EnvStonefishRL import EnvStonefishRLParallel,launch_stonefish_simulator
 import gymnasium as gym
 import time
 import gc
+import os
+import psutil
 
 class dsEnv(EnvStonefishRLParallel):
     def __init__(self, rank, config,**kwargs):
@@ -53,32 +54,41 @@ class dsEnv(EnvStonefishRLParallel):
         self.n_calls=0
         self.check_freq = 2100
         self.goal_achieved = False
-        self.start_distance_factor = 0.75
+        self.collision_recorded = 0 
+        self.start_distance_factor = 0.5
         self.collision_thres = 1.0 
         self.previous_distance_error = np.zeros(3)
         self.max_dist = 10.0
         self.yaw_max = np.pi
         self.previous_yaw = np.pi
-
+        self.velocities_history = []
         self.x_offset = 0.0
         self.y_offset = 0.0
-        self.z_offset = -1.25
+        self.z_offset = -1.0
         self.yaw_offset = np.pi/2 
         self.total_yaw_reward= 0.0 
+        self.uncontrolled_reward = 0.0 # refers to the rewards that varies with the initial position of the robot, like distance and angle. 
 
         self.enable_currents = config["sim"]["current"]
         self.current_x = config["sim"]["current_value"][0]
         self.current_y = config["sim"]["current_value"][1]
         self.currnet_uniform = config["sim"]["current_uniform"]
+        self.enable_noise = config["sim"]["enable_noise"]
 
         self.last_action_applied = np.zeros(self.action_size, dtype=np.float32)
         self.current_action = np.zeros(self.action_size, dtype=np.float32)
-        
+    
+    def print_python_memory(self, tag=""):
+        process = psutil.Process(os.getpid())
+        rss_mb = process.memory_info().rss / 1024 / 1024
+        print(f"[PY MEM] pid={os.getpid()} {tag} RSS={rss_mb:.2f} MB")
+
     def _on_step(self) -> bool:
         self.n_calls+=1
         if self.n_calls % self.check_freq == 0:
             # print("*************** Calling GC *************")
             gc.collect()  # Force the scan
+            # self.print_python_memory(f"env={self.env_id} step={self.step_count}")
             self.n_calls=0
         return True    
 
@@ -99,10 +109,10 @@ class dsEnv(EnvStonefishRLParallel):
         girona_pos = [
             0.0+ self.start_distance_factor*self.np_random.uniform(-6.0, 6.0),
             0.0+ self.start_distance_factor*self.np_random.uniform(-3.0, 3.0),
-            4.0- (self.start_distance_factor*2.8 )
+            3.5- (self.start_distance_factor*2.8 )
         ]
         girona_rot = [
-            0.0+ self.start_distance_factor*self.np_random.uniform(-np.pi, np.pi),
+            0.0+ self.start_distance_factor*self.np_random.uniform(-np.pi, np.pi)+np.pi/2,
             0.0,
             0.0
         ]
@@ -110,7 +120,7 @@ class dsEnv(EnvStonefishRLParallel):
         ds_pos = [
             0.0+ self.start_distance_factor*self.np_random.uniform(-1.0, 1.0),
             0.0+ self.start_distance_factor*self.np_random.uniform(-1.0, 1.0),
-            5.5
+            5.2
         ]
         ds_rot = [
             0.0+self.start_distance_factor*self.np_random.uniform(-np.pi, np.pi),
@@ -145,15 +155,16 @@ class dsEnv(EnvStonefishRLParallel):
         # Distance Reset variables
         self.max_dist = 10.0
         self.previous_distance_error = np.zeros(3)
-
+        self.uncontrolled_reward = 0.0
         # Yaw Reset variables
         self.yaw_max = np.pi
+        self.collision_recorded = 0 
         self.previous_yaw = np.pi
 
 
         self.goal_achieved = False
         
-        self.previous_acceleration = np.zeros(3)
+        self.velocities_history = []
 
         # with previous action 
 
@@ -186,14 +197,13 @@ class dsEnv(EnvStonefishRLParallel):
            
         # Goal check
         if self.goal_achieved:
-            print(f"[Port {self.port}] Goal achieved!")
             done = True
-            # additional_reward +=500
-        
-        if truncated:
-            additional_reward -= self.episode_duration*self.rl_observation_freq # Penalty for timeout
-            done = True
-        
+            
+            print(f"[Port {self.port}] Goal achieved!, additional Reward {-self.uncontrolled_reward/self.rl_observation_freq}, collisions {self.collision_recorded}") 
+
+        if truncated and not self._auv_observed_ds(): 
+            additional_reward -= 100 
+            print("----------------- DS NOT OBSERVED ------------- ")
         # reward comes from the parrent class and additional_reward comes from the child class
         total_reward = reward + additional_reward
 
@@ -204,19 +214,24 @@ class dsEnv(EnvStonefishRLParallel):
         # adjusting state space to fit the observation requirements (adding offset,wrap, noise etc.)
 
         obs[2] += self.z_offset # docking offset
-        obs[3] += self.yaw_offset # yaw offset
 
+        obs[3] += self.yaw_offset # yaw offset
         if obs[3] > np.pi:
             obs[3] -= 2*np.pi
         
-        error = np.linalg.norm(self._get_state_by_pattern("error")[:3])/6 # add noise to observations if ds is observed to prevent overfitting to perfect observations
+        # Adding Noise to observation 
+        if self.enable_noise: 
+            error = np.linalg.norm(self._get_state_by_pattern("error")[:3])/6 # add noise to observations if ds is observed to prevent overfitting to perfect observations
 
-        if not self._auv_observed_ds(): 
-            obs[:3] += np.random.normal(0,error,3) # add noise to observations if ds is observed to prevent overfitting to perfect observations
-        obs[:3] += np.random.normal(0,error/2,3)
+            if not self._auv_observed_ds(): 
+                obs[:3] += np.random.normal(0,error,3) # add noise to observations if ds is observed to prevent overfitting to perfect observations
+            obs[:3] += np.random.normal(0,error/2,3)
+            obs[3] = abs(np.clip(obs[3]+np.random.normal(0,0.1), -np.pi, np.pi))  # add noise to yaw error observation to prevent overfitting to perfect observations
+
+        obs[:3] = np.clip(obs[:3],-3.6,3.6)/3.6
+        # obs[3] /= np.pi
         
-        obs[3] = abs(np.clip(obs[3]+np.random.normal(0,0.1), -np.pi, np.pi))  # add noise to yaw error observation to prevent overfitting to perfect observations
-
+               
         self.concatenate_history(obs)
 
         return np.round(self.observation,3), total_reward, done, truncated, {}
@@ -263,84 +278,99 @@ class dsEnv(EnvStonefishRLParallel):
         imu_acc = self._get_state_by_pattern("imu_linear_acceleration")
         
         reward = 0.0 
+        error[:3] = np.clip(error[:3],-3.6,3.6)
+        reward_dist = -np.linalg.norm(error[:3]*np.array([1,1,0.8]))
 
-         
-        # Penalty for losing sight of the docking station
-        if not self._auv_observed_ds():
-            reward += -1.0 
-
-        # new distance reward: 
-        current_dist_error = np.array([abs(error[0]+self.x_offset), abs(error[1]+self.y_offset), abs(error[2]+self.z_offset)]) 
-        distance_error_var = current_dist_error - self.previous_distance_error
-        reward_dist = 0.0
-
-        if np.linalg.norm(current_dist_error) < self.max_dist:
-                self.max_dist = np.linalg.norm(current_dist_error)   
-                # print(f"[Port {self.port}] New closest distance: {self.max_dist:.2f} m")
-        elif np.linalg.norm(current_dist_error) > self.max_dist + 0.5: 
-            reward_dist -= np.linalg.norm(current_dist_error) - np.linalg.norm(self.previous_distance_error) # Penalty for moving away from the target
-            # print(f"[Port {self.port}] Moving away from target, distance error change: {distance_error_var}")
-
-
-        self.previous_distance_error = current_dist_error
-        # old distance reward:
-        # reward_dist = -abs(error[0])-abs(error[1])-(abs(error[2]))*0.5
-        
         # Yaw reward: 
         reward_yaw = 0.0
         current_yaw = error[3]+self.yaw_offset
         if current_yaw > np.pi:
             current_yaw -= 2*np.pi
-        current_yaw = abs(current_yaw)
-        
-        yaw_change = current_yaw - self.previous_yaw
-        
-        if current_yaw > self.yaw_max+np.pi/8:
-            reward_yaw = -yaw_change # Reward for reducing yaw error
-        elif current_yaw < self.yaw_max: 
-            self.yaw_max = current_yaw
-        
-        self.total_yaw_reward += reward_yaw
-        self.previous_yaw = current_yaw
-        # reward_yaw = np.exp(-2*abs(error[3]+self.yaw_offset))-1
 
-        action_difference = abs(self.current_action - self.last_action_applied)
+        # insure highest yaw_reward for angles below 9 degrees to prevent oscillations
+        if current_yaw > -0.15708 and current_yaw< 0.15708:    
+            reward_yaw = 0 
+        else: 
+            reward_yaw = np.exp(-2*abs(current_yaw))-1
+        
+        # Uncontrolled reward is used when the time is over or goal is achieved 
+        self.uncontrolled_reward += (reward_dist+reward_yaw)
+
         
         # Smoothing reward 
         smoothing_reward = 0.0
+        action_difference = abs(self.current_action - self.last_action_applied) 
+
+        # action_difference is a vector of 6 [x,y,z,roll,pitch,yaw]
         for difference in action_difference: 
             if difference > 0.2: 
-                smoothing_reward -= 0.1 * difference # Penalty for large action changes
+                # Penalty for large action changes
+                smoothing_reward -= 0.5 * difference 
+    
 
-        # Old smoothing        
-        # smoothing_reward = -np.exp(action_difference)/(self.action_size*10)   # Exponential penalty for large action changes
-        
-            
-        reward = reward_dist  + reward_yaw + smoothing_reward # this value makes the weight moving the ball equivalent to reaching the ball
-        self.info.update({"reward_dist": reward_dist, "reward_yaw": reward_yaw, "smoothing_reward": smoothing_reward})
+        # Collision reward
+        collision_reward = 0.0
+        collided, acceleration = self.detect_collision()
 
-        # Checking Collision
-        if np.linalg.norm(self.previous_acceleration) != 0.0 :
-            difference = np.linalg.norm(self.previous_acceleration - imu_acc)
-            if difference > self.collision_thres : 
-                reward -= 10 
-                self.collision_thres+= self.collision_thres
-                # print("collision Detected,  Reward: ", reward)
-            elif self.collision_thres > 1.0: 
-                self.collision_thres /= 2 
+        if collided: 
+            self.collision_recorded +=1
+            collision_reward -= 10*self.rl_observation_freq 
 
-        # print(f"[Port {self.port}] reward_dist: {reward_dist:.2f}, reward_yaw: {reward_yaw:.2f}, collision: {difference}, action_diff: {action_difference:.2f}, smoothing_reward: {smoothing_reward:.2f}")
+        reward = reward_dist  + reward_yaw + smoothing_reward + collision_reward # this value makes the weight moving the ball equivalent to reaching the ball
+        self.info.update({"reward_dist": reward_dist, "reward_yaw": reward_yaw, "smoothing_reward": smoothing_reward, "collision_reward": collision_reward, "acceleration": acceleration, "uncontrolled_reward":self.uncontrolled_reward})
         
         if abs(error[2]+self.z_offset) > 0.05 or abs(error[0]+self.x_offset) > 0.15 or abs(error[1]+self.y_offset) > 0.15 : 
             self.goal_achieved = False
         else:
+            reward+= abs(self.uncontrolled_reward)
             self.goal_achieved = True
 
-        self.previous_acceleration = imu_acc
-        reward /= self.rl_observation_freq    
-        # print(f"[Port {self.port}] Distance to target: {error[0]:.2f} {error[1]:.2f} {error[2]:.2f} m , reward: {reward:.2f}", end='\r')
-        # print(f"[DEBUG] Calculated additional reward: {reward}")    
+        reward /= self.rl_observation_freq # making reward homogenous regardless of the RL frequency   
+
         return reward
+
+
+    def detect_collision(self, acceleration_threshold=3):
+        """
+        Detect collision based on sudden change in velocity.
+
+        A collision is detected when the acceleration magnitude exceeds
+        `acceleration_threshold`.
+
+        Parameters
+        ----------
+        acceleration_threshold : float
+            Acceleration threshold in m/s^2.
+
+        Returns
+        -------
+        boolq
+            True if collision is detected, otherwise False.
+        """
+
+        current_velocity = self._get_state_by_pattern("velocity")
+
+        # Append current velocity
+        self.velocities_history.append(current_velocity)
+
+        # Keep only the last two velocity vectors
+        self.velocities_history = self.velocities_history[-2:]
+
+        # Need two velocity vectors to compute acceleration
+        if self.step_count <= 2:
+            return False,0
+
+        previous_velocity = self.velocities_history[0]
+        current_velocity = self.velocities_history[1]
+
+        # Change in velocity
+        delta_velocity = current_velocity - previous_velocity
+        acceleration = delta_velocity * self.rl_observation_freq
+
+        acceleration_magnitude = np.linalg.norm(acceleration)
+        
+        return acceleration_magnitude > acceleration_threshold, acceleration_magnitude
+
 
     def _get_state_by_pattern(self, pattern, default=0.0):
         """Get observation value by name pattern"""
@@ -364,11 +394,6 @@ class dsEnv(EnvStonefishRLParallel):
     def _is_terminated(self):
         """Application-specific termination conditions"""
         robot_pos = self._get_state_by_pattern("auv_pose")
-        collision_flag = self._get_state_by_pattern("collision", default=0.0)
-        # Terminate if collision
-        if collision_flag > 0.5:
-            return True
-            
         return False
 
     def _is_truncated(self):

@@ -11,8 +11,8 @@ from docking_env import dsEnv
 from EnvStonefishRL import global_path
 
 
-obs_path = global_path("include/observations/ds_state_v2_config.json")
-act_path = global_path("include/observations/ds_action_config.json")
+obs_path = global_path("include/observations/ds_state_v2_config.yaml")
+act_path = global_path("include/observations/ds_action_config.yaml")
 
 
 # 1. LOAD DATA (Handling your KeyError)

@@ -29,6 +29,12 @@ def make_env(rank, config):
         return env
     return _init
 
+def linear_schedule(initial_lr, final_lr):
+    def schedule(progress_remaining):
+        return final_lr + progress_remaining * (initial_lr - final_lr)
+    return schedule
+
+
 
 if __name__ == "__main__":
     # --- CLEANUP OLD PROCESSES ---
@@ -95,6 +101,10 @@ if __name__ == "__main__":
     else: 
         callback = eval_callback
 
+    learning_rate = linear_schedule(
+        config["model"]["learning_rate_start"],
+        config["model"]["learning_rate_end"]
+    )
     # 5. IModel Initilization 
     # MlpPolicy is standard for vector/sensor observations
     if config["model"]["algorithm"]=="SAC": 
@@ -111,10 +121,11 @@ if __name__ == "__main__":
                 train_freq=(1, "step"), # Collect steps from each env before updating
                 gradient_steps=config["model"]["gradient_steps"],       # Do  gradient updates 
                 verbose=1, 
-                learning_rate=config["model"]["learning_rate"],
+                learning_rate=learning_rate,
                 tensorboard_log=f"runs/{run.id}" if config["log"]["enable_wandb"] else log_dir,
                 buffer_size=config["model"]["buffer_size"], 
-                learning_starts=config["model"]["learning_starts"]
+                learning_starts=config["model"]["learning_starts"],
+                ent_coef = config["model"]["ent_coef"]
             )
     elif config["model"]["algorithm"]=="PPO":
         if config["model"]["pretrained"]: 
@@ -126,7 +137,7 @@ if __name__ == "__main__":
         else: 
             model = PPO(config["model"]["policy"],
                         env=train_env,
-                        learning_rate= config["model"]["learning_rate"], 
+                        learning_rate= learning_rate, 
                         n_steps= config["model"]["n_steps"], 
                         batch_size= config["model"]["batch_size"], 
                         ent_coef= config["model"]["ent_coef"], 
@@ -144,7 +155,7 @@ if __name__ == "__main__":
         else:
             model = TD3(config["model"]["policy"],
                         env=train_env,
-                        learning_rate= config["model"]["learning_rate"], 
+                        learning_rate= learning_rate, 
                         buffer_size=config["model"]["buffer_size"], 
                         batch_size= config["model"]["batch_size"], 
                         policy_delay= config["model"]["policy_delay"],

@@ -2,32 +2,85 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <cctype>
+#include <iomanip>
+#include <yaml-cpp/yaml.h>
 
-// Helper function to safely convert string to float with detailed error reporting
+namespace {
+std::string trimCopy(const std::string& input) {
+    const size_t start = input.find_first_not_of(" \t\n\r\f\v");
+    if (start == std::string::npos) {
+        return "";
+    }
 
-#include <cctype>  // ADD THIS INCLUDE
-#include <iomanip> // ADD THIS FOR hex output
+    const size_t end = input.find_last_not_of(" \t\n\r\f\v");
+    return input.substr(start, end - start + 1);
+}
+
+std::string stripOptionalTrailingSemicolon(const std::string& input) {
+    std::string output = trimCopy(input);
+    if (!output.empty() && output.back() == ';') {
+        output.pop_back();
+        output = trimCopy(output);
+    }
+    return output;
+}
+
+std::string getStringOrDefault(const YAML::Node& node,
+                               const std::string& key,
+                               const std::string& default_value = "") {
+    if (!node || !node[key]) {
+        return default_value;
+    }
+
+    try {
+        return node[key].as<std::string>();
+    } catch (const YAML::Exception& e) {
+        std::cerr << "[CommandProcessor] WARNING: Invalid string for key '"
+                  << key << "': " << e.what() << std::endl;
+        return default_value;
+    }
+}
+
+std::vector<float> getFloatArrayOrDefault(const YAML::Node& node,
+                                          const std::string& key,
+                                          const std::vector<float>& default_value) {
+    if (!node || !node[key] || !node[key].IsSequence()) {
+        return default_value;
+    }
+
+    std::vector<float> result;
+    result.reserve(node[key].size());
+
+    for (const auto& elem : node[key]) {
+        try {
+            result.push_back(elem.as<float>());
+        } catch (const YAML::Exception&) {
+            try {
+                result.push_back(elem.as<bool>() ? 1.0f : 0.0f);
+            } catch (const YAML::Exception&) {
+                result.push_back(0.0f);
+            }
+        }
+    }
+
+    return result;
+}
+}
 
 float CommandProcessor::safe_stof(const std::string& str, const std::string& context) {
-    // Check if string is empty
     if (str.empty()) {
         std::cerr << "[ERROR] safe_stof: Empty string" << context << std::endl;
         throw std::invalid_argument("Empty string");
     }
     
-    // DEBUG: Print the actual string with non-printable characters
-    // std::cerr << "[DEBUG] safe_stof" << context << ": length=" << str.length() << ", content='";
     for (size_t i = 0; i < str.length(); ++i) {
         unsigned char c = static_cast<unsigned char>(str[i]);
-        if (std::isprint(c) && c != '\r' && c != '\n' && c != '\t') {
-            // std::cerr << c;
-        } else {
-            // Show non-printable as hex
+        if (!(std::isprint(c) && c != '\r' && c != '\n' && c != '\t')) {
             std::cerr << "\\x" << std::hex << std::setw(2) << std::setfill('0') 
                      << static_cast<int>(c) << std::dec;
         }
     }
-    // std::cerr << "'" << std::endl;
     
     try {
         return std::stof(str);
@@ -48,26 +101,13 @@ bool CommandProcessor::isValidFloatString(const std::string& s) {
         return false;
     }
     
-    // First, check for completely empty after trimming
-    std::string trimmed = s;
-    
-    // Trim leading whitespace
-    size_t start = trimmed.find_first_not_of(" \t\n\r\f\v");
-    if (start == std::string::npos) {
-        std::cerr << "[DEBUG] isValidFloatString: All whitespace" << std::endl;
-        return false;  // String is all whitespace
-    }
-    
-    // Trim trailing whitespace
-    size_t end = trimmed.find_last_not_of(" \t\n\r\f\v");
-    trimmed = trimmed.substr(start, end - start + 1);
+    std::string trimmed = trimCopy(s);
     
     if (trimmed.empty()) {
         std::cerr << "[DEBUG] isValidFloatString: Empty after trim" << std::endl;
         return false;
     }
     
-    // Simple validation: must start with digit, minus, plus, or dot
     char first_char = trimmed[0];
     if (!(std::isdigit(static_cast<unsigned char>(first_char)) || 
           first_char == '-' || first_char == '+' || first_char == '.')) {
@@ -75,7 +115,6 @@ bool CommandProcessor::isValidFloatString(const std::string& s) {
         return false;
     }
     
-    // Count dots
     int dot_count = 0;
     int digit_count = 0;
     
@@ -86,23 +125,20 @@ bool CommandProcessor::isValidFloatString(const std::string& s) {
             dot_count++;
             if (dot_count > 1) {
                 std::cerr << "[DEBUG] isValidFloatString: Multiple dots" << std::endl;
-                return false;  // Multiple dots not allowed
+                return false;
             }
         } else if (std::isdigit(static_cast<unsigned char>(c))) {
             digit_count++;
         } else if (c == '-' || c == '+') {
-            // Sign must be at position 0
             if (i != 0) {
                 std::cerr << "[DEBUG] isValidFloatString: Sign not at start" << std::endl;
                 return false;
             }
         } else if (c == 'e' || c == 'E') {
-            // Scientific notation - check next character
             if (i + 1 >= trimmed.length()) {
                 std::cerr << "[DEBUG] isValidFloatString: Incomplete scientific notation" << std::endl;
                 return false;
             }
-            // Next char must be digit or sign
             char next = trimmed[i + 1];
             if (!std::isdigit(static_cast<unsigned char>(next)) && next != '-' && next != '+') {
                 std::cerr << "[DEBUG] isValidFloatString: Invalid char after 'e'" << std::endl;
@@ -110,7 +146,7 @@ bool CommandProcessor::isValidFloatString(const std::string& s) {
             }
         } else {
             std::cerr << "[DEBUG] isValidFloatString: Invalid character '" << c << "'" << std::endl;
-            return false;  // Invalid character
+            return false;
         }
     }
     
@@ -121,30 +157,46 @@ bool CommandProcessor::isValidFloatString(const std::string& s) {
     
     return true;
 }
-// end of helper function 
+
+
+
 
 std::vector<ResetInfo> CommandProcessor::parseResetCommand(const std::string& command) {
     std::vector<ResetInfo> result;
-    size_t pos = 0;
 
-    // Find all objects in the format { ... }
-    while ((pos = command.find("{", pos)) != std::string::npos) {
-        size_t end = command.find("}", pos);
-        if (end == std::string::npos) break;
-        
-        std::string object_str = command.substr(pos, end - pos + 1);
-        ResetInfo obj = parseObjectFromJson(object_str);
-        result.push_back(obj);
-        
-        pos = end + 1;
+    const std::string yaml_payload = stripOptionalTrailingSemicolon(command);
+    if (yaml_payload.empty()) {
+        std::cerr << "[CommandProcessor] Empty RESET payload" << std::endl;
+        return result;
     }
-    // debug output
-    // std::cout << "[CommandProcessor] Parsed " << result.size() << " reset objects" << std::endl;
+
+    try {
+        YAML::Node root = YAML::Load(yaml_payload);
+
+        if (root.IsSequence()) {
+            for (const auto& item : root) {
+                if (item && item.IsMap()) {
+                    // result.push_back(parseResetObject(item.as<YAML::Node>()));      
+                    result.push_back(parseResetObject(item));               
+         
+                 } else {
+                    std::cerr << "[CommandProcessor] WARNING: Skipping invalid RESET item" << std::endl;
+                }
+            }
+        } else if (root.IsMap()) {
+            result.push_back(parseResetObject(root));
+        } else {
+            std::cerr << "[CommandProcessor] RESET payload must be a YAML map or sequence" << std::endl;
+        }
+    } catch (const YAML::Exception& e) {
+        std::cerr << "[CommandProcessor] Failed to parse RESET YAML payload: " << e.what() << std::endl;
+    }
+
     return result;
 }
 
 void CommandProcessor::parseActionCommands(const std::string& command) {
-    clear(); // Clear previous commands
+    clear();
     
     size_t obs_pos = command.find("OBS:");
     if (obs_pos == std::string::npos) {
@@ -155,7 +207,6 @@ void CommandProcessor::parseActionCommands(const std::string& command) {
     std::string cmd_str = command.substr(0, obs_pos);
     std::string obs_str = command.substr(obs_pos + 4);
 
-    // Parse action commands
     std::stringstream ss(cmd_str);
     std::string token;
     
@@ -165,65 +216,28 @@ void CommandProcessor::parseActionCommands(const std::string& command) {
         }
     }
 
-    // Parse state filters
     if (!obs_str.empty()) {
         parseStateFilter(obs_str);
     }
-    //  Debug output 
-    // std::cout << "[CommandProcessor] Parsed " << commands_.size() << " actuators, " 
-    // << relevant_obs_names_.size() << " state filters" << std::endl;
-    
 }
 
 
-ResetInfo CommandProcessor::parseObjectFromJson(const std::string& object_str) {
+ResetInfo CommandProcessor::parseResetObject(const YAML::Node& node) {
     ResetInfo obj;
-    
-    try {
-        json j = json::parse(object_str);
-    
-        
 
-        // Use helper function to get array with type conversion
-        auto getFloatArray = [](const json& j, const std::string& key, 
-                                const std::vector<float>& default_value) -> std::vector<float> {
-            if (!j.contains(key) || !j[key].is_array()) {
-                // debug output
-                // std::cerr << "[WARNING] Missing or invalid '" << key << "' field" << std::endl;
-                return default_value;
-            }
-            
-            std::vector<float> result;
-            for (const auto& elem : j[key]) {
-                if (elem.is_number()) {
-                    result.push_back(elem.get<float>());
-                } else if (elem.is_boolean()) {
-                    // Question: What should we do with booleans in numeric arrays?
-                    // Option 1: Convert to 0.0/1.0
-                    result.push_back(elem.get<bool>() ? 1.0f : 0.0f);
-                    
-                    // Option 2: Throw error for invalid data
-                    // throw json::type_error::create(302, 
-                    //     "Boolean in numeric array: " + elem.dump());
-                } else {
-                    // For other types, try conversion or use 0.0
-                    result.push_back(0.0f);
-                }
-            }
-            return result;
-        };
-
-        // Get values
-        obj.name = j.value("name", "unknown");
-        obj.position = getFloatArray(j, "position", {0.0f, 0.0f, 0.0f});
-        obj.rotation = getFloatArray(j, "rotation", {0.0f, 0.0f, 0.0f, 1.0f});
-        obj.current = getFloatArray(j, "current", {0.0f, 0.0f, 0.0f}); // current need to be added to one robot only
-
-    } catch (const json::exception& e) {
-        std::cerr << "[ERROR] JSON parsing failed: " << e.what() << std::endl;
-        throw;  // Or return default object
+    if (!node || !node.IsMap()) {
+        obj.name = "unknown";
+        obj.position = {0.0f, 0.0f, 0.0f};
+        obj.rotation = {0.0f, 0.0f, 0.0f, 1.0f};
+        obj.current = {0.0f, 0.0f, 0.0f};
+        return obj;
     }
-    
+
+    obj.name = getStringOrDefault(node, "name", "unknown");
+    obj.position = getFloatArrayOrDefault(node, "position", {0.0f, 0.0f, 0.0f});
+    obj.rotation = getFloatArrayOrDefault(node, "rotation", {0.0f, 0.0f, 0.0f, 1.0f});
+    obj.current = getFloatArrayOrDefault(node, "current", {0.0f, 0.0f, 0.0f});
+
     return obj;
 }
 
@@ -235,29 +249,17 @@ void CommandProcessor::parseCommandToken(const std::string& token) {
         std::getline(tokenStream, action, ':') &&
         std::getline(tokenStream, action_value)) {
         
-        // Trim whitespace from action_value
-        action_value.erase(0, action_value.find_first_not_of(" \t\n\r\f\v"));
-        action_value.erase(action_value.find_last_not_of(" \t\n\r\f\v") + 1);
+        action_value = trimCopy(action_value);
         
         try {
-            // Use our safe_stof function instead of std::stof
             float value = safe_stof(action_value, 
                                    " for command: " + actuator_name + ":" + action);
             commands_[actuator_name][action] = value;
-            
-            // Optional: uncomment for debug
-            // std::cout << "[CommandProcessor] Command: " << actuator_name << ":" 
-            //           << action << " = " << value << std::endl;
         }
         catch (const std::exception& e) {
             std::cerr << "[ERROR] CommandProcessor: Invalid value for " << actuator_name 
                       << ":" << action << " -> '" << token << "': " << e.what() << std::endl;
-            
-            // Option 1: Set default value (0.0) to continue execution
             commands_[actuator_name][action] = 0.0f;
-            
-            // Option 2: Re-throw to stop execution
-            // throw;
         }
     } else {
         std::cerr << "[ERROR] CommandProcessor: Invalid command format: '" << token 
@@ -272,7 +274,6 @@ void CommandProcessor::parseStateFilter(const std::string& obs_str) {
     while (std::getline(obsStream, obj_name, ';')) {
         if (!obj_name.empty()) {
             relevant_obs_names_.insert(obj_name);
-            // std::cout << "[CommandProcessor] State filter: " << obj_name << std::endl;
         }
     }
 }

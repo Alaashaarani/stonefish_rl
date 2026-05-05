@@ -43,7 +43,7 @@ private:
     // Initialization
     void initializeExtractors();
     
-    // Field extraction system Used during initialization to map field types from the Json to extractor functions
+    // Field extraction system Used during initialization to map field types from the yaml to extractor functions
     /* 
     This maps the extractor functions for robot fields. creating a reference to retrive the value based on field type.
     Example: "position.x" -> function to extract x position from robot

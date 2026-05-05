@@ -1,5 +1,5 @@
 import zmq
-import json
+import yaml
 import gymnasium as gym
 import numpy as np
 import os 
@@ -31,9 +31,13 @@ class EnvStonefishRLParallel(gym.Env):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REQ)
         
-        # Critical: Increase timeout for the first connection as Stonefish takes time to load
-        self.socket.setsockopt(zmq.RCVTIMEO, 30000) # 30s for the first reset
-        self.socket.setsockopt(zmq.LINGER, 0)
+        # Critical: Increase timeout for the first connection as Stonefish takes time to load    
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REQ)
+        self.socket.connect(self.ip)
+
+        # self.socket.setsockopt(zmq.IMMEDIATE, 1)
+
         self.socket.connect(self.ip)
         
         # Load configurations (paths are defined in the Child Class)
@@ -75,15 +79,16 @@ class EnvStonefishRLParallel(gym.Env):
         self.process = None # Initialize as None; child class will assign the Popen object
         
     def _load_config(self, config_path):
-        """Load JSON configuration file"""
+        """Load YAML configuration file."""
         try:
-            with open(config_path, 'r') as f:
-                return json.load(f)
+            with open(config_path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+                return data or {}
         except FileNotFoundError:
             print(f"[WARNING] Config file {config_path} not found, using empty config")
             return {}
-        except json.JSONDecodeError as e:
-            print(f"[ERROR] Failed to parse {config_path}: {e}")
+        except yaml.YAMLError as e:
+            print(f"[ERROR] Failed to parse YAML config file {config_path}: {e}")
             return {}
 
     def _get_state_names(self):
@@ -113,17 +118,20 @@ class EnvStonefishRLParallel(gym.Env):
             return []
 
     def _process_state_vector(self, msg):
-        """Process state vector from C++"""
+        """Process YAML state vector from C++"""
         try:
-            state_vector = json.loads(msg)
+            state_vector = yaml.safe_load(msg)
+            if state_vector is None:
+                state_vector = []
+            if not isinstance(state_vector, list):
+                raise ValueError(f"Expected YAML sequence for state vector, got {type(state_vector).__name__}")
             if len(state_vector) != self.state_size:
                 print(f"[WARNING_here] State size mismatch: expected {self.state_size}, got {len(state_vector)}")
 
             self.state = np.array(state_vector, dtype=np.float32)
-            # print(f"[DEBUG] Processed {len(self.state)} states")
-            
-        except json.JSONDecodeError as e:
-            print(f"[ERROR] Failed to decode state vector: {e}")
+
+        except (yaml.YAMLError, ValueError, TypeError) as e:
+            print(f"[ERROR] Failed to decode YAML state vector: {e}")
             self.state = np.array([], dtype=np.float32)
 
         return self.state
@@ -162,14 +170,41 @@ class EnvStonefishRLParallel(gym.Env):
 
     def send_command(self, message):
         """Send command to StonefishRL simulator"""
-        # print(f"[CONN] Sending command: {message}")
         self.socket.send_string(message)
-        # print(f"[PYTHON] Sending step action for step {self.step_count}")
         self.step_count+=1        
         response = self.socket.recv_string()
-        # print(f"[CONN] Response received: {len(response)} chars")
-        # print("[EnvStonefishRL] Observation:", response)
         return response
+
+    def reset_communication(self):
+        """
+        Forcefully closes and re-initializes the ZMQ socket and context 
+        to clear RAM and sync with the C++ reset.
+        """
+        # 1. Close existing socket immediately
+        if hasattr(self, 'socket') and self.socket:
+            # LINGER 0 ensures messages in the OS buffer are dropped instantly
+            self.socket.setsockopt(zmq.LINGER, 0)
+            self.socket.close()
+        
+        # 2. Terminate and recreate context to ensure all C++ backend memory is freed
+        if hasattr(self, 'context') and self.context:
+            self.context.term()
+        
+        self.context = zmq.Context()
+        
+        # 3. Re-initialize the REQ socket
+        self.socket = self.context.socket(zmq.REQ)
+        
+        # 4. Re-apply your specific options
+        self.socket.setsockopt(zmq.RCVHWM, 2)
+        self.socket.setsockopt(zmq.SNDHWM, 2)
+        self.socket.setsockopt(zmq.SNDTIMEO, 30000)
+        self.socket.setsockopt(zmq.RCVTIMEO, 30000)
+        self.socket.setsockopt(zmq.LINGER, 0)
+        
+        # 5. Reconnect
+        self.socket.connect(self.ip)
+        print(f"[ENV {self.env_id}] Python ZMQ Communication Reset Successful")
 
     def close(self):
         """Close environment and ensure subprocess is killed"""
@@ -217,7 +252,14 @@ class EnvStonefishRLParallel(gym.Env):
         super().reset(seed=seed)
         # We must build a valid reset command. Child classes override 'build_reset_command'
         command_payload = self.build_reset_command() if hasattr(self, 'build_reset_command') else {}
-        reset_msg = "RESET:" + json.dumps(command_payload) + ";"
+        reset_payload = yaml.safe_dump(command_payload, default_flow_style=False, sort_keys=False)
+        reset_msg = "RESET:\n" + reset_payload
+        
+        # try: 
+        #     self.reset_communication() 
+        # except Exception as e:
+        #     print(f"[ENV {self.env_id}] Failed to reset communication: {e}")
+
         
         try:
             response = self.send_command(reset_msg)
@@ -306,10 +348,11 @@ def launch_stonefish_simulator(rank, config):
 
     scene_path= config["sim"]["scene_path"]
     resources_path= config["sim"]["resources_path"]
-    real_time= config["sim"]["realtime"] 
+    # real_time= config["sim"]["realtime"] 
     resolution=config["sim"]["resolution"]
     graphical=config["sim"]["graphical_interface"]
-    dt = 0.0 if real_time else 0.005
+    dt = 1/rl_freq
+    
     # Run the scene
     # Note: We pass the port as an additional command line argument to the C++ executable
     print(f"[INFO] Executing Stonefish on Port {port} with the scene: {scene_path}")
@@ -323,7 +366,6 @@ def launch_stonefish_simulator(rank, config):
         str(port),
         str(resolution),
         str(graphical),
-        str(rl_freq), 
         str(dt)
         ]
     
