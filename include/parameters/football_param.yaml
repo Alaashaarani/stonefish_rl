@@ -1,0 +1,46 @@
+env:
+  state_config: "include/observations/football_state_config.yaml"
+  history_length: 2
+  action_config: "include/observations/ds_action_config.yaml"
+  observe_actions: True
+  instances: 1
+  base_port: 5750
+  episode_duration: 60
+  rl_observation_freq: 5
+
+sim:
+  scene_path: "Resources/scenarios/football/football_pool.scn"
+  resources_path: "./"
+  graphical_interface: True
+  evaluation_graphical_interface: True
+  resolution: 800
+  current: False
+  current_value: [0.2, 0.2]
+  current_uniform: True
+  enable_noise: False
+
+action:
+  force_6Dof: True
+  tcm: [[-1,-1,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,-1,-1],
+        [0,0,0,0,0],
+        [0,0,0,0.5,-0.5],
+        [-1,1,0,0,0]]
+
+football:
+  goal_position: [-5.5, 0.0, 5.2]
+  goal_tolerance: 0.5
+  distance_scale: 10.0
+  robot_ball_weight: 1.0
+  ball_goal_weight: 1.0
+  success_bonus: 50.0
+  randomize_reset: True
+  robot_start_position: [0.0, 0.0, 0.7]
+  ball_start_position: [-2.0, 0.0, 5.2]
+  robot_random_xy: [2.0, 2.0]
+  ball_random_xy: [1.0, 1.0]
+
+testing:
+  episodes: 3
+  step_per_print: 10

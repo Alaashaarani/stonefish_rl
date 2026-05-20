@@ -18,15 +18,15 @@
     # rl_observation_freq:
     #   - the frequency of observations in Hz, or steps per second.
 env:
-  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.yaml"
-  history_length: 0
-  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.yaml"
+  state_config: "include/observations/ds_state_v2_config.yaml"
+  history_length: 2
+  action_config: "include/observations/ds_action_config.yaml"
   observe_actions: True
   instances: 1
   base_port: 5650
-  episode_duration: 60
+  episode_duration: 600
   rl_observation_freq: 10
-
+ 
 # Sim Settings
   # Graphical_interface: 
   #   - if True, the simulation will be rendered, otherwise it will run in headless mode
@@ -40,8 +40,8 @@ env:
   #   - if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
 
 sim:
-  scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
-  resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
+  scene_path: "Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
+  resources_path: "./"
   graphical_interface: True
   resolution: 800
   realtime: False
@@ -49,6 +49,14 @@ sim:
   current_value: [0.2,0.2] 
   current_uniform: True 
   enable_noise: False
+
+# Reward Settings
+  # weights:
+  #   - Six reward weights used by the docking environment.
+  #   - multi_train.py can override this value per training run.
+
+reward:
+  weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
 # action space settings
   # force_6Dof: 
@@ -74,13 +82,14 @@ action:
 
 
 testing: 
-  episodes: 10
+  episodes: 3
   step_per_print: 1
 
 # if logitech is True, controller is used as an input
 # if random is true, random actions are applied
 # if both are false, force vector is used as in input (Change the size according to action space) 
 # action space of setpoints [surge1,surge2,sway,heave1,heave2], 
+# action space of forces [x,y,z,roll,pitch,yaw], 
 controller:
   logitech: True
   random: True

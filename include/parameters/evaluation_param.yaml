@@ -21,16 +21,15 @@
     #   - the frequency of observations in Hz, or steps per second.
 
 env:
-  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.yaml"
-  history_length: 5
-  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.yaml"
+  state_config: "include/observations/ds_state_v2_config.yaml"
+  history_length: 2
+  action_config: "include/observations/ds_action_config.yaml"
   observe_actions: True
-
   # only one instance is allowed in evaluation
   instances: 1
-  base_port: 5595
+  base_port: 5695
   episode_duration: 60
-  rl_observation_freq: 5
+  rl_observation_freq: 10
 
 # Sim Settings
   # Graphical_interface: 
@@ -47,15 +46,23 @@ env:
   #   - if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
 
 sim:
-  scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
-  resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
+  scene_path: "Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
+  resources_path: "./"
   graphical_interface: True
   resolution: 900
-  realtime: False
-  # current in x and y direction, in m/s 
+  # realtime: False
   current: True
   current_value: [0.2,0.2] 
   current_uniform: True 
+  enable_noise: True
+
+# Reward Settings
+  # weights:
+  #   - Six reward weights used by the docking environment.
+  #   - multi_train.py can override this value per training run.
+
+reward:
+  weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
 # action space settings
   # force_6Dof: 
@@ -76,26 +83,46 @@ action:
         [0,0,1,0,0],
         [0,0,0,-1,-1],
         [0,0,0,0,0],
-        [0,0,0,1,-1],
+        [0,0,0,0.5,-0.5],
         [-1,1,0,0,0]]
 
 
 # Model for Evaluation
 evaluate:
-  algorithm: "SAC"
+  algorithm: "PPO"
   # model_path: "PPO_docking_currents_20260203_172120.zip"
-  model_path: "/home/cirs_alaa/repositories/stonefish_rl/src/python/SAC_O11_A6_20260427_212449.zip"
+  model_path: "models/PPO_H2_A1_0507_current_best.ppo"
   num_episodes: 10
   step_per_print: 100
+  # Evaluation reset seed. Episode N uses seed + N, so model comparisons
+  # see the same randomized starts/currents/noise for each episode.
+  # Set to null if you intentionally want unseeded random evaluation.
+  seed: 0
 
-# to do 
+# Use ealuate_docking_compare.py for these settings
 compare:
   compare: True
-  num_episodes: 10 
+  num_episodes: 50
   step_per_print: 100
-  num_models: 2
-  algorithms: ["PPO","PPO"]
-  model_paths: ["/home/cirs_alaa/repositories/stonefish_rl/src/python/PPO_O14_A6.zip",
-                "/home/cirs_alaa/repositories/stonefish_rl/src/python/PPO_PPO_O11_A6_20260226_200005.zip"]
+  # Compare seed overrides evaluate.seed. Episode N uses seed + N for every model.
+  seed: 0
+  num_models: 10
+  algorithms: ["PPO","PPO","PPO","PPO","PPO","PPO","PPO","PPO","PPO","SAC"]
+  model_paths:
+    - "models/PPO_H2_A1_5M_0507_current_best.zip"
+    - "models/PPO_H2_A1_15M_20260515_163803.zip"
+    - "models/PPO_H2_A1_20M_collision_20260515_211539.zip"
+    - "models/PPO_H2_A1_20M_smooth_20260515_193649.zip"
+    - "models/PPO_H2_A1_20M_smo_col_20260515_225502.zip"
+    - "models/PPO_H2_A1_20M_new_smooth_20260519_170848.zip"
+    - "models/PPO_H2_A1_20M_new_smooth_high_xy_weight_20260519_184859.zip"
+    - "models/PPO_H2_A1_20M_new_smooth_high_xy_weight_high_collision_weight_20260519_202855.zip"
+    - "models/PPO_H2_A1_10M_no_pretrain_new_smooth_20260519_152828.zip"
+    - "models/SAC_H2_A1_3M_0508_current_best.zip" 
+
+  parallel: True
+  max_workers: 20
+  port_stride: 1
+  force_headless_parallel: True
   
 # Environment Settings

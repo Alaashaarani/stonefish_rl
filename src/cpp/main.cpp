@@ -25,7 +25,8 @@ struct LearningThreadData
 
 
 double physics_frequency = 200; // frequencey used to compute physics (Number of times physics is computed per sec)  
-
+double sf_dt; 
+double rl_freq; 
 
 int learning(void* data) {
     sf::SimulationApp& simApp = static_cast<LearningThreadData*>(data)->sim;
@@ -41,6 +42,8 @@ int learning(void* data) {
     // Start the simulation (includes building the scenario)
     std::string nextStepSim;
 
+    int sim_step = static_cast<int> (1/(sf_dt*rl_freq));
+
     double time0= 0.0;
     while(nextStepSim != "EXIT")
     {   
@@ -48,8 +51,11 @@ int learning(void* data) {
         nextStepSim = myManager->RecieveInstructions(simApp);
         if(nextStepSim == "CMD"){
             myManager->SendStates(); // Send states after all steps
-            
             simApp.StepSimulation();
+
+            // for(int i=0;i < sim_step;i++ ){
+            //     simApp.StepSimulation();
+            // }
         }      
         else{ // THis includes the RESET or others
             // time0 = myManager->getSimulationTime();
@@ -76,10 +82,9 @@ int main(int argc, char **argv) {
     int port = std::stoi(argv[5]); // Parse the port
     int resolution = std::stoi(argv[6]); // Parse the resolution
     std::string graphical_arg = argv[7];
-    double sf_dt = std::stod(argv[8]); // Parse the dt if provided
-
-
-    
+    rl_freq = std::stod(argv[8]); // Parse the dt if provided
+    // if (rl_freq < 10){sf_dt = 1/(rl_freq*2); }else{ sf_dt = 1/rl_freq; }; 
+    sf_dt = 1/rl_freq; 
 
     bool graphical = graphical_arg == "True";
     sf::HelperSettings h;

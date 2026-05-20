@@ -2,9 +2,8 @@
 import os, sys
 import numpy as np
 import time
-from docking_env import dsEnv
-from EnvStonefishRL import global_path
-from python.utils.utils import LogitechController
+from stonefish_rl.envs.docking_env import dsEnv
+from stonefish_rl.utils.utils import LogitechController, resolve_path
 from stable_baselines3.common.vec_env import SubprocVecEnv
 import time   
 controller = LogitechController()
@@ -19,10 +18,10 @@ if __name__ == "__main__":
     num_instances = 1  # Set to 2 for two instances
 
 
-    obs_path = global_path("include/observations/ds_state_v2_config.yaml")
-    act_path = global_path("include/observations/ds_action_config.yaml")
-    scene_path = global_path("Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn")
-    res_path = global_path("./")
+    obs_path = resolve_path("include/observations/ds_state_v2_config.yaml")
+    act_path = resolve_path("include/observations/ds_action_config.yaml")
+    scene_path = resolve_path("Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn")
+    res_path = resolve_path("./")
 
     env = env = dsEnv(
             observation_config_path=obs_path,

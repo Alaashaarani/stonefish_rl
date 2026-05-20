@@ -7,12 +7,12 @@ from stable_baselines3 import SAC
 from stable_baselines3.common.policies import ActorCriticPolicy
 from imitation.algorithms import bc
 from imitation.data.types import Transitions
-from docking_env import dsEnv
-from EnvStonefishRL import global_path
+from stonefish_rl.envs.docking_env import dsEnv
+from stonefish_rl.utils.utils import resolve_path
 
 
-obs_path = global_path("include/observations/ds_state_v2_config.yaml")
-act_path = global_path("include/observations/ds_action_config.yaml")
+obs_path = resolve_path("include/observations/ds_state_v2_config.yaml")
+act_path = resolve_path("include/observations/ds_action_config.yaml")
 
 
 # 1. LOAD DATA (Handling your KeyError)

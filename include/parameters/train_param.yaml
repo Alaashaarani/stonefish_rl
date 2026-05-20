@@ -21,13 +21,13 @@
     #   - the frequency of observations in Hz, or steps per second.
 
 env:
-  state_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_state_v2_config.yaml"
-  history_length: 1
-  action_config: "/home/cirs_alaa/repositories/stonefish_rl/include/observations/ds_action_config.yaml"
+  state_config: "include/observations/ds_state_v2_config.yaml"
+  history_length: 2
+  action_config: "include/observations/ds_action_config.yaml"
   observe_actions: True
-  instances: 50
+  instances: 40
   base_port: 5555
-  episode_duration: 60
+  episode_duration: 120
   rl_observation_freq: 10
 
 # Sim Settings
@@ -45,13 +45,13 @@ env:
   #   - if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
 
 sim:
-  scene_path: "/home/cirs_alaa/repositories/stonefish_rl/Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
-  resources_path: "/home/cirs_alaa/repositories/stonefish_rl/"
-  graphical_interface: False
+  scene_path: "Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
+  resources_path: "./"
+  graphical_interface: True
   evaluation_graphical_interface: True
   resolution: 800
   # realtime: False
-  current: False
+  current: True
   current_value: [0.2,0.2] 
   current_uniform: True 
   enable_noise: True
@@ -79,6 +79,14 @@ action:
         [0,0,0,0.5,-0.5],
         [-1,1,0,0,0]]
 
+# Reward Settings
+  # weights:
+  #   - Six reward weights used by the docking environment.
+  #   - multi_train.py can override this value per training run.
+
+reward:
+  weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
 
 # Model Settings:
   # pretrained: 
@@ -94,24 +102,26 @@ action:
 
 model:
   pretrained: True
-  algorithm: "SAC"
-  model_path: "SAC_Test_H1_A1_20260505_195427.zip" 
+  # algorithm: "SAC"
+  # model_path: "SAC_H2_A1_3M_0508_current_best.zip"
+  algorithm: "PPO"
+  model_path: "models/PPO_H2_A1_5M_0507_current_best.zip" 
 
   # comment param
   policy: "MlpPolicy"
   learning_rate_start: 0.001
   learning_rate_end: 0.00005
   buffer_size: 500000 # 8*batch_size
-  batch_size: 51200 # n_step*instances (50 = 25600, 100 = 51200 )
+  batch_size: 20480 # n_step*instances (40 = 20480, 50 = 25600, 100 = 51200 )
   weights_only: True
-  ent_coef: auto_0.1
 
   # SAC param
   tau: 0.005
   gamma: 0.99
   train_freq: 1
   gradient_steps: 1
-  learning_starts: 1000
+  learning_starts: 600
+  ent_coef: auto
 
   # PPO PARAM
   n_steps: 512
@@ -131,11 +141,12 @@ policy:
 
 # Training Settings
 train:
-  total_timesteps: 13000_000
+  total_timesteps: 10000_000
   reset_num_timesteps: False
   eval_freq: 2000
+  # Use "default" to save final trained models to stonefish_rl/models.
   save_path: "default"
-  save_name: "Test_H1_A1"
+  save_name: "H2_A1_10M_"
   warm_start_path: "PPO_"
   weights_only: True
 
@@ -144,4 +155,4 @@ log:
   project_name: "stonefish_docking"
   run_name: "default"
   tags: ["PPO", "docking", "stonefish"]
-  log_dir: "../../logs/"
+  log_dir: "logs"

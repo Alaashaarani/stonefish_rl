@@ -1,14 +1,12 @@
+import numpy as np
 import torch
-from stable_baselines3 import PPO, SAC
+from stable_baselines3 import PPO
 
 
 device = torch.device("cpu")
 
-model_path = "./PPO_H2_A1_15M_20260515_163803.zip"
-output_name = "PPO_H2_A1_15M_20260515_163803.onnx"
-
+model_path = "./PPO_H2_A1_0507_current_best.zip"
 model = PPO.load(model_path, device=device)
-model.policy.to(device)
 model.policy.eval()
 
 
@@ -40,25 +38,18 @@ wrapper = OnnxablePolicy(
 
 obs_dim = model.observation_space.shape[0]
 
-if obs_dim != 42:
-    raise ValueError(f"Expected obs_dim=42, but model expects {obs_dim}")
+for i in range(10):
+    obs = np.random.uniform(-1.0, 1.0, size=(obs_dim,)).astype(np.float32)
 
-dummy_input = torch.zeros(1, obs_dim, dtype=torch.float32).to(device)
+    action_sb3, _ = model.predict(obs, deterministic=True)
 
-torch.onnx.export(
-    wrapper,
-    dummy_input,
-    output_name,
-    opset_version=11,
-    input_names=["input"],
-    output_names=["action"],
-    dynamic_axes={
-        "input": {0: "batch_size"},
-        "action": {0: "batch_size"},
-    },
-)
+    obs_torch = torch.tensor(obs.reshape(1, obs_dim), dtype=torch.float32)
+    with torch.no_grad():
+        action_wrapper = wrapper(obs_torch).cpu().numpy()[0]
 
-print(f"Exported: {output_name}")
-print("Observation dim:", obs_dim)
-print("Action low:", model.action_space.low)
-print("Action high:", model.action_space.high)
+    print("Test", i)
+    print("SB3:    ", action_sb3)
+    print("Wrapper:", action_wrapper)
+    print("Diff:   ", action_sb3 - action_wrapper)
+    print("Max diff:", np.max(np.abs(action_sb3 - action_wrapper)))
+    print()

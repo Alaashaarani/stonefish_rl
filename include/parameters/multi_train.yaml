@@ -1,0 +1,65 @@
+# Multi-training settings. Each scalar value is reused for every training run.
+# Each list value can either contain one value, or one value per training run.
+
+base_config: "train_param.yaml"
+training_config_num: 5
+
+# Six reward weights. Use either one vector for all runs, or one vector per run.
+# xy , z, yaw , accuracy, smooth, collision
+reward_weights:
+  - [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  - [5.0, 1.0, 1.0, 1.0, 2.0, 10.0]
+  - [5.0, 1.0, 1.0, 1.0, 2.0, 20.0]
+  - [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  - [5.0, 1.0, 1.0, 1.0, 2.0, 20.0]
+  # - [5.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  # - [5.0, 1.0, 1.0, 1.0, 1.0, 3.0]
+
+# Maps to train.total_timesteps in the generated training YAML.
+max_iteration:
+  - 20000000
+  - 20000000
+  - 20000000
+  - 20000000
+  - 20000000
+
+
+# Maps to train.save_name, which is used in the final saved model filename.
+output_agent_name:
+  - "H2_A1_20M_R111111"
+  - "H2_A1_20M_R5111210"
+  - "H2_A1_20M_R5111220"
+  - "H2_A1_20M_R111111"
+  - "H2_A1_20M_R5111220"
+
+# Maps to train.warm_start_path, which is used as the final model filename prefix.
+warm_start_path:
+  - "PPO_"
+  - "PPO_"
+  - "PPO_"
+  - "SAC_"
+  - "SAC_"
+# Maps to model.algorithm.
+model_type:
+  - "PPO"
+  - "PPO"
+  - "PPO"
+  - "SAC"
+  - "SAC"
+
+# Maps to model.pretrained.
+pre_trained:
+  - false
+  - false
+  - false
+  - false
+  - false
+
+# Maps to model.model_path. Used by train_docking.py when pre_trained is true.
+pretrained:
+  - "PPO_H2_A1_20M_111111"
+  - "PPO_H2_A1_15M_20260515_163803.zip"
+  - "PPO_H2_A1_15M_20260515_163803.zip"
+  - "PPO_H2_A1_15M_20260515_163803.zip"
+  - ""
+
