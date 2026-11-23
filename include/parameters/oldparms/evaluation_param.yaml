@@ -1,0 +1,186 @@
+# GYM Environment Settings:
+  # This defines the observation and action space, and how many instances to run in parallel.
+    # state config:
+    #   - The state space is defined in the state config file, it is a yaml. This includes the values
+    # that are sent by stonefish to the python code.
+    # History length:
+    #   - Zero: no history is passed, only current observation is passed.
+    #   - One: the last observation is concatenated with the current observation.
+    # Action config: 
+    #   - The action space is defined in the action config file, it is a yaml file. 
+    # Observe actions: 
+    #   - if true, the last action is concatenated to the observation, and passed to the RL algorithm.
+    # instances:
+    #   - number of parallel environments to run, each environment will run on a different port, starting from base_port.
+    # base_port:
+    #   - the starting port for the first environment, the rest of the environments will use consecutive ports. this port is used by stonefish
+    # to send and recieve data from the python code. 
+    # episode_duration:
+    #   - the duration of each episode in seconds.
+    # rl_observation_freq:
+    #   - the frequency of observations in Hz, or steps per second.
+
+env:
+  # For station-frame PID, use docking_station AND ds_state_pid_pose.yaml below.
+  observation_frame: auv
+  state_config: "include/observations/ds_state_v2_config.yaml"
+  history_length: 2
+  # Seconds between selected history observations. Use 0.0 for consecutive steps.
+  history_gap: 0.0
+  action_config: "include/observations/ds_action_config.yaml"
+  observe_actions: True
+  # yaw_observation:
+  #   - "angle": keep error_yaw as one normalized angle. Use this for old models.
+  #   - "cos_sin": replace error_yaw with error_yaw_cos and error_yaw_sin.
+  yaw_observation: "cos_sin"
+  # only one instance is allowed in evaluation
+  instances: 1
+  base_port: 5695
+  episode_duration: 60
+  rl_observation_freq: 3
+
+# Sim Settings
+  # Graphical_interface: 
+  #   - if True, the simulation will be rendered, otherwise it will run in headless mode
+  #   - if False the simulation senario cannot have any graphical element (camera,...), otherwise stonefish will crash
+  # evaluate_graphical_interface:
+  #   - if True, the simulation will be rendered the evaluation gui (stonefish env) only one. It will use resolution parameter
+  # realtime: 
+  #   - if False will run with the max allowed speed of the simulation. if True will run in real time.  
+  #   - Their is another factor that affect the simulation speed and is called physics_frequency. it is set to 300, you can find this param in the cpp main file. 
+  # current:
+  #   - water current in x and y direction, in m/s 
+  # current_unifrom: 
+  #   - if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
+
+sim:
+  scene_path: "Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
+  resources_path: "./"
+  graphical_interface: True
+  resolution: 900
+  # realtime: False
+  current: true
+  current_value: [0.2,0.2] 
+  current_uniform: True 
+  # Offset noise is sampled once per episode and shifts the perceived docking-station pose.
+  enable_offset_noise: true
+  # Random noise fluctuates each step while the AUV observes the docking station.
+  enable_random_noise: True
+
+# Reward Settings
+  # weights:
+  #   - Seven reward weights used by the docking environment.
+  #   - multi_train.py can override this value per training run.
+
+reward:
+  weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+# action space settings
+  # force_6Dof: 
+  #   - if true, the action space defined in the Config action as thrusters setpoints will be maped to force request in the (x,y,z,roll,pitch,yaw) 
+  #   - if false, the action space defined in the Config action as thrusters setpoints is used
+  #   - This is done this way because stonefish accepts setpoint, if we want to use forces and define it in the configuration file, then we need to 
+  # hard code the mapping in stonefish files (the CPP section of the Library). 
+  # tcm:  
+  #   - This is the mapping matrix between the action space (setpoints) defined in the configuration file and the forces in (x,y,z,roll,pitch,yaw).
+  #   - The size of the tcm is (number of thrusters, 6), where 6 is the number of forces in (x,y,z,roll,pitch,yaw).
+  #   - The forces are calculated as follows: setpoint = forces@tcm.T , where setpoints are defined in the action_config file, 
+  # and forces are the output of the RL algorithm (action space). The RL output forces, then the code convert forces to setpoint, 
+  # and Simulation recieves Setpoints
+
+action: 
+  force_6Dof: True
+  # tcm: [[-1,-1,0,0,0],
+  #       [0,0,1,0,0],
+  #       [0,0,0,-1,-1],
+  #       [0,0,0,0,0],
+  #       [0,0,0,0.5,-0.5],
+  #       [-1,1,0,0,0]]
+  tcm: [[-1,-1,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,-1,-1],
+        [-1,1,0,0,0]]
+
+
+# PID baseline: use model_path: "PID" (or algorithm: "PID").
+# All gain/limit vectors are ordered [x, y, z, yaw]; errors use metres/radians.
+pid:
+  z_offset: 0.5 # metres added to PID z error to push further into the station
+  mode: two_stage # one_stage or two_stage
+  alignment_threshold: 1.0 # horizontal distance in metres; enables z/yaw
+  kp: [0.4, 0.4, 0.5, 0.5]
+  ki: [0.02, 0.02, 0.02, 0.02]
+  kd: [0.15, 0.15, 0.15, 0.15]
+  output_limit: [1.0, 1.0, 1.0, 1.0]
+  integral_limit: [1.0, 1.0, 1.0, 1.0]
+
+# Model for Evaluation
+evaluate:
+  algorithm: "PPO"
+  # model_path: "PPO_docking_currents_20260203_172120.zip"
+  # model_path: "models/PPO_H2_A4_9M_cs_v1-2_20260715_185553.zip"
+  model_path: "models/PPO_abl-R1111111_20260910_020315.zip"
+
+  num_episodes: 20
+  step_per_print: 100
+  # Evaluation reset seed. Episode N uses seed + N, so model comparisons
+  # see the same randomized starts/currents/noise for each episode.
+  # Set to null if you intentionally want unseeded random evaluation.
+  seed: 0
+
+# Use ealuate_docking_compare.py for these settings
+compare:
+  # Optional display name and note: a shared string or one entry per model.
+  # Empty names use the model name/tag. Repeated runs always get unique files.
+  evaluation_name: ""
+  note: ""
+  compare: False
+  num_episodes: 100
+  step_per_print: 100
+  # If true, compare evaluation inspects SB3 model observation shapes before
+  # launching each simulator and corrects yaw_observation/history_length when
+  # there is a unique matching configuration.
+  auto_correct_observation: True
+  # Compare seed overrides evaluate.seed. Episode N uses seed + N for every model.
+  seed: 0
+  num_models: 10
+  algorithms: ["PPO","PPO","PPO","PPO","PPO","PPO","PPO","PPO","PPO","SAC"]
+  # Optional per-model yaw observation mode. Use either one value for all
+  # models, or one value per model_path. "angle" keeps the old scalar yaw;
+  # "cos_sin" uses error_yaw_cos and error_yaw_sin for newer models.
+  yaw_observation: "cos_sin"
+  # yaw_observation:
+  #   - "angle"
+  #   - "angle"
+  #   - "angle"
+  #   - "cos_sin"
+  # Optional per-model observation history length. Use one integer for all
+  # models, or one integer per model_path.
+  history_length: 1
+  # history_length:
+  #   - 2
+  #   - 0
+  # Optional per-model history gap in seconds. Use 0.0 for consecutive
+  # observations, or one float per model_path.
+  history_gap: 0.0
+  # history_gap:
+  #   - 0.0
+  #   - 0.2
+  # Optional evaluation tag. A tag is appended to the model name when saving
+  # results, so the same model can be evaluated under different conditions.
+  # Example: "3hz" saves model_name_3hz and does not replace model_name.
+  evaluation_tag: ""
+  # evaluation_tag:
+  #   - "10hz"
+  #   - "3hz"
+  model_paths:
+   - " "
+  parallel: True
+  # Evaluate models in groups of this size. This keeps large comparisons from
+  # launching too many simulators at once.
+  batch_size: 20
+  max_workers: 20
+  port_stride: 1
+  force_headless_parallel: True
+  
+# Environment Settings

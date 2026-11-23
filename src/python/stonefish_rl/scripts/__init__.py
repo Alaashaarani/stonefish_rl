@@ -1,2 +1,0 @@
-"""Small executable test scripts."""
-

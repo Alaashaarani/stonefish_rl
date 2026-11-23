@@ -1,6 +1,9 @@
 #include "StonefishRL.h"
+#include "RuntimeDomainRandomization.h"
 #include <iostream>
 #include <sstream>
+#include <cmath>
+#include <stdexcept>
 
 
 StonefishRL::StonefishRL(const std::string &path, 
@@ -51,28 +54,50 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
     cmd = cmd.substr(pos + 1);
 
     if (prefix == "RESET") {
-        // Updated: Use ResetInfo instead of InfoObject
-        std::vector<ResetInfo> command_data = command_processor_.parseResetCommand(cmd);
+        try {
+            auto document = YAML::Load(cmd);
+            const bool runtimeReset = document.IsMap() && bool(document["robots"]);
+            YAML::Node metadata;
+            if (runtimeReset) {
+                if (document["version"].as<int>(0) != 1) throw std::invalid_argument("Unsupported RESET protocol version");
+                cmd = YAML::Dump(document["robots"]);
+            }
+            // Updated: Use ResetInfo instead of InfoObject
+            std::vector<ResetInfo> command_data = command_processor_.parseResetCommand(cmd);
+            if (command_data.empty()) throw std::invalid_argument("RESET contains no robot poses");
+            for (const auto& reset : command_data) {
+                if (!getRobot(reset.name)) throw std::invalid_argument("RESET robot not found: " + reset.name);
+                if (reset.position.size() != 3 || reset.rotation.size() < 3 || reset.current.size() != 3)
+                    throw std::invalid_argument("RESET requires valid position, rotation and current vectors");
+                for (const auto* vector : {&reset.position, &reset.rotation, &reset.current})
+                    for (const auto value : *vector)
+                        if (!std::isfinite(value)) throw std::invalid_argument("RESET values must be finite");
+            }
+            if (runtimeReset)
+                metadata = ApplyRuntimeDomainRandomization(*this, document["domain_randomization"]);
+            state_manager_.updateRobotPosition(command_data, this);
 
+            getOcean()->ResetVelocityField();
 
-        
-        state_manager_.updateRobotPosition(command_data, this);
-        
-        getOcean()->ResetVelocityField();
+            sf::Vector3 currentVec(
+                command_data[0].current[0],
+                command_data[0].current[1],
+                command_data[0].current[2]
+            );
+            // std::cout << "[StonefishRL] Setting ocean current to: ("
+            //           << currentVec[0] << ", " << currentVec[1] << ", " << currentVec[2] << ")\n";
+            getOcean()->AddVelocityField(new sf::Uniform(currentVec));
 
-        sf::Vector3 currentVec(
-            command_data[0].current[0], 
-            command_data[0].current[1], 
-            command_data[0].current[2]
-        );
-        // std::cout << "[StonefishRL] Setting ocean current to: (" 
-        //           << currentVec[0] << ", " << currentVec[1] << ", " << currentVec[2] << ")\n";
-        getOcean()->AddVelocityField(new sf::Uniform(currentVec));    
-
-        // Send states using new vector approach
-        SendStates();
-        // std::cout << "[StonefishRL] Received RESET command\n";
-        return "RESET";
+            // Send states using new vector approach
+            SendStates(metadata);
+            // std::cout << "[StonefishRL] Received RESET command\n";
+            return "RESET";
+        } catch (const std::exception& error) {
+            YAML::Node response;
+            response["error"] = error.what();
+            communicator->sendMessage(YAML::Dump(response));
+            return "RESET_ERROR";
+        }
     }
     else if (prefix == "EXIT") {
         std::cout << "[StonefishRL] Received EXIT command\n";
@@ -91,9 +116,16 @@ std::string StonefishRL::RecieveInstructions(sf::SimulationApp& simApp) {
 }
 
 
-void StonefishRL::SendStates() {
+void StonefishRL::SendStates(const YAML::Node& resetMetadata) {
     // Get state vector from new StateManager
     std::vector<float> states = state_manager_.getStateVector(this);
+    if (resetMetadata.IsMap()) {
+        YAML::Node response;
+        response["state"] = states;
+        response["domain_randomization"] = resetMetadata;
+        communicator->sendMessage(YAML::Dump(response));
+        return;
+    }
     // std::cout << "[StonefishRL] Sending state vector of size: " << states.size() << std::endl;
     
     // Convert to YAML array for sending

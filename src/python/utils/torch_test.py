@@ -1,3 +1,7 @@
+
+if __package__ in (None, ""):
+    import _bootstrap  # Enable direct execution from any working directory.
+
 import numpy as np
 import torch
 from stable_baselines3 import PPO

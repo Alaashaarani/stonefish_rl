@@ -1,6 +1,5 @@
 # Blender 4.1.0
 # www.blender.org
-mtllib marker_v2_13_vis.mtl
 o Experiment_Scenario_-_ArUco_ID13_v3-1
 v 0.040496 0.039201 -0.081720
 v 0.040819 0.039108 -0.081720

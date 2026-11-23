@@ -1,0 +1,181 @@
+# Each launcher merges common with its training/evaluation/testing section.
+# Nested mappings merge; lists (TCM, weights, model paths) are replaced in full.
+# Old flat YAML files remain supported when explicitly selected.
+# Full parameter reference and examples: README.md in this directory.
+common:
+  domain_randomization:
+    enabled: true
+    mode: runtime # Apply changed values during RESET; restart keeps the legacy scene-reload path.
+    config: include/parameters/domain_randomization.yaml
+    editor: build/StonefishDomainRandomization
+
+  env:
+    type: docking # docking or pid_tuning
+    # Matches the current train_param.yaml; this file already reports DS-frame errors.
+    state_config: include/observations/ds_state_v2_config.yaml
+    action_config: include/observations/ds_action_config.yaml
+    Inverse: false # Do not invert a state config that already reverses the entities.
+    history_length: 2
+    history_gap: 0.0
+    observe_actions: true
+    yaw_observation: cos_sin
+    episode_duration: 60
+    rl_observation_freq: 5
+
+  sim:
+    log_mesh_loading: false # Suppress mesh loading progress; geometry errors remain visible.
+    scene_path: Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn
+    resources_path: ./
+    graphical_interface: true
+    evaluation_graphical_interface: true
+    resolution: 800
+    current: true
+    current_value: [0.2, 0.2]
+    current_uniform: true
+    enable_offset_noise: true
+    enable_random_noise: true
+
+  action:
+    use_thruster_health: true # Random episode faults; append health once after history.
+    thruster_health:
+      min: 0.5 # Fraction of actuator command retained; 0 = disabled, 1 = healthy.
+      max: 1.0
+      max_affected: 2 # Randomly select 1..2 distinct thrusters per episode; 0 keeps all healthy.
+    force_6Dof: true
+    # Rows: x,y,z,yaw; columns: five thruster setpoints. setpoints = action @ tcm.
+    # tcm:
+    #   - [-1, -1, 0, 0, 0]
+    #   - [0, 0, 1, 0, 0]
+    #   - [0, 0, 0, -1, -1]
+    #   - [-1, 1, 0, 0, 0]
+
+    tcm: # Calculated 
+      - [-0.5, -0.5, 0, 0, 0]
+      - [0, 0, 1, 0, 0]
+      - [0, 0, 0, -0.5, -0.5]
+      - [-0.126, 0.126, 0, 0, 0]
+
+  reward:
+    weights: [0, 0, 0.0, 0, 0, 0, 0]
+
+  # Shared checkpoint selection for evaluation and the test GUI's trained mode.
+  evaluate:
+    algorithm: PPO
+    model_path: logs/unified/best_model.zip
+
+  # Used only by fixed PID or pid_tuning. Arrays: x,y,z,yaw.
+  # For station-frame PID use ds_state_pid_pose.yaml AND env.Inverse: true above.
+  pid:
+    mode: two_stage
+    alignment_threshold: 0.3
+    z_offset: 0.5
+    target_pose: [0, 0, -0.91, 0, 0, 1.5707963267948966]
+    kp: [1, 1, 0.5, 0.5]
+    ki: [0.1, 0.1, 0.1, 0.1]
+    kd: [0.15, 0.15, 0.15, 0.15]
+    output_limit: [1, 1, 1, 1]
+    integral_limit: [1, 1, 1, 1]
+
+  pid_tuning:
+    kp:
+      low: [0, 0, 0, 0]
+      high: [0.8, 0.8, 1, 1]
+    ki:
+      low: [0, 0, 0, 0]
+      high: [0.04, 0.04, 0.04, 0.04]
+    kd:
+      low: [0, 0, 0, 0]
+      high: [0.3, 0.3, 0.3, 0.3]
+    offset:
+      low: [-0.25, -0.25, 0, -0.35]
+      high: [0.25, 0.25, 1, 0.35]
+
+training:
+  # Currents, sensor noise and thruster health are inherited from common.
+  env:
+    instances: 50
+    base_port: 5555
+
+  model:
+    algorithm: PPO
+    policy: MlpPolicy
+    pretrained: true # Set true and supply a compatible checkpoint to resume.
+    model_path: "models/unified/PPO_TD_h2_all_sparse_20261123_113050.zip"
+    weights_only: true
+    # learning_rate: auto
+    learning_rate_start: 0.001
+    learning_rate_end: 0.000051
+    n_steps: 600 # Per worker: 5 Hz * 60 s; 50 workers produce 30000 samples per PPO rollout.
+    batch_size: 6000 # 5 full minibatches per epoch at 50 workers.
+    clip_range: 0.2
+    # SAC/TD3 settings used when the algorithm is changed.
+    buffer_size: 60000
+    gradient_steps: 1
+    learning_starts: 1440
+    ent_coef: auto
+    policy_delay: 2
+
+  train:
+    seed: 42 # Starting seed for standalone training; null leaves RNGs unseeded.
+    total_timesteps: 10000000
+    reset_num_timesteps: false
+    eval_freq: 2000 # Vector steps: evaluate every 100000 training samples at 50 workers.
+    eval_instances: 20 # Parallel evaluation simulators, separate from training workers.
+    eval_episodes: 60 # Total per callback: 5 episodes per worker with 5 workers.
+    success_rate_threshold: 0.95 # Strictly higher (23/25); null disables success-based stopping.
+    success_rate_required_evaluations: 5 # Cumulative within each stage, not necessarily consecutive.
+    success_rate_drop_threshold: 0.60 # After first >90%, <60% saves and advances to the next stage.
+    save_path: models/unified
+    save_name: TD_h2_all_sparse
+
+  log:
+    enable_wandb: true
+    project_name: stonefish_docking
+    run_name: default
+    tags: [docking, unified]
+    log_dir: logs/unified
+
+evaluation:
+  env:
+    instances: 50 # Default worker cap; no inheritance from training.
+    base_port: 5695
+    episode_duration: 60
+
+  evaluate:
+    num_episodes: 100
+    step_per_print: 100
+    seed: 0
+    evaluation_name: ""
+    note: ""
+
+  compare:
+    compare: false # Set true and fill algorithms/model_paths for multiple models.
+    algorithms: []
+    model_paths: []
+    parallel: true # Multiple models run sequentially unless this is true.
+    # To run N simulators concurrently: parallel: true and env.instances: N.
+    # Optional max_workers overrides the env.instances cap.
+    batch_size: 20
+    port_stride: 1
+    force_headless_parallel: false # Set true for parallel headless runs.
+    auto_correct_observation: false # Keep the shared observation configuration.
+
+testing:
+  env:
+    instances: 1 # The interactive GUI operates one environment at a time.
+    base_port: 5650
+    episode_duration: 30
+
+  sim:
+    current: false
+    enable_offset_noise: false
+    enable_random_noise: false
+
+  testing:
+    episodes: 10
+    step_per_print: 1
+
+  controller:
+    logitech: false
+    random: false
+    force_vector: [0, 0, 0, 0]

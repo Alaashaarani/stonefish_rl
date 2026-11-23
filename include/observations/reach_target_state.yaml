@@ -1,0 +1,26 @@
+state_config:
+  specs:
+  - entity_name: girona1000
+    field_type: position
+    component: x
+    output_name: position_x
+  - entity_name: girona1000
+    field_type: position
+    component: y
+    output_name: position_y
+  - entity_name: girona1000
+    field_type: position
+    component: z
+    output_name: position_z
+  - entity_name: girona1000/odometry
+    field_type: odom.linear.velocity
+    component: x
+    output_name: velocity_x
+  - entity_name: girona1000/odometry
+    field_type: odom.linear.velocity
+    component: y
+    output_name: velocity_y
+  - entity_name: girona1000/odometry
+    field_type: odom.linear.velocity
+    component: z
+    output_name: velocity_z

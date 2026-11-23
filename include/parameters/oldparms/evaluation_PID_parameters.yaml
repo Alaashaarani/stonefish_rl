@@ -1,0 +1,115 @@
+env:
+  observation_frame: auv
+  state_config: include/observations/ds_state_v2_config.yaml
+  history_length: 2
+  history_gap: 0.0
+  action_config: include/observations/ds_action_config.yaml
+  observe_actions: true
+  yaw_observation: cos_sin
+  instances: 1
+  base_port: 5695
+  episode_duration: 60
+  rl_observation_freq: 3
+sim:
+  scene_path: Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn
+  resources_path: ./
+  graphical_interface: true
+  resolution: 900
+  current: true
+  current_value:
+  - 0.2
+  - 0.2
+  current_uniform: true
+  enable_offset_noise: true
+  enable_random_noise: true
+reward:
+  weights:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+action:
+  force_6Dof: true
+  tcm:
+  - - -1
+    - -1
+    - 0
+    - 0
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 0
+    - 0
+  - - 0
+    - 0
+    - 0
+    - -1
+    - -1
+  - - -1
+    - 1
+    - 0
+    - 0
+    - 0
+pid:
+  z_offset: 0.5
+  mode: two_stage
+  alignment_threshold: 0.3
+  kp:
+  - 1
+  - 1
+  - 0.5
+  - 0.5
+  ki:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.0
+  kd:
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  output_limit:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  integral_limit:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+evaluate:
+  algorithm: PPO
+  model_path: models/PPO_abl-R1111111_20260910_020315.zip
+  num_episodes: 20
+  step_per_print: 100
+  seed: 0
+compare:
+  evaluation_name:
+  - pi-test
+  note:
+  - 'test '
+  compare: true
+  num_episodes: 10
+  step_per_print: 100
+  auto_correct_observation: true
+  seed: 0
+  num_models: 1
+  algorithms:
+  - PPO
+  yaw_observation: cos_sin
+  history_length: 1
+  history_gap: 0.0
+  evaluation_tag: ''
+  model_paths:
+  - PID
+  parallel: true
+  batch_size: 20
+  max_workers: 20
+  port_stride: 1
+  force_headless_parallel: false

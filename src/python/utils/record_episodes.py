@@ -1,9 +1,13 @@
+
+if __package__ in (None, ""):
+    import _bootstrap  # Enable direct execution from any working directory.
+
 # recorder_script.py
 import os, sys
 import numpy as np
 import time
-from stonefish_rl.envs.docking_env import dsEnv
-from stonefish_rl.utils.utils import LogitechController, resolve_path
+from library.docking_env import dsEnv
+from library.common import LogitechController, resolve_path
 from stable_baselines3.common.vec_env import SubprocVecEnv
 import time   
 controller = LogitechController()

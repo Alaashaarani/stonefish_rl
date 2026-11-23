@@ -1,6 +1,5 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib semi_docking_structure_phy.mtl
 o Cube
 v -0.636709 0.890882 -0.000684
 v -0.636709 0.890882 -0.508743

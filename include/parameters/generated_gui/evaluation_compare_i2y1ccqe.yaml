@@ -1,0 +1,167 @@
+env:
+  type: docking
+  state_config: include/observations/ds_state_v2_config.yaml
+  action_config: include/observations/ds_action_config.yaml
+  Inverse: false
+  history_length: 1
+  history_gap: 0.0
+  observe_actions: true
+  yaw_observation: cos_sin
+  episode_duration: 60
+  rl_observation_freq: 5
+  instances: 1
+  base_port: 5695
+sim:
+  scene_path: Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn
+  resources_path: ./
+  graphical_interface: true
+  evaluation_graphical_interface: true
+  resolution: 800
+  current: true
+  current_value:
+  - 0.2
+  - 0.2
+  current_uniform: true
+  enable_offset_noise: true
+  enable_random_noise: true
+action:
+  use_thruster_health: true
+  force_6Dof: true
+  tcm:
+  - - -1
+    - -1
+    - 0
+    - 0
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 0
+    - 0
+  - - 0
+    - 0
+    - 0
+    - -1
+    - -1
+  - - -1
+    - 1
+    - 0
+    - 0
+    - 0
+reward:
+  weights:
+  - 1
+  - 1
+  - 0
+  - 1
+  - 0
+  - 0
+  - 0
+evaluate:
+  algorithm: PPO
+  model_path: logs/unified/best_model.zip
+  num_episodes: 20
+  step_per_print: 100
+  seed: 0
+  evaluation_name: ''
+  note: ''
+pid:
+  mode: two_stage
+  alignment_threshold: 0.3
+  z_offset: 0.5
+  target_pose:
+  - 0
+  - 0
+  - -0.91
+  - 0
+  - 0
+  - 1.5707963267948966
+  kp:
+  - 1
+  - 1
+  - 0.5
+  - 0.5
+  ki:
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  kd:
+  - 0.15
+  - 0.15
+  - 0.15
+  - 0.15
+  output_limit:
+  - 1
+  - 1
+  - 1
+  - 1
+  integral_limit:
+  - 1
+  - 1
+  - 1
+  - 1
+pid_tuning:
+  kp:
+    low:
+    - 0
+    - 0
+    - 0
+    - 0
+    high:
+    - 0.8
+    - 0.8
+    - 1
+    - 1
+  ki:
+    low:
+    - 0
+    - 0
+    - 0
+    - 0
+    high:
+    - 0.04
+    - 0.04
+    - 0.04
+    - 0.04
+  kd:
+    low:
+    - 0
+    - 0
+    - 0
+    - 0
+    high:
+    - 0.3
+    - 0.3
+    - 0.3
+    - 0.3
+  offset:
+    low:
+    - -0.25
+    - -0.25
+    - 0
+    - -0.35
+    high:
+    - 0.25
+    - 0.25
+    - 1
+    - 0.35
+compare:
+  compare: true
+  algorithms:
+  - PPO
+  model_paths:
+  - models/unified/PPO_docking_20260925_103739.zip
+  parallel: false
+  batch_size: 20
+  port_stride: 1
+  force_headless_parallel: false
+  auto_correct_observation: false
+  max_workers: 1
+  num_models: 1
+  num_episodes: 20
+  step_per_print: 100
+  evaluation_name:
+  - ''
+  note:
+  - ''

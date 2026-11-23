@@ -1,0 +1,145 @@
+# First iteration: one physical robot; team slots are padded with zeros.
+common:
+  domain_randomization:
+    enabled: false
+  env:
+    type: team_football_solo
+    state_config: include/observations/team_football_solo.yaml
+    action_config: include/observations/ds_action_config.yaml
+    history_length: 0
+    observe_actions: false
+    episode_duration: 60
+    rl_observation_freq: 5
+    base_port: 5800
+    instances: 1
+  sim:
+    scene_path: Resources/scenarios/football/football_pool.scn
+    resources_path: ./
+    graphical_interface: false
+    evaluation_graphical_interface: false
+    resolution: 800
+    current: false
+    current_value:
+    - 0
+    - 0
+    current_uniform: false
+    enable_offset_noise: false
+    enable_random_noise: false
+  action:
+    force_6Dof: true
+    use_thruster_health: false
+    tcm:
+    - - -0.5
+      - -0.5
+      - 0
+      - 0
+      - 0
+    - - 0
+      - 0
+      - 1
+      - 0
+      - 0
+    - - 0
+      - 0
+      - 0
+      - -0.5
+      - -0.5
+    - - -0.126
+      - 0.126
+      - 0
+      - 0
+      - 0
+  reward:
+    weights:
+    - 1.0
+    - 2.0
+    - 0.01
+    - 25.0
+  evaluate:
+    algorithm: PPO
+    model_path: models/team_football_solo/CHOOSE_A_CHECKPOINT.zip
+  task:
+    mode: solo
+    goal_position:
+    - -5.5
+    - 0.0
+    - 5.2
+    goal_tolerance: 0.5
+    reset:
+    - name: girona1000
+      position:
+      - 0.0
+      - 0.0
+      - 5.2
+      rotation:
+      - 0.0
+      - 0.0
+      - 3.14159265
+      position_min:
+      - -0.3
+      - -0.3
+      - 5.2
+      position_max:
+      - 0.3
+      - 0.3
+      - 5.2
+    - name: ball
+      position:
+      - -2.0
+      - 0.0
+      - 5.2
+      position_min:
+      - -2.3
+      - -0.3
+      - 5.2
+      position_max:
+      - -1.7
+      - 0.3
+      - 5.2
+training:
+  env:
+    instances: 1
+  model:
+    algorithm: PPO
+    policy: MlpPolicy
+    pretrained: false
+    n_steps: 300
+    batch_size: 100
+    learning_rate: 0.0003
+  train:
+    seed: 42
+    total_timesteps: 100000
+    eval_freq: 1200
+    eval_instances: 1
+    eval_episodes: 10
+    success_rate_threshold: null
+    save_path: models/team_football_solo
+    save_name: ball_pushing
+  log:
+    enable_wandb: false
+    project_name: stonefish_tasks
+    run_name: default
+    tags:
+    - team_football
+    - solo
+    log_dir: logs/team_football_solo
+evaluation:
+  env:
+    instances: 1
+    base_port: 5900
+  evaluate:
+    num_episodes: 25
+    seed: 42
+    step_per_print: 0
+  compare:
+    parallel: false
+    auto_correct_observation: false
+testing:
+  env:
+    instances: 1
+    base_port: 5950
+  sim:
+    graphical_interface: true
+  testing:
+    episodes: 5
+    step_per_print: 10

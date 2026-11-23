@@ -1,0 +1,10 @@
+status: failed
+run_number: 1
+run_count: 1
+stage_number: 2
+stage_count: 5
+stage_name: stage2
+config_path: /home/cirs_alaa/repositories/stonefish_rl/include/parameters/generated_multi_train/20261119_122256/train_run_001_stage_02_stage2.yaml
+stop_file: /home/cirs_alaa/repositories/stonefish_rl/include/parameters/generated_multi_train/20261119_122256/control/stop_run_001_stage_02.request
+returncode: 2
+finished_at: '2026-11-19T14:32:21'

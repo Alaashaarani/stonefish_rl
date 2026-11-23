@@ -1,0 +1,175 @@
+# Multi-training settings. Each scalar value is reused for every training run.
+# Each list value can either contain one value, or one value per training run.
+
+base_config: "train_param.yaml"
+training_config_num: 2
+
+# Optional multi-stage training. When enabled, every agent/run goes through all
+# stages in order. Stage 2 loads the model saved by stage 1, stage 3 loads the
+# model saved by stage 2, etc. Intermediate stage files are saved without dates
+# so the next stage can load them easily. The final stage saves with the
+# generated multi-train timestamp:
+# models/<warm_start_path><output_agent_name>_YYYYMMDD_HHMMSS.zip.
+#
+# Supported override forms:
+#   - "sim,current,false"
+#   - [sim, enable_offset_noise, true]
+#   - [sim, enable_random_noise, true]
+#   - max_iteration: 100000
+#   - sim:
+#       current: false
+#
+multistage:
+  use: true
+  stages:
+    - name: stage1
+      max_iteration: 2000000
+      sim:
+        current: false
+        enable_offset_noise: false
+        enable_random_noise: True
+      reward:
+        weights: [1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    
+    - name: stage2
+      max_iteration: 2000000
+      sim:
+        current: false
+        enable_offset_noise: true
+        enable_random_noise: true
+      reward:
+        weights: [1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    
+    - name: stage3
+      max_iteration: 1500000
+      sim:
+        current: true
+        enable_offset_noise: true
+        enable_random_noise: true
+      reward:
+        weights: [1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    - name: stage4
+      max_iteration: 1500000
+      sim:
+        current: true
+        enable_offset_noise: true
+        enable_random_noise: true
+      reward:
+        weights: [1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+
+    - name: stage5
+      max_iteration: 3000000
+      sim:
+        current: true
+        enable_offset_noise: true
+        enable_random_noise: true
+      reward:
+        weights: [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]
+
+# Maps to env.yaw_observation.
+# Use "angle" for models trained with the old scalar yaw observation.
+# Use "cos_sin" to replace error_yaw with error_yaw_cos and error_yaw_sin.
+yaw_observation:
+- "cos_sin"
+# - "angle"
+# - "cos_sin"
+# - "cos_sin"
+# - "cos_sin"
+# - "cos_sin"
+# - "cos_sin"
+# - "cos_sin"
+
+# Maps to env.history_length. Use one integer for all runs, or one integer per run.
+# history_length: 2
+# history_length:
+#   - 2
+#   - 0
+#   - 2
+
+# Maps to env.history_gap in seconds. Use one float for all runs, or one float per run.
+# history_gap: 0.0
+# history_gap:
+#   - 0.0
+#   - 0.2
+#   - 0.5
+
+# Six reward weights. Use either one vector for all runs, or one vector per run.
+# xy , z, yaw , accuracy, smooth, collision
+# reward_weights:
+#   - [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  # - [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  # - [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  # - [2.0, 1.0, 1.0, 1.0, 1.0, 10.0]
+  # - [1.0, 1.0, 1.0, 0.0, 1.0, 1.0]
+  # - [1.0, 1.0, 0.0, 1.0, 1.0, 1.0]
+  # - [1.0, 0.0, 1.0, 1.0, 1.0, 1.0]
+  # - [0.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  # - [5.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  # - [5.0, 1.0, 1.0, 1.0, 1.0, 3.0]
+
+# Maps to train.total_timesteps in the generated training YAML.
+# max_iteration:
+#   - 1500000
+  # - 1500000
+  # - 5000000
+  # - 5000000
+  # - 5000000
+  # - 5000000
+  # - 5000000
+  # - 5000000
+
+history_length:
+  - 1
+  - 1
+  
+history_gap:
+  - 1.0
+  - 1.0
+
+rl_observation_freq:
+  - 3.0
+  - 10.0
+# Maps to train.save_name, which is used in the final saved model filename.
+output_agent_name:
+  - "H1_A1_10M_3hz_R1111_v2"
+  - "H1_A1_10M_10hz_R1111_v2"
+  # - "H2_A1_15M_5hz_R2111110"
+  # - "H2_A1_4M_3hz_R111011"
+  # - "H2_A1_15M_5hz_R110111"
+  # - "H2_A1_15M_5hz_R101111"
+  # - "H2_A1_15M_5hz_R011111"
+
+# Maps to train.warm_start_path, which is used as the final model filename prefix.
+warm_start_path:
+  - "PPO_"
+  # - "PPO_"
+  # - "PPO_"
+  # - "PPO_"
+  # - "PPO_"
+  # - "PPO_"
+  # - "PPO_"
+  # - "PPO_"
+  
+  
+# Maps to model.algorithm.
+model_type:
+  - "PPO"
+  # - "PPO"
+  # - "PPO"
+  # - "PPO"
+  # - "PPO"
+  # - "PPO"
+  # - "PPO"
+  # - "PPO"
+
+# Maps to model.pretrained.
+pre_trained:
+  - False
+
+
+# Maps to model.model_path. Used by train_docking.py when pre_trained is true.
+pretrained:
+  - "PPO_H2_A1_7M_3hz_R11111_stage4_CS.zip"
+  - "PPO_H2_A1_7M_3hz_R11111_stage4-angle.zip"
+ 

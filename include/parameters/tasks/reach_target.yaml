@@ -1,0 +1,141 @@
+# Example starting point; tune reward and target for your experiment.
+# Uses the existing football scene; the ball is reset out of the robot path.
+common:
+  domain_randomization:
+    enabled: false
+  env:
+    type: reach_target
+    state_config: include/observations/reach_target_state.yaml
+    action_config: include/observations/ds_action_config.yaml
+    history_length: 0
+    observe_actions: true
+    episode_duration: 30
+    rl_observation_freq: 5
+    base_port: 5800
+    instances: 1
+    observation_scale: 10.0
+  sim:
+    scene_path: Resources/scenarios/football/football_pool.scn
+    resources_path: ./
+    graphical_interface: false
+    evaluation_graphical_interface: false
+    resolution: 800
+    current: false
+    current_value:
+    - 0
+    - 0
+    current_uniform: false
+    enable_offset_noise: false
+    enable_random_noise: false
+  action:
+    force_6Dof: true
+    use_thruster_health: false
+    tcm:
+    - - -0.5
+      - -0.5
+      - 0
+      - 0
+      - 0
+    - - 0
+      - 0
+      - 1
+      - 0
+      - 0
+    - - 0
+      - 0
+      - 0
+      - -0.5
+      - -0.5
+    - - -0.126
+      - 0.126
+      - 0
+      - 0
+      - 0
+  reward:
+    weights:
+    - 1.0
+    - 0.01
+    - 10.0
+  task:
+    target_position:
+    - -2.0
+    - 0.0
+    - 2.0
+    tolerance: 0.2
+    hold_seconds: 1.0
+    reset:
+    - name: girona1000
+      position_min:
+      - -1.0
+      - -0.5
+      - 1.0
+      position_max:
+      - 1.0
+      - 0.5
+      - 1.5
+      rotation:
+      - 0.0
+      - 0.0
+      - 0.0
+      current:
+      - 0.0
+      - 0.0
+      - 0.0
+    - name: ball
+      position:
+      - -4.0
+      - 0.0
+      - 5.2
+      rotation:
+      - 0.0
+      - 0.0
+      - 0.0
+  evaluate:
+    algorithm: PPO
+    model_path: models/reach_target/CHOOSE_A_CHECKPOINT.zip
+training:
+  env:
+    instances: 2
+  model:
+    algorithm: PPO
+    policy: MlpPolicy
+    pretrained: false
+    n_steps: 256
+    batch_size: 128
+    learning_rate: 0.0003
+  train:
+    seed: 42
+    total_timesteps: 100000
+    eval_freq: 1000
+    eval_instances: 1
+    eval_episodes: 10
+    success_rate_threshold: 0.9
+    save_path: models/reach_target
+    save_name: reach_target
+  log:
+    enable_wandb: false
+    project_name: stonefish_tasks
+    run_name: default
+    tags:
+    - reach_target
+    log_dir: logs/reach_target
+evaluation:
+  env:
+    instances: 1
+    base_port: 5900
+  evaluate:
+    num_episodes: 25
+    seed: 42
+    step_per_print: 0
+  compare:
+    parallel: false
+    auto_correct_observation: false
+testing:
+  env:
+    instances: 1
+    base_port: 5950
+  sim:
+    graphical_interface: true
+  testing:
+    episodes: 5
+    step_per_print: 10

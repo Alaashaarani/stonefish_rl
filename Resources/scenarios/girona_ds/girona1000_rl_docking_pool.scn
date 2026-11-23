@@ -1,8 +1,14 @@
 <?xml version="1.0"?>
 <scenario>
+	<solver>
+		<multithreading max_physics_threads="1"/>
+	</solver>
+
 	<environment>
 		<ned latitude="41.7777" longitude="3.0333"/>
-		<ocean />
+		<ocean>
+			<water density="1015.0" jerlov="0.2" temperature="15.0"/>
+		</ocean>
 		<atmosphere>
 			<sun azimuth="20.0" elevation="40.0"/>
 		</atmosphere>
@@ -33,6 +39,7 @@
 	<looks>
 		<look name="black" gray="0.05" roughness="0.2"/>
 		<look name="yellow" rgb="1.0 0.9 0.0" roughness="0.3"/>
+		<look name="red" rgb="1.0 0.0 0.0" roughness="0.3"/>
 		<look name="tbar_back" gray="1.0" roughness="0.4" metalness="0.5" texture="Resources/data/girona1000/tbar_back_tex.png"/>
 		<look name="tbar_front" gray="1.0" roughness="0.4" metalness="0.5" texture="Resources/data/girona1000/tbar_front_tex.png"/>
 		<look name="lower_hull" gray="1.0" roughness="0.3" texture="Resources/data/girona1000/lower_hull_tex.png"/>
@@ -49,11 +56,11 @@
 	<!-- Environment -->
 	<static name="Tank" type="model">
 		<physical>
-			<mesh filename="Resources/data/pool/cirs_pool_2025.obj" scale="1.0"/>
+			<mesh filename="Resources/data/pool/cirs_pool_2025_v2.obj" scale="1.0"/>
 			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 		</physical>
 		<visual>
-			<mesh filename="Resources/data/pool/cirs_pool_2025.obj" scale="1.0"/>
+			<mesh filename="Resources/data/pool/cirs_pool_2025_v2.obj" scale="1.0"/>
 			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 		</visual>
 		<material name="Neutral"/>
@@ -86,7 +93,7 @@
 	<!-- Girona Docking Station -->
 	<include file="Resources/scenarios/girona_ds/ds_origin_for_rl.scn">
 		<arg name="ds_name" value="ds"/>
-		<arg name="position" value="0.0 0.0 5.2"/>
+		<arg name="position" value="0.0 0.0 5.5"/>
 		<arg name="rotation" value="0.0 0.0 0.0"/>
 	</include>
 

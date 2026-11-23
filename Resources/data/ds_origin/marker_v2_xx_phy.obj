@@ -1,6 +1,5 @@
 # Blender 4.1.0
 # www.blender.org
-mtllib marker_v2_xx_phy.mtl
 o Cube.002
 v -0.060624 -0.058860 -0.076653
 v -0.060624 -0.058860 -0.083749

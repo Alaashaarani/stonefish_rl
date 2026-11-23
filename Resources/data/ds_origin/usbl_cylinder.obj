@@ -1,6 +1,5 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib ds_stonefishMesh.mtl
 o USBL_modem
 v -0.877195 1.085024 -1.847337
 v -0.877195 1.085024 -1.758287

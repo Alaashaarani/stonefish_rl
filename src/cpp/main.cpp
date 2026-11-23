@@ -47,7 +47,7 @@ int learning(void* data) {
     double time0= 0.0;
     while(nextStepSim != "EXIT")
     {   
-        // std::cout << " SimulationTime " << myManager->getSimulationTime()-time0 << std::endl;
+        // std::cout << " SimulationTime " << myManager->getSimulationTime() << "\n";
         nextStepSim = myManager->RecieveInstructions(simApp);
         if(nextStepSim == "CMD"){
             myManager->SendStates(); // Send states after all steps
@@ -57,7 +57,7 @@ int learning(void* data) {
             //     simApp.StepSimulation();
             // }
         }      
-        else{ // THis includes the RESET or others
+        else if (nextStepSim != "RESET_ERROR") { // Never advance a rejected reset.
             // time0 = myManager->getSimulationTime();
             simApp.StepSimulation();
         }                               

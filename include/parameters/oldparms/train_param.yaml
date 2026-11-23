@@ -1,0 +1,178 @@
+# GYM Environment Settings:
+  # This defines the observation and action space, and how many instances to run in parallel.
+    # state config:
+    #   - The state space is defined in the state config file, it is a yaml. This includes the values
+    # that are sent by stonefish to the python code.
+    # History length:
+    #   - Zero: no history is passed, only current observation is passed.
+    #   - One: the last observation is concatenated with the current observation.
+    # Action config: 
+    #   - The action space is defined in the action config file, it is a yaml file. 
+    # Observe actions: 
+    #   - if true, the last action is concatenated to the observation, and passed to the RL algorithm.
+    # instances:
+    #   - number of parallel environments to run, each environment will run on a different port, starting from base_port.
+    # base_port:
+    #   - the starting port for the first environment, the rest of the environments will use consecutive ports. this port is used by stonefish
+    # to send and recieve data from the python code. 
+    # episode_duration:
+    #   - the duration of each episode in seconds.
+    # rl_observation_freq:
+    #   - the frequency of observations in Hz, or steps per second.
+
+env:
+  state_config: "include/observations/ds_state_v2_config.yaml"
+  history_length: 0
+  # Seconds between selected history observations. Use 0.0 for consecutive steps.
+  history_gap: 0.0 # in seconds, the time between the observations.
+  action_config: "include/observations/ds_action_config.yaml"
+  observe_actions: true
+  # yaw_observation:
+  #   - "angle": keep error_yaw as one normalized angle. Use this for old models.
+  #   - "cos_sin": replace error_yaw with error_yaw_cos and error_yaw_sin.
+  yaw_observation: "cos_sin"
+  instances: 40
+  base_port: 5555
+  episode_duration: 120
+  rl_observation_freq: 5
+
+# Sim Settings
+  # Graphical_interface: 
+  #   - if True, the simulation will be rendered, otherwise it will run in headless mode
+  #   - if False the simulation senario cannot have any graphical element (camera,...), otherwise stonefish will crash
+  # evaluate_graphical_interface:
+  #   - if True, the simulation will be rendered the evaluation gui (stonefish env) only one. It will use resolution parameter
+  # realtime: 
+  #   - if False will run with the max allowed speed of the simulation. if True will run in real time.  
+  #   - Their is another factor that affect the simulation speed and is called physics_frequency. it is set to 300, you can find this param in the cpp main file. 
+  # current:
+  #   - water current in x and y direction, in m/s 
+  # current_unifrom: 
+  #   - if true, current value will be generated in a uniform distribution between - and + of each value, if false, current value will be constant as defined in current_value
+  # enable_offset_noise: 
+  #  - if true, adds per-episode offset noise that shifts the perceived docking-station pose. The offset decreases with distance error.
+  # enable_random_noise:
+  #  - if true, adds per-step random fluctuation to mimic camera/pose-estimation noise. The fluctuation decreases with distance error.
+sim:
+  scene_path: "Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn"
+  resources_path: "./"
+  graphical_interface: True
+  evaluation_graphical_interface: True
+  resolution: 800
+  # realtime: False
+  current: false
+  current_value: [0.2,0.2] 
+  current_uniform: True 
+  enable_offset_noise: false 
+  enable_random_noise: false
+
+
+# action space settings
+  # force_6Dof: 
+  #   - if true, the action space defined in the Config action as thrusters setpoints will be maped to force request in the (x,y,z,roll,pitch,yaw) 
+  #   - if false, the action space defined in the Config action as thrusters setpoints is used
+  #   - This is done this way because stonefish accepts setpoint, if we want to use forces and define it in the configuration file, then we need to 
+  # hard code the mapping in stonefish files (the CPP section of the Library). 
+  # tcm:  
+  #   - This is the mapping matrix between the action space (setpoints) defined in the configuration file and the forces in (x,y,z,roll,pitch,yaw).
+  #   - The size of the tcm is (number of thrusters, 6), where 6 is the number of forces in (x,y,z,roll,pitch,yaw).
+  #   - The forces are calculated as follows: setpoint = forces@tcm.T , where setpoints are defined in the action_config file, 
+  # and forces are the output of the RL algorithm (action space). The RL output forces, then the code convert forces to setpoint, 
+  # and Simulation recieves Setpoints
+
+action: 
+  use_thruster_health: True
+  force_6Dof: True
+  # tcm: [[-1,-1,0,0,0],
+  #       [0,0,1,0,0],
+  #       [0,0,0,-1,-1],
+  #       [0,0,0,0,0],
+  #       [0,0,0,0.0,0.0],
+  #       [-1,1,0,0,0]]
+  tcm: [[-1,-1,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,-1,-1],
+        [-1,1,0,0,0]]
+
+# Reward Settings
+  # weights:
+  #   - Seven reward weights used by the docking environment.
+  #   - multi_train.py can override this value per training run.
+
+reward:
+  weights: [1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+
+
+# Model Settings:
+  # pretrained: 
+  #   - if true, the model will be loaded from the specified path, and training will continue from there. 
+  # make sure to have the same vector size between the tranied model and the environment. 
+  #   - if false, a new model will be created and trained from scratch. 
+  # algorithm: 
+  #   - the RL algorithm to use, currently supports PPO and SAC. 
+  # model_path: 
+  #   - the path to the pretrained model, if pretrained is set to true.
+  # batch_size:
+  #   - We recommend using a `batch_size` that is a factor of `n_steps * n_envs`.
+
+model:
+  pretrained: false
+  # algorithm: "SAC"
+  # model_path: "SAC_H2_A1_3M_0508_current_best.zip"
+  algorithm: "PPO"
+  model_path: "models/PPO_H2_A4_3M_cs_v1_2_20260715_171603.zip" 
+
+  # comment param
+  policy: "MlpPolicy"
+  # Learning rate options:
+  #   - learning_rate: auto       # use SB3 default for the selected algorithm
+  #   - learning_rate: 0.0003     # constant learning rate
+  #   - learning_rate_start/end   # linear schedule, each can be numeric or auto
+  learning_rate: auto
+  # learning_rate_start: 0.001
+  # learning_rate_end: 0.00005
+  batch_size: 24000 # n_step*instances (40 = 21600, 50 = 27000, 100 = 51200 )
+  buffer_size: 192000 # 8*batch_size
+  weights_only: True
+
+  # SAC param
+  tau: 0.005
+  gamma: 0.99
+  train_freq: 1
+  gradient_steps: 1
+  learning_starts: 600
+  ent_coef: auto
+
+  # PPO PARAM
+  n_steps: 1200
+  clip_range: 0.2
+
+  # TD3 param , TO DO , NOT WORKING
+  policy_delay: 2
+
+
+# Neural Network Architecture if needed 
+policy:
+  custom_policy: False
+  net_arch:
+    pi: [256, 256]
+    qf: [256, 256]
+  activation_fn: "relu" # map this string to th.nn.ReLU in Python
+
+# Training Settings
+train:
+  total_timesteps: 6000_000
+  reset_num_timesteps: False
+  eval_freq: 1000
+  # Use "default" to save final trained models to stonefish_rl/models.
+  save_path: "default"
+  save_name: "H2_A4_6M_cs_v1-2-inverted"
+  warm_start_path: "PPO_"
+  weights_only: True
+
+log: 
+  enable_wandb: false
+  project_name: "stonefish_docking"
+  run_name: "default"
+  tags: ["PPO", "docking", "stonefish"]
+  log_dir: "logs"

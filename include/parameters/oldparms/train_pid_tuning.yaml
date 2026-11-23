@@ -1,0 +1,95 @@
+# Policy tunes [Kp(x,y,z,yaw), Ki(...), Kd(...), offset(...)], every step.
+# Each normalized action in [-1,1] maps linearly to the corresponding bounds.
+env:
+  type: pid_tuning
+  state_config: include/observations/ds_state_pid_pose.yaml
+  Inverse: true # True: station-frame pose; False: original AUV-frame errors.
+  action_config: include/observations/ds_action_config.yaml
+  history_length: 2
+  history_gap: 0.0
+  observe_actions: true # Applied vehicle commands, not the 16 tuning parameters.
+  yaw_observation: cos_sin
+  instances: 40
+  base_port: 5855
+  episode_duration: 120
+  rl_observation_freq: 3
+
+sim:
+  scene_path: Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn
+  resources_path: ./
+  graphical_interface: true
+  evaluation_graphical_interface: true
+  resolution: 800
+  current: true
+  current_value: [0.2, 0.2]
+  current_uniform: true
+  enable_offset_noise: true
+  enable_random_noise: true
+
+action:
+  force_6Dof: true
+  tcm: [[-1,-1,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,-1,-1],
+        [-1,1,0,0,0]]
+
+reward:
+  weights: [1, 1, 1, 1, 1, 1, 1]
+
+pid:
+  # Desired AUV pose in station coordinates: x,y,z,roll,pitch,yaw (m/rad).
+  target_pose: [0, 0, -0.91, 0, 0, 1.5707963267948966]
+  mode: two_stage # x/y/yaw first, then enable z; or one_stage for all axes.
+  alignment_threshold: 1.0
+  output_limit: [1, 1, 1, 1]
+  integral_limit: [1, 1, 1, 1]
+
+pid_tuning:
+  # Gain bounds and offsets are ordered x,y,z,yaw. Offsets: metres/radians.
+  kp:
+    low: [0, 0, 0, 0]
+    high: [0.8, 0.8, 1.0, 1.0]
+  ki:
+    low: [0, 0, 0, 0]
+    high: [0.04, 0.04, 0.04, 0.04]
+  kd:
+    low: [0, 0, 0, 0]
+    high: [0.3, 0.3, 0.3, 0.3]
+  offset:
+    low: [-0.25, -0.25, 0.0, -0.35]
+    high: [0.25, 0.25, 1.0, 0.35]
+
+model:
+  algorithm: PPO
+  policy: MlpPolicy
+  pretrained: false
+  model_path: ""
+  learning_rate: 0.0003
+  n_steps: 720
+  batch_size: 90
+  clip_range: 0.2
+  weights_only: true
+
+train:
+  total_timesteps: 6000000
+  reset_num_timesteps: true
+  eval_freq: 2500
+  save_path: models/pid_tuning
+  save_name: adaptive_pid
+  warm_start_path: PPO_
+
+log:
+  enable_wandb: false
+  log_dir: logs/pid_tuning
+
+# For post-training evaluation, set model_path to the saved PPO checkpoint.
+evaluate:
+  algorithm: PPO
+  # model_path: logs/pid_tuning/best_model.zip
+  model_path: models/pid_tuning/PPO_adaptive_pid_twostage.zip
+
+  num_episodes: 20
+  step_per_print: 100
+  seed: 0
+compare:
+  compare: false

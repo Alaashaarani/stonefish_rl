@@ -233,7 +233,7 @@
                     <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.0"/>
                 </visual>
                 <material name="Fiberglass"/>
-                <look name="girona_docking_station_guides"/>
+                <look name="red"/>
                 <compound_transform rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
             </external_part>
             <!-- guide_x1 -->

@@ -1,0 +1,52 @@
+state_config:
+  specs:
+    - entity_name: error
+      field_type: position
+      component: x
+      entity_1: girona1000
+      entity_2: ball
+      output_name: robot_to_ball_x
+
+    - entity_name: error
+      field_type: position
+      component: y
+      entity_1: girona1000
+      entity_2: ball
+      output_name: robot_to_ball_y
+
+    - entity_name: error
+      field_type: position
+      component: z
+      entity_1: girona1000
+      entity_2: ball
+      output_name: robot_to_ball_z
+
+    - entity_name: ball
+      field_type: position
+      component: x
+      output_name: ball_position_x
+
+    - entity_name: ball
+      field_type: position
+      component: y
+      output_name: ball_position_y
+
+    - entity_name: ball
+      field_type: position
+      component: z
+      output_name: ball_position_z
+
+    - entity_name: girona1000/odometry
+      field_type: odom.linear.velocity
+      component: x
+      output_name: robot_linear_velocity_x
+
+    - entity_name: girona1000/odometry
+      field_type: odom.linear.velocity
+      component: y
+      output_name: robot_linear_velocity_y
+
+    - entity_name: girona1000/odometry
+      field_type: odom.linear.velocity
+      component: z
+      output_name: robot_linear_velocity_z

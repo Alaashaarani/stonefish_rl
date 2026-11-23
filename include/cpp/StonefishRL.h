@@ -34,7 +34,7 @@ public:
 
     // Core RL Communication loop
     std::string RecieveInstructions(sf::SimulationApp& simApp);
-    void SendStates();
+    void SendStates(const YAML::Node& resetMetadata = YAML::Node());
     void ApplyCommands(const std::string& str_cmds);
     
     // Stonefish lifecycle overrides

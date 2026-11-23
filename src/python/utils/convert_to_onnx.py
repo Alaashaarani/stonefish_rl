@@ -1,11 +1,15 @@
+
+if __package__ in (None, ""):
+    import _bootstrap  # Enable direct execution from any working directory.
+
 import torch
 from stable_baselines3 import PPO, SAC
 
 
 device = torch.device("cpu")
 
-model_path = "./PPO_H2_A1_15M_20260515_163803.zip"
-output_name = "PPO_H2_A1_15M_20260515_163803.onnx"
+model_path = "./PPO_docking_20261006_193435.zip"
+output_name = "PPO_docking_TD_20261006.onnx"
 
 model = PPO.load(model_path, device=device)
 model.policy.to(device)
@@ -40,8 +44,8 @@ wrapper = OnnxablePolicy(
 
 obs_dim = model.observation_space.shape[0]
 
-if obs_dim != 42:
-    raise ValueError(f"Expected obs_dim=42, but model expects {obs_dim}")
+if obs_dim != 35:
+    raise ValueError(f"Expected obs_dim=35, but model expects {obs_dim}")
 
 dummy_input = torch.zeros(1, obs_dim, dtype=torch.float32).to(device)
 

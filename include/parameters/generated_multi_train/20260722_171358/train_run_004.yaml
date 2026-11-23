@@ -1,0 +1,104 @@
+env:
+  state_config: include/observations/ds_state_v2_config.yaml
+  history_length: 2
+  history_gap: 0.0
+  action_config: include/observations/ds_action_config.yaml
+  observe_actions: true
+  yaw_observation: cos_sin
+  instances: 40
+  base_port: 5555
+  episode_duration: 60
+  rl_observation_freq: 3
+sim:
+  scene_path: Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn
+  resources_path: ./
+  graphical_interface: true
+  evaluation_graphical_interface: true
+  resolution: 800
+  current: false
+  current_value:
+  - 0.2
+  - 0.2
+  current_uniform: true
+  enable_offset_noise: true
+  enable_random_noise: true
+action:
+  force_6Dof: true
+  tcm:
+  - - -1
+    - -1
+    - 0
+    - 0
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 0
+    - 0
+  - - 0
+    - 0
+    - 0
+    - -1
+    - -1
+  - - -1
+    - 1
+    - 0
+    - 0
+    - 0
+reward:
+  weights:
+  - 1.0
+  - 1.0
+  - 0.0
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+model:
+  pretrained: false
+  algorithm: PPO
+  model_path: models/PPO_H2_A4_3M_cs_v1_2_20260715_171603.zip
+  policy: MlpPolicy
+  learning_rate_start: 0.001
+  learning_rate_end: 5.0e-05
+  buffer_size: 720000
+  batch_size: 90000
+  weights_only: true
+  tau: 0.005
+  gamma: 0.99
+  train_freq: 1
+  gradient_steps: 1
+  learning_starts: 600
+  ent_coef: auto
+  n_steps: 1800
+  clip_range: 0.2
+  policy_delay: 2
+policy:
+  custom_policy: false
+  net_arch:
+    pi:
+    - 256
+    - 256
+    qf:
+    - 256
+    - 256
+  activation_fn: relu
+train:
+  total_timesteps: 3000000
+  reset_num_timesteps: false
+  eval_freq: 6000
+  save_path: default
+  save_name: abl-R1101111
+  warm_start_path: PPO_
+  weights_only: true
+  stop_file: /home/cirs_alaa/repositories/stonefish_rl/include/parameters/generated_multi_train/20260722_171358/control/stop_run_004.request
+  stop_check_freq: 100
+log:
+  enable_wandb: true
+  project_name: stonefish_docking
+  run_name: default
+  tags:
+  - PPO
+  - docking
+  - stonefish
+  log_dir: logs

@@ -1,0 +1,44 @@
+# Shared bounds apply to every part in each group.
+# Each part receives its own independent uniform sample at every episode reset.
+# Bounds are ADDITIVE offsets from the original XML values, not absolute values.
+# Units: mass kg, xyz metres, rpy radians, max_setpoint rad/s for these thrusters.
+# Equal min/max fixes an offset. Zero min/max restores the original value.
+# occurrence is zero-based among matching kind/name entries in the source file.
+# Save changes to these bounds; they are read at the next Reset.
+groups:
+  cylinders:
+    file: Resources/scenarios/girona_ds/girona1000_rl.scn
+    kind: internal_part
+    parts:
+      - {id: front_battery, name: BatteryCylinder, occurrence: 0}
+      - {id: front_starboard, name: StarboardCylinder, occurrence: 0}
+      - {id: front_port, name: PortCylinder, occurrence: 0}
+      - {id: rear_battery, name: BatteryCylinder, occurrence: 1}
+      - {id: rear_starboard, name: StarboardCylinder, occurrence: 1}
+      - {id: rear_port, name: PortCylinder, occurrence: 1}
+    parameters:
+      # Edit these bounds once to change the mass range for ALL six cylinders.
+      mass:
+        min: -0.5
+        max: 0.5
+      compound_transform.xyz:
+        min: [-0.01, -0.01, -0.03]
+        max: [0.01, 0.01, 0.03]
+      compound_transform.rpy:
+        min: [-0.01, -0.01, -0.01]
+        max: [0.01, 0.01, 0.01]
+
+  thrusters:
+    file: Resources/scenarios/girona_ds/girona1000_rl.scn
+    kind: actuator
+    parts:
+      - {id: surge_port, name: ThrusterSurgePort}
+      - {id: surge_starboard, name: ThrusterSurgeStarboard}
+      - {id: heave_bow, name: ThrusterHeaveBow}
+      - {id: heave_stern, name: ThrusterHeaveStern}
+      - {id: sway, name: ThrusterSway}
+    parameters:
+      # Edit once for ALL five thrusters.
+      max_setpoint:
+        min: -5.0
+        max: 5.0

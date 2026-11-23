@@ -1,4 +1,8 @@
 
+if __package__ in (None, ""):
+    import _bootstrap  # Enable direct execution from any working directory.
+
+
 
 import numpy as np
 import torch as th
@@ -7,8 +11,8 @@ from stable_baselines3 import SAC
 from stable_baselines3.common.policies import ActorCriticPolicy
 from imitation.algorithms import bc
 from imitation.data.types import Transitions
-from stonefish_rl.envs.docking_env import dsEnv
-from stonefish_rl.utils.utils import resolve_path
+from library.docking_env import dsEnv
+from library.common import resolve_path
 
 
 obs_path = resolve_path("include/observations/ds_state_v2_config.yaml")

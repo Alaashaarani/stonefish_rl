@@ -1,0 +1,100 @@
+# Experimental scalar K policy. Frozen PPO and PID both output body-frame commands.
+common:
+  env:
+    type: pid_rl_blend
+    state_config: include/observations/ds_state_v2_config.yaml
+    action_config: include/observations/ds_action_config.yaml
+    Inverse: false
+    history_length: 1
+    history_gap: 0.0
+    observe_actions: true # History contains applied vehicle commands, not K.
+    yaw_observation: cos_sin
+    episode_duration: 120
+    rl_observation_freq: 2
+  sim:
+    scene_path: Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn
+    resources_path: ./
+    graphical_interface: true
+    evaluation_graphical_interface: true
+    resolution: 800
+    current: true
+    current_value: [0.1, 0.1]
+    current_uniform: true
+    enable_offset_noise: true
+    enable_random_noise: true
+  action:
+    use_thruster_health: true
+    force_6Dof: true
+    tcm:
+      - [-0.5, -0.5, 0, 0, 0]
+      - [0, 0, 1, 0, 0]
+      - [0, 0, 0, -0.5, -0.5]
+      - [-0.126, 0.126, 0, 0, 0]
+  reward:
+    weights: [1, 1, 1, 1, 0, 0, 0]
+  pid_rl_blend:
+    enable_upward: false # Keep the existing K1 checkpoint compatible; see the upward YAML.
+    upward_z: -1.0 # Normalized body -Z command used by K2 when enabled.
+    model_path: models/unified/PPO_docking_20261006_193435.zip
+  pid:
+    mode: two_stage
+    alignment_threshold: 0.3
+    z_offset: 0.5
+    target_pose: [0, 0, -0.91, 0, 0, 1.5707963267948966]
+    kp: [1, 1, 0.5, 0.5]
+    ki: [0.1, 0.1, 0.1, 0.1]
+    kd: [0.15, 0.15, 0.15, 0.15]
+    output_limit: [1, 1, 1, 1]
+    integral_limit: [1, 1, 1, 1]
+  evaluate:
+    algorithm: PPO # The trained scalar policy, NOT the frozen four-command PPO.
+    model_path: logs/pid_rl_blend/best_model.zip
+
+training:
+  env:
+    instances: 20
+    base_port: 5750
+  model:
+    algorithm: PPO
+    policy: MlpPolicy
+    pretrained: true
+    model_path: "models/pid_rl_blend/PPO_blend_20261012_155907.zip"
+    weights_only: true
+    learning_rate: 0.0003
+    n_steps: 1200
+    batch_size: 3000
+    clip_range: 0.2
+  train:
+    total_timesteps: 1000000
+    reset_num_timesteps: true
+    eval_freq: 2400
+    eval_instances: 1
+    eval_episodes: 5
+    save_path: models/pid_rl_blend
+    save_name: blend
+  log:
+    enable_wandb: false
+    project_name: stonefish_pid_rl_blend
+    run_name: default
+    tags: [docking, pid_rl_blend]
+    log_dir: logs/pid_rl_blend
+
+evaluation:
+  env:
+    instances: 1
+    base_port: 5790
+  evaluate:
+    num_episodes: 25
+    step_per_print: 100
+    seed: 0
+    evaluation_name: ""
+    note: "PID/PPO scalar blending experiment"
+  compare:
+    compare: false
+    parallel: false
+    auto_correct_observation: false
+
+testing:
+  env:
+    instances: 1
+    base_port: 5780

@@ -1,6 +1,5 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib cylinder1obj.mtl
 o Cylinder1
 v -0.626500 -0.543135 -0.585394
 v -0.625000 -0.543135 -0.587993

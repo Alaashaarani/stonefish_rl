@@ -15,6 +15,10 @@ axes and reward is encoded by color.
 
 from __future__ import annotations
 
+if __package__ in (None, ""):
+    import _bootstrap  # Enable direct execution from any working directory.
+
+
 import argparse
 from pathlib import Path
 
@@ -22,11 +26,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import colors
 
-SCRIPT_DIR = Path(__file__).resolve().parent
+SCRIPT_DIR = Path(__file__).resolve().parents[3] / "evaluation_results/tool_plots"
 DEFAULT_SAVE_PATH = SCRIPT_DIR / "docking_accuracy_reward_4d.png"
 DEFAULT_DIAGONAL_SAVE_PATH = SCRIPT_DIR / "docking_accuracy_diagonal_cut.png"
 DEFAULT_HALF_SAVE_PATH = SCRIPT_DIR / "docking_accuracy_half_domain.png"
-REWARD_MODES = ("accuracy", "xy-z")
+REWARD_MODES = ("accuracy", "xy-z", "velocity")  # "accuracy" is the default used in the docking environment
 
 
 def make_color_norm(values: np.ndarray, contrast_percentile: float = 2.0):
@@ -77,14 +81,61 @@ def docking_accuracy_reward(
         If true, mimic the environment's current `z_abs_error` preprocessing:
         `np.clip(z, 0.01, 5) / 5`. If false, use `abs(z)`.
     """
-    xy_error_squared = x_values**2 + y_values**2
 
-    if normalize_z_like_env:
-        z_abs_error = np.clip(z_values, 0.01, 5.0) / 5.0
-    else:
-        z_abs_error = np.maximum(np.abs(z_values), eps)
+    xy_error = np.linalg.norm([x_values, y_values], axis=0)
+    z_abs_error = np.maximum(np.abs(z_values), eps)
 
-    reward = -(xy_error_squared / z_abs_error)
+    reward_xy = -np.clip(xy_error/5, 0.0, 5.0)  # Docking accuracy term
+    reward_z = -np.clip(z_abs_error/5, 0.0, 1.0)
+    reward_dock = -(0.5 * (xy_error)**2 / -reward_z)  # Docking accuracy term
+    reward_dock = np.clip(reward_dock, -5.0, 0.0)  # Clip to avoid extreme values
+    # ALL 
+    reward = reward_xy+reward_z
+    # -(0.5 * (xy_error)**2 / z_abs_error)
+    # - xy_error - z_abs_error
+
+    if clip_min is not None:
+        reward = np.clip(reward, clip_min, 0.0)
+
+    return reward
+
+def velocity_reward(
+    x_values: np.ndarray,
+    y_values: np.ndarray,
+    z_values: np.ndarray,
+    *,
+    eps: float = 1e-3,
+    clip_min: float | None = -25.0,
+    normalize_z_like_env: bool = False,
+) -> np.ndarray:
+    """Return the reward corresponding to the velocity term.
+
+    Parameters
+    ----------
+    x_values, y_values, z_values:
+        Error coordinates.
+    eps:
+        Small positive value used to avoid division by zero.
+    clip_min:
+        Lower clipping value for visualization. Use `None` to disable clipping.
+    normalize_z_like_env:
+        If true, mimic the environment's current `z_abs_error` preprocessing:
+        `np.clip(z, 0.01, 5) / 5`. If false, use `abs(z)`.
+    """
+
+    xy_error = np.linalg.norm([x_values, y_values], axis=0)
+    z_abs_error = np.maximum(np.abs(z_values), eps)
+    distance_error = np.linalg.norm([x_values, y_values, z_values], axis=0)
+    reward_xy = -np.clip(xy_error/5, 0.0, 5.0)  # Docking accuracy term
+    reward_z = -np.clip(z_abs_error/5, 0.0, 1.0)
+    reward_dock = -(0.5 * (xy_error)**2 / -reward_z)  # Docking accuracy term
+    reward_dock = np.clip(reward_dock, -5.0, 0.0)  # Clip to avoid extreme values
+    mean_velocity = 0.6
+    velocity_reward = -np.clip(mean_velocity/distance_error,0,1.0)
+    # ALL 
+    reward = velocity_reward + reward_xy+reward_z+reward_dock
+    # -(0.5 * (xy_error)**2 / z_abs_error)
+    # - xy_error - z_abs_error
 
     if clip_min is not None:
         reward = np.clip(reward, clip_min, 0.0)
@@ -109,7 +160,7 @@ def xy_z_reward(
         reward_z = -clip(z_abs_error, 0, 1)
         reward = reward_xy + reward_z
     """
-    xy_error = np.sqrt(x_values**2 + y_values**2)
+    xy_error = np.sqrt(x_values**2 + y_values**2) 
     reward_xy = np.clip(1.0 / (xy_error + eps), 0.0, 1.0)
 
     if normalize_z_like_env:
@@ -144,6 +195,16 @@ def compute_reward(
             clip_min=clip_min,
             normalize_z_like_env=normalize_z_like_env,
         )
+
+    if reward_mode == "velocity":
+        return velocity_reward(
+            x_values,
+            y_values,
+            z_values,
+            clip_min=clip_min,
+            normalize_z_like_env=normalize_z_like_env,
+        )
+    
     if reward_mode == "xy-z":
         return xy_z_reward(
             x_values,
@@ -417,7 +478,7 @@ def parse_args():
         "--reward-mode",
         choices=REWARD_MODES,
         default="accuracy",
-        help="Reward equation to plot: 'accuracy' or 'xy-z'.",
+        help="Reward equation to plot: 'accuracy' or 'xy-z'. or 'velocity'",
     )
     parser.add_argument("--clip-min", type=float, default=-25.0)
     parser.add_argument(

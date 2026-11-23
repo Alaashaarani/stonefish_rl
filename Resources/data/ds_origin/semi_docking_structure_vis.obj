@@ -1,6 +1,5 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib semi_docking_structure_vis.mtl
 o Experiment_Scenario_-_CylinderHolder-1
 v 0.088564 0.168222 -0.509059
 v 0.088564 0.168222 -0.529080

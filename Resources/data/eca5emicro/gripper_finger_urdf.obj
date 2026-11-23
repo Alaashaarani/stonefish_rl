@@ -1,6 +1,5 @@
 # Blender v2.82 (sub 7) OBJ File: ''
 # www.blender.org
-mtllib gripper_finger_urdf.mtl
 o gripper_finger_a
 v -0.000820 0.050000 0.002465
 v 0.000595 0.050006 0.103390

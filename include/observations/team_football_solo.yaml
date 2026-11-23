@@ -1,0 +1,62 @@
+state_config:
+  specs:
+  - entity_name: girona1000
+    field_type: position
+    component: x
+    output_name: robot_x
+  - entity_name: girona1000
+    field_type: position
+    component: y
+    output_name: robot_y
+  - entity_name: girona1000
+    field_type: position
+    component: z
+    output_name: robot_z
+  - entity_name: girona1000
+    field_type: rotation
+    component: roll
+    output_name: robot_roll
+  - entity_name: girona1000
+    field_type: rotation
+    component: pitch
+    output_name: robot_pitch
+  - entity_name: girona1000
+    field_type: rotation
+    component: yaw
+    output_name: robot_yaw
+  - entity_name: girona1000/odometry
+    field_type: odom.linear.velocity
+    component: x
+    output_name: velocity_x
+  - entity_name: girona1000/odometry
+    field_type: odom.linear.velocity
+    component: y
+    output_name: velocity_y
+  - entity_name: girona1000/odometry
+    field_type: odom.linear.velocity
+    component: z
+    output_name: velocity_z
+  - entity_name: girona1000/odometry
+    field_type: odom.angular.velocity
+    component: x
+    output_name: angular_x
+  - entity_name: girona1000/odometry
+    field_type: odom.angular.velocity
+    component: y
+    output_name: angular_y
+  - entity_name: girona1000/odometry
+    field_type: odom.angular.velocity
+    component: z
+    output_name: angular_z
+  - entity_name: ball
+    field_type: position
+    component: x
+    output_name: ball_x
+  - entity_name: ball
+    field_type: position
+    component: y
+    output_name: ball_y
+  - entity_name: ball
+    field_type: position
+    component: z
+    output_name: ball_z

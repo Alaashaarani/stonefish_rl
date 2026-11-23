@@ -45,6 +45,16 @@ state_config:
 
     - entity_name: girona1000/odometry
       field_type: odom.angular.velocity
+      component: x
+      output_name: auv_angular_velocity_x
+
+    - entity_name: girona1000/odometry
+      field_type: odom.angular.velocity
+      component: y
+      output_name: auv_angular_velocity_y
+
+    - entity_name: girona1000/odometry
+      field_type: odom.angular.velocity
       component: z
       output_name: auv_angular_velocity_z
 

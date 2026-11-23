@@ -1,0 +1,125 @@
+env:
+  type: pid_rl_blend
+  state_config: include/observations/ds_state_v2_config.yaml
+  action_config: include/observations/ds_action_config.yaml
+  Inverse: false
+  history_length: 1
+  history_gap: 0.0
+  observe_actions: true
+  yaw_observation: cos_sin
+  episode_duration: 120
+  rl_observation_freq: 2
+  instances: 1
+  base_port: 5790
+sim:
+  scene_path: Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn
+  resources_path: ./
+  graphical_interface: true
+  evaluation_graphical_interface: true
+  resolution: 800
+  current: true
+  current_value:
+  - 0.1
+  - 0.1
+  current_uniform: true
+  enable_offset_noise: true
+  enable_random_noise: true
+action:
+  use_thruster_health: true
+  force_6Dof: true
+  tcm:
+  - - -0.5
+    - -0.5
+    - 0
+    - 0
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 0
+    - 0
+  - - 0
+    - 0
+    - 0
+    - -0.5
+    - -0.5
+  - - -0.126
+    - 0.126
+    - 0
+    - 0
+    - 0
+reward:
+  weights:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 0
+pid_rl_blend:
+  enable_upward: true
+  upward_z: -1.0
+  model_path: models/unified/PPO_docking_20261006_193435.zip
+pid:
+  mode: two_stage
+  alignment_threshold: 0.3
+  z_offset: 0.5
+  target_pose:
+  - 0
+  - 0
+  - -0.91
+  - 0
+  - 0
+  - 1.5707963267948966
+  kp:
+  - 1
+  - 1
+  - 0.5
+  - 0.5
+  ki:
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  kd:
+  - 0.15
+  - 0.15
+  - 0.15
+  - 0.15
+  output_limit:
+  - 1
+  - 1
+  - 1
+  - 1
+  integral_limit:
+  - 1
+  - 1
+  - 1
+  - 1
+evaluate:
+  algorithm: PPO
+  model_path: logs/pid_rl_blend_upward/best_model.zip
+  num_episodes: 25
+  step_per_print: 100
+  seed: 0
+  evaluation_name: ''
+  note: K1 PID/PPO blend with K2 upward retry
+compare:
+  compare: true
+  parallel: false
+  auto_correct_observation: false
+  max_workers: 2
+  num_models: 1
+  algorithms:
+  - PPO
+  model_paths:
+  - /home/cirs_alaa/repositories/stonefish_rl/models/pid_rl_blend_upward/PPO_blend_upward_20261013_043644.zip
+  num_episodes: 25
+  step_per_print: 100
+  batch_size: 20
+  force_headless_parallel: false
+  evaluation_name:
+  - ''
+  note:
+  - ''

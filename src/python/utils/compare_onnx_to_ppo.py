@@ -1,10 +1,14 @@
+
+if __package__ in (None, ""):
+    import _bootstrap  # Enable direct execution from any working directory.
+
 import numpy as np
 import openvino as ov
 from stable_baselines3 import PPO,SAC
 
 
-ppo_model_path = "./PPO_H2_A1_15M_20260515_163803.zip"
-onnx_model_path = "./PPO_H2_A1_15M_20260515_163803.onnx"
+ppo_model_path = "./PPO_docking_20261006_193435.zip"
+onnx_model_path = "./PPO_docking_TD_20261006.onnx"
 
 model = PPO.load(ppo_model_path, device="cpu")
 

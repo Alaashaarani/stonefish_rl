@@ -1,0 +1,178 @@
+env:
+  type: docking
+  state_config: include/observations/ds_state_v2_config.yaml
+  action_config: include/observations/ds_action_config.yaml
+  Inverse: false
+  history_length: 2
+  history_gap: 0.0
+  observe_actions: true
+  yaw_observation: cos_sin
+  episode_duration: 60
+  rl_observation_freq: 5
+  instances: 20
+  base_port: 5555
+sim:
+  scene_path: Resources/scenarios/girona_ds/girona1000_rl_docking_pool.scn
+  resources_path: ./
+  graphical_interface: true
+  evaluation_graphical_interface: true
+  resolution: 800
+  current: false
+  current_value:
+  - 0.1
+  - 0.1
+  current_uniform: false
+  enable_offset_noise: false
+  enable_random_noise: false
+action:
+  use_thruster_health: false
+  force_6Dof: true
+  tcm:
+  - - -0.5
+    - -0.5
+    - 0
+    - 0
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 0
+    - 0
+  - - 0
+    - 0
+    - 0
+    - -0.5
+    - -0.5
+  - - -0.126
+    - 0.126
+    - 0
+    - 0
+    - 0
+reward:
+  weights:
+  - 1.0
+  - 1.0
+  - 0.0
+  - 1.0
+  - 0.0
+  - 0.0
+  - 0.0
+evaluate:
+  algorithm: PPO
+  model_path: logs/unified/best_model.zip
+pid:
+  mode: two_stage
+  alignment_threshold: 0.3
+  z_offset: 0.5
+  target_pose:
+  - 0
+  - 0
+  - -0.91
+  - 0
+  - 0
+  - 1.5707963267948966
+  kp:
+  - 1
+  - 1
+  - 0.5
+  - 0.5
+  ki:
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  kd:
+  - 0.15
+  - 0.15
+  - 0.15
+  - 0.15
+  output_limit:
+  - 1
+  - 1
+  - 1
+  - 1
+  integral_limit:
+  - 1
+  - 1
+  - 1
+  - 1
+pid_tuning:
+  kp:
+    low:
+    - 0
+    - 0
+    - 0
+    - 0
+    high:
+    - 0.8
+    - 0.8
+    - 1
+    - 1
+  ki:
+    low:
+    - 0
+    - 0
+    - 0
+    - 0
+    high:
+    - 0.04
+    - 0.04
+    - 0.04
+    - 0.04
+  kd:
+    low:
+    - 0
+    - 0
+    - 0
+    - 0
+    high:
+    - 0.3
+    - 0.3
+    - 0.3
+    - 0.3
+  offset:
+    low:
+    - -0.25
+    - -0.25
+    - 0
+    - -0.35
+    high:
+    - 0.25
+    - 0.25
+    - 1
+    - 0.35
+model:
+  algorithm: PPO
+  policy: MlpPolicy
+  pretrained: false
+  model_path: models/unified/PPO_docking_20261006_193435.zip
+  weights_only: true
+  learning_rate_start: 0.001
+  learning_rate_end: 5.1e-05
+  n_steps: 1200
+  batch_size: 3000
+  clip_range: 0.2
+  buffer_size: 60000
+  gradient_steps: 1
+  learning_starts: 1440
+  ent_coef: auto
+  policy_delay: 2
+train:
+  total_timesteps: 8000000
+  reset_num_timesteps: false
+  eval_freq: 1800
+  eval_instances: 5
+  eval_episodes: 25
+  save_path: models/unified
+  save_name: abl-R1101000_Trial-ID4
+  warm_start_path: PPO_
+  stop_file: /home/cirs_alaa/repositories/stonefish_rl/include/parameters/generated_multi_train/20261117_170419/control/stop_run_001.request
+  stop_check_freq: 100
+log:
+  enable_wandb: false
+  project_name: stonefish_docking
+  run_name: default
+  tags:
+  - docking
+  - unified
+  log_dir: logs/unified
